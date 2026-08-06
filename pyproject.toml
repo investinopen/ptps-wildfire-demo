@@ -1,0 +1,15 @@
+[project]
+name = "ptps-wildfire-demo"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [{ name = "Aidan Feldman", email = "aidan.feldman@gmail.com" }]
+requires-python = ">=3.11"
+dependencies = [
+    "dask>=2026.7.1",
+    "duckdb>=1.5.5",
+    "icechunk>=1.1.21",
+    "ipykernel>=7.3.0",
+    "lonboard>=0.16.0",
+    "xarray>=2026.7.0",
+]

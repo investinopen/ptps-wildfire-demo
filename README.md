@@ -2,6 +2,8 @@
 
 A networked data infrastructure demo for the "Investing in Open Infra to Safeguard Critical Scientific Data" project. Requires [DuckDB](https://duckdb.org/).
 
+For Python dependencies managed with `uv`, use a regular CPython build (for example `3.14.6`), not a free-threaded build (for example `3.14.6t` / `3.14.6+freethreaded`). Some binary packages used by this project (such as `lonboard` -> `geoarrow-rust-core`) do not currently publish free-threaded wheels.
+
 ```sh
 duckdb -init setup.sql
 ```
