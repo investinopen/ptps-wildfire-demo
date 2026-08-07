@@ -5,6 +5,9 @@ LOAD httpfs;
 -- https://duckdb.org/docs/current/core_extensions/spatial/overview#installing-and-loading
 INSTALL spatial;
 LOAD spatial;
+-- treat format as [LONGITUDE, LATITUDE]
+-- https://duckdb.org/2026/03/09/announcing-duckdb-150
+SET geometry_always_xy = true;
 
 -- https://docs.source.coop/data-proxy
 -- https://github.com/source-cooperative/docs.source.coop/pull/29
