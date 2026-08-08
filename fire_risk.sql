@@ -13,16 +13,21 @@ SELECT
     ) AS geom
 FROM read_parquet('/tmp/burn_prob_1km/*.parquet');
 
+COMMENT ON VIEW burn_prob_1km IS 'See fire.ipynb for details.';
 
--- https://open-climate-risk.readthedocs.io/en/latest/access-data.html#regional-statistics-downloads
+
 CREATE OR REPLACE VIEW county_burn_prob AS
 SELECT *
 FROM ST_Read('https://s3.us-west-2.amazonaws.com/us-west-2.opendata.source.coop/carbonplan/carbonplan-ocr/output/fire-risk/vector/production/v1.1.0/region-analysis/counties/stats.geojson');
 
+COMMENT ON VIEW county_burn_prob IS 'https://open-climate-risk.readthedocs.io/en/latest/access-data.html#regional-statistics-downloads';
 
--- "Each MODIS active fire/thermal hotspot location represents the center of a 1km pixel that is flagged by the algorithm as containing one or more fires within the pixel."
--- https://www.earthdata.nasa.gov/data/tools/firms
+
 CREATE OR REPLACE VIEW active_fires AS
 SELECT *
--- https://firms.modaps.eosdis.nasa.gov/active_fire/#firms-txt
 FROM 'https://firms.modaps.eosdis.nasa.gov/data/active_fire/modis-c6.1/csv/MODIS_C6_1_USA_contiguous_and_Hawaii_24h.csv';
+
+COMMENT ON VIEW active_fires IS '"Each MODIS active fire/thermal hotspot location represents the center of a 1km pixel that is flagged by the algorithm as containing one or more fires within the pixel."
+
+- https://www.earthdata.nasa.gov/data/tools/firms
+- https://firms.modaps.eosdis.nasa.gov/active_fire/#firms-txt';
