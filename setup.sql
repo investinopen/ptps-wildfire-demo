@@ -1,6 +1,12 @@
+SET memory_limit = '10GB';
+
 -- https://duckdb.org/docs/current/core_extensions/httpfs/overview#installation-and-loading
 INSTALL httpfs;
 LOAD httpfs;
+
+-- https://duckdb.org/community_extensions/extensions/cache_httpfs
+INSTALL cache_httpfs FROM community;
+LOAD cache_httpfs;
 
 -- https://duckdb.org/docs/current/core_extensions/spatial/overview#installing-and-loading
 INSTALL spatial;
