@@ -7,3 +7,9 @@ For Python dependencies managed with `uv`, use a regular CPython build (for exam
 ```sh
 duckdb -init setup.sql
 ```
+
+Then, in the DuckDB shell, run:
+
+```
+.read fire_risk.sql
+```
