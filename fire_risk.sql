@@ -30,3 +30,14 @@ COMMENT ON VIEW active_fires IS '"Each MODIS active fire/thermal hotspot locatio
 
 - https://www.earthdata.nasa.gov/data/tools/firms
 - https://firms.modaps.eosdis.nasa.gov/active_fire/#firms-txt';
+
+
+-- couldn't find a way to read the shapefile from within the ZIP directly, so download first
+.shell 'curl -fsSL "https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_state_20m.zip" -o /tmp/cb_2018_us_state_20m.zip'
+CREATE OR REPLACE VIEW state_boundaries AS
+SELECT *
+FROM ST_Read(
+        '/vsizip//tmp/cb_2018_us_state_20m.zip/cb_2018_us_state_20m.shp'
+    );
+
+COMMENT ON VIEW state_boundaries IS 'https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html';
