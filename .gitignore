@@ -3,6 +3,10 @@
 *.ddb
 *.duckdb
 
+# created by SQLTools?
+*.wal
+
 .mypy_cache/
 .python-version
+__pycache__
 data/

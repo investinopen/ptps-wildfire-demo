@@ -4,12 +4,11 @@ A networked data infrastructure demo for the "Investing in Open Infra to Safegua
 
 For Python dependencies managed with `uv`, use a regular CPython build (for example `3.14.6`), not a free-threaded build (for example `3.14.6t` / `3.14.6+freethreaded`). Some binary packages used by this project (such as `lonboard` -> `geoarrow-rust-core`) do not currently publish free-threaded wheels.
 
-```sh
-duckdb -init setup.sql
-```
+1. Set up the database.
 
-Then, in the DuckDB shell, run:
+   ```sh
+   duckdb -init setup.sql fire.duckdb < views.sql
+   ```
 
-```
-.read fire_risk.sql
-```
+1. [Download the burn probability data.](burn_prob.ipynb)
+1. [Run the analysis.](risk.ipynb)

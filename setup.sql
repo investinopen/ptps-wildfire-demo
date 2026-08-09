@@ -1,4 +1,5 @@
 SET memory_limit = '10GB';
+SET temp_directory = '/tmp/duckdb_spill';
 
 -- https://duckdb.org/docs/current/core_extensions/httpfs/overview#installation-and-loading
 INSTALL httpfs;
