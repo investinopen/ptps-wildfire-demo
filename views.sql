@@ -19,13 +19,43 @@ FROM ST_Read(
 COMMENT ON VIEW county_burn_prob IS 'https://open-climate-risk.readthedocs.io/en/latest/access-data.html#regional-statistics-downloads';
 
 
-CREATE OR REPLACE VIEW red_flag_warnings AS
+CREATE OR REPLACE VIEW fire_zones AS
 SELECT *
 FROM ST_Read(
-        'https://api.weather.gov/alerts/active?event=Red%20Flag%20Warning&status=actual' -- , open_options = ['FLATTEN_NESTED_ATTRIBUTES=YES']
+        'zip://https://www.weather.gov/source/gis/Shapefiles/WSOM/fz16ap26.zip/fz16ap26.shp'
     );
 
-COMMENT ON VIEW red_flag_warnings IS 'https://www.weather.gov/documentation/services-web-api#/default/alerts_active';
+COMMENT ON VIEW fire_zones IS 'https://www.weather.gov/gis/FireZones';
+
+
+-- the geom is empty, so backfill it from the fire_zones
+-- https://github.com/weather-gov/api/discussions/278
+CREATE OR REPLACE VIEW red_flag_warnings AS WITH warnings AS (
+        SELECT DISTINCT * EXCLUDE geom,
+            unnest(affectedZones) AS zone_url,
+            regexp_extract(
+                zone_url,
+                '^https://api.weather.gov/zones/fire/([A-Z]{2})Z(\d{3})$',
+                ['state', 'zone']
+            ) AS zone_parsed
+        FROM ST_Read(
+                'https://api.weather.gov/alerts/active?event=Red%20Flag%20Warning&status=actual' -- , open_options = ['FLATTEN_NESTED_ATTRIBUTES=YES']
+            )
+    ),
+    zones_with_geom AS (
+        SELECT warnings.* EXCLUDE (zone_url, zone_parsed),
+            fire_zones.geom
+        FROM warnings
+            LEFT JOIN fire_zones ON warnings.zone_parsed.state = fire_zones.state
+            AND warnings.zone_parsed.zone = fire_zones.zone
+    )
+SELECT zones_with_geom.* EXCLUDE geom,
+    -- ST_Union_Agg seems to return a WKB, so cast it
+    ST_Union_Agg(geom)::GEOMETRY AS geom
+FROM zones_with_geom
+GROUP BY ALL;
+
+COMMENT ON VIEW red_flag_warnings IS 'https://www.weather.gov/documentation/services-web-api#/default/alerts_active, enriched with the combined geometries';
 
 
 CREATE OR REPLACE VIEW active_fires AS
