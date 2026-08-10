@@ -19,6 +19,15 @@ FROM ST_Read(
 COMMENT ON VIEW county_burn_prob IS 'https://open-climate-risk.readthedocs.io/en/latest/access-data.html#regional-statistics-downloads';
 
 
+CREATE OR REPLACE VIEW red_flag_alerts AS
+SELECT *
+FROM ST_Read(
+        'https://api.weather.gov/alerts/active?event=Red%20Flag%20Warning&status=actual' -- , open_options = ['FLATTEN_NESTED_ATTRIBUTES=YES']
+    );
+
+COMMENT ON VIEW red_flag_alerts IS 'https://www.weather.gov/documentation/services-web-api#/default/alerts_active';
+
+
 CREATE OR REPLACE VIEW active_fires AS
 SELECT *
 FROM 'https://firms.modaps.eosdis.nasa.gov/data/active_fire/modis-c6.1/csv/MODIS_C6_1_USA_contiguous_and_Hawaii_24h.csv';
