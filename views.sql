@@ -2,15 +2,12 @@
 -- https://docs.google.com/document/d/1rYsP1I1-TAd3Tu-G6EJ-5o7IbQIHf_dKT3DjH8IpQuo/edit?tab=t.0#heading=h.87di2doy0z55
 CREATE OR REPLACE VIEW burn_prob_1km AS
 SELECT *,
-    ST_MakeEnvelope(
-        longitude - (990 / (111320.0 * COS(RADIANS(latitude)))) / 2.0,
-        latitude - (990 / 111320.0) / 2.0,
-        longitude + (990 / (111320.0 * COS(RADIANS(latitude)))) / 2.0,
-        latitude + (990 / 111320.0) / 2.0
-    ) AS geom
+    ST_MakePoint(longitude, latitude) AS point
 FROM read_parquet('data/burn_prob_1km/*.parquet');
 
-COMMENT ON VIEW burn_prob_1km IS 'See fire.ipynb for details.';
+COMMENT ON VIEW burn_prob_1km IS 'https://docs.carbonplan.org/ocr/en/latest/reference/data-schema.html#raster-tensor-datasets
+
+Downloaded via burn_prob.ipynb.';
 
 
 CREATE OR REPLACE VIEW county_burn_prob AS
