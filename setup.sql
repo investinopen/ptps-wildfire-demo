@@ -10,6 +10,11 @@ INSTALL cache_httpfs
 FROM community;
 LOAD cache_httpfs;
 
+-- https://duckdb.org/community_extensions/extensions/zipfs
+INSTALL zipfs
+FROM community;
+LOAD zipfs;
+
 -- https://duckdb.org/docs/current/core_extensions/spatial/overview#installing-and-loading
 INSTALL spatial;
 LOAD spatial;
