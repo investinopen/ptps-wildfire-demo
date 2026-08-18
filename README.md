@@ -97,6 +97,21 @@ Considering the following options for the resolution layer:
 
 #### Option 1: HTTP proxy
 
+1. [Install Caddy.](https://caddyserver.com/docs/install)
+1. Start the proxy.
+
+   ```sh
+   caddy run --config proxy/Caddyfile
+   ```
+
+1. In another terminal, run a test request.
+
+   ```sh
+   curl -I \
+     -H "X-Upstream: afeld.me:80" \
+     http://localhost:8080/unknown/path
+   ```
+
 #### Option 2: DuckDB extension
 
 #### Option 3: Python package
