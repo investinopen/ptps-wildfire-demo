@@ -3,17 +3,38 @@
 }
 
 :8080 {
-	# Upstream is provided per-request via the X-Upstream header,
-	# e.g. curl -H "X-Upstream: example.com:443" http://localhost:8080/
-	reverse_proxy {http.request.header.X-Upstream} {
-		health_uri /health
-		health_interval 10s
+	@https header X-Upstream-Scheme https
+	handle @https {
+		reverse_proxy {http.request.header.X-Upstream} {
+			transport http {
+				tls
+				tls_server_name {http.request.header.X-Upstream-Host}
+			}
+
+			header_up Host {http.request.header.X-Upstream-Host}
+
+			@not_found status 404
+			handle_response @not_found {
+				respond "Sorry, this page could not be found. -proxy" 404
+			}
+		}
+	}
+
+	handle {
+		reverse_proxy {http.request.header.X-Upstream} {
+			header_up Host {http.request.header.X-Upstream-Host}
+
+			@not_found status 404
+			handle_response @not_found {
+				respond "Sorry, this page could not be found. -proxy" 404
+			}
+		}
 	}
 
 	handle_errors {
-		@404 expression {http.error.status_code} == 404
-		respond @404 "Sorry, this page could not be found." 404
+		@unavailable expression {http.error.status_code} == 502
+		respond @unavailable "Sorry, the upstream server could not be reached. -proxy" 502
 
-		respond "An unexpected error occurred (status {http.error.status_code})." {http.error.status_code}
+		respond "An unexpected proxy error occurred. -proxy" 500
 	}
 }

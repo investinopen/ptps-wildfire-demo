@@ -110,6 +110,12 @@ Considering the following options for the resolution layer:
    curl -I \
      -H "X-Upstream: afeld.me:80" \
      http://localhost:8080/unknown/path
+
+   curl \
+     -H 'X-Upstream-Scheme: https' \
+     -H 'X-Upstream: afeld.me:443' \
+     -H 'X-Upstream-Host: afeld.me' \
+     http://localhost:8080/unknown/path
    ```
 
 #### Option 2: DuckDB extension
