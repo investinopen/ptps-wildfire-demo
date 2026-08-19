@@ -116,7 +116,7 @@ Considering the following options for the resolution layer:
 uv run pytest
 ```
 
-If you want to debug the addon, use the `Debug mitmdump` [launch configuration in VSCode](https://code.visualstudio.com/docs/debugtest/debugging-configuration#_start-a-debugging-session-with-a-launch-configuration).
+[Debugging in VSCode](https://code.visualstudio.com/docs/python/debugging) is supported.
 
 #### Option 2: DuckDB extension
 
