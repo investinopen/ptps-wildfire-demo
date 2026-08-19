@@ -1,4 +1,6 @@
+import ssl
 import subprocess
+import urllib.request
 from pathlib import Path
 
 import pytest
@@ -43,7 +45,7 @@ def test_requests_pkg_env_vars(monkeypatch, url):
 
 
 def run_cmd(cmd: list[str]):
-    print("Running:\n\n\t", " ".join(cmd))
+    print("Running:\n\n$", " ".join(cmd), "\n")
     subprocess.run(cmd, check=True)
 
 
@@ -73,3 +75,20 @@ def test_curl_env_vars(monkeypatch, url):
     monkeypatch.setenv("CURL_CA_BUNDLE", str(CERT_PATH))
 
     run_cmd(["curl", "-i", url])
+
+
+def test_urllib(monkeypatch, url):
+    monkeypatch.setenv("ALL_PROXY", PROXY_URL)
+
+    assert urllib.request.getproxies() == {"all": PROXY_URL}
+
+    # Source - https://stackoverflow.com/a/75248628
+    # Posted by PatheticCoder, modified by community. See post 'Timeline' for change history
+    # Retrieved 2026-08-19, License - CC BY-SA 4.0
+
+    # add self_signed cert
+    myssl = ssl.create_default_context()
+    myssl.load_verify_locations(CERT_PATH)
+    # send request
+    response = urllib.request.urlopen(url, context=myssl)
+    assert response.status == 200
