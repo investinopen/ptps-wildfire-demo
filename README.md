@@ -104,7 +104,7 @@ Considering the following options for the resolution layer:
    mitmdump
    ```
 
-1. In other terminal, test the proxy.
+1. In another terminal, test the proxy.
    - cURL
 
      ```sh
@@ -114,7 +114,7 @@ Considering the following options for the resolution layer:
    - Python
 
      ```sh
-     uv run python proxy/test.py
+     uv run pytest
      ```
 
 #### Option 2: DuckDB extension

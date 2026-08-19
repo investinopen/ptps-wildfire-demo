@@ -1,5 +1,8 @@
 {
   "sqltools.format": {
     "linesBetweenQueries": "preserve"
-  }
+  },
+  "python.testing.pytestArgs": ["."],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
 }
