@@ -104,20 +104,19 @@ Considering the following options for the resolution layer:
    mitmdump -s proxy/custom_error_messages.py
    ```
 
-1. In another terminal:
-   1. [Install the certificate.](https://docs.mitmproxy.org/stable/concepts/certificates/#installing-the-mitmproxy-ca-certificate-manually)
+1. In another terminal, [install the certificate](https://docs.mitmproxy.org/stable/concepts/certificates/#installing-the-mitmproxy-ca-certificate-manually).
 
-      ```sh
-      curl --proxy 127.0.0.1:8080 --cacert ~/.mitmproxy/mitmproxy-ca-cert.pem https://example.com/
-      ```
+   ```sh
+   curl --proxy 127.0.0.1:8080 --cacert ~/.mitmproxy/mitmproxy-ca-cert.pem https://example.com/
+   ```
 
-   1. Test the proxy.
+##### Testing
 
-      ```sh
-      uv run pytest
-      ```
+```sh
+uv run pytest
+```
 
-\*If you want to debug the addon, use the `Debug mitmdump` [launch configuration in VSCode](https://code.visualstudio.com/docs/debugtest/debugging-configuration#_start-a-debugging-session-with-a-launch-configuration).
+If you want to debug the addon, use the `Debug mitmdump` [launch configuration in VSCode](https://code.visualstudio.com/docs/debugtest/debugging-configuration#_start-a-debugging-session-with-a-launch-configuration).
 
 #### Option 2: DuckDB extension
 
