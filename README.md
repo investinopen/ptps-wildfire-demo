@@ -101,7 +101,7 @@ Considering the following options for the resolution layer:
 1. [Start the proxy.](https://docs.mitmproxy.org/stable/overview/getting-started/#launch-the-tool-you-need)
 
    ```sh
-   mitmdump
+   mitmdump -s proxy/custom_error_messages.py
    ```
 
 1. In another terminal:

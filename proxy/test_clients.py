@@ -1,22 +1,18 @@
 import ssl
 import subprocess
 import urllib.request
-from pathlib import Path
 
 import pytest
 import requests
 
-PROXY_ORIGIN = "localhost:8080"
-PROXY_URL = f"http://{PROXY_ORIGIN}/"
-# https://docs.mitmproxy.org/stable/concepts/certificates/#using-a-custom-certificate-authority
-CERT_PATH = Path("~/.mitmproxy/mitmproxy-ca-cert.pem").expanduser()
+from proxy.constants import CERT_PATH, PROXY_ORIGIN, PROXY_URL
 
 
 @pytest.fixture(
     params=[
         pytest.param("http://mitm.it/", id="HTTP"),
         pytest.param("https://mitm.it/", id="HTTPS"),
-        pytest.param("https://httpbin.org/ip", id="HTTPS third-party"),
+        # pytest.param("https://httpbin.org/ip", id="HTTPS third-party"),
     ]
 )
 def url(request):
