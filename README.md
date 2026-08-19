@@ -97,6 +97,26 @@ Considering the following options for the resolution layer:
 
 #### Option 1: HTTP proxy
 
+1. [Install mitmproxy.](https://docs.mitmproxy.org/stable/overview/installation/)
+1. [Start the proxy.](https://docs.mitmproxy.org/stable/overview/getting-started/#launch-the-tool-you-need)
+
+   ```sh
+   mitmdump
+   ```
+
+1. In other terminal, test the proxy.
+   - cURL
+
+     ```sh
+     curl -i -x http://localhost:8080 http://mitm.it/
+     ```
+
+   - Python
+
+     ```sh
+     uv run python proxy/test.py
+     ```
+
 #### Option 2: DuckDB extension
 
 #### Option 3: Python package
