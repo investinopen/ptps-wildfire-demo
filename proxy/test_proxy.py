@@ -42,15 +42,24 @@ def test_requests_pkg_env_vars(monkeypatch, url):
     print(resp.text)
 
 
+def run_cmd(cmd: list[str]):
+    print("Running:\n\n\t", " ".join(cmd))
+    subprocess.run(cmd, check=True)
+
+
 def test_curl(url):
     """https://everything.curl.dev/usingcurl/proxies/http.html"""
 
-    cmd = ["curl", "-i", "--proxy", PROXY_ORIGIN, "--cacert", str(CERT_PATH), url]
-    print("Running:\n\n\t", " ".join(cmd))
-
-    subprocess.run(
-        cmd,
-        check=True,
+    run_cmd(
+        [
+            "curl",
+            "-i",
+            "--proxy",
+            PROXY_ORIGIN,
+            "--cacert",
+            str(CERT_PATH),
+            url,
+        ]
     )
 
 
@@ -63,4 +72,4 @@ def test_curl_env_vars(monkeypatch, url):
     monkeypatch.setenv("ALL_PROXY", PROXY_URL)
     monkeypatch.setenv("CURL_CA_BUNDLE", str(CERT_PATH))
 
-    subprocess.run(["curl", "-i", url], check=True)
+    run_cmd(["curl", "-i", url])
