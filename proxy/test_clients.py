@@ -6,6 +6,7 @@ import pytest
 import requests
 
 from proxy.constants import CERT_PATH, PROXY_ORIGIN, PROXY_URL
+from proxy.helpers import requests_get
 
 
 @pytest.fixture(
@@ -25,8 +26,7 @@ def test_requests_pkg(url):
     - https://docs.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
     """
 
-    proxies = {"http": PROXY_URL, "https": PROXY_URL}
-    resp = requests.get(url, proxies=proxies, verify=str(CERT_PATH), timeout=10)
+    resp = requests_get(url)
     print(resp.text)
 
 
