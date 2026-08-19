@@ -101,17 +101,17 @@ Considering the following options for the resolution layer:
 1. Start the proxy.
 
    ```sh
-   caddy run --config proxy/Caddyfile
+   caddy run --config proxy/Caddyfile --watch
    ```
 
 1. In another terminal, run a test request.
 
    ```sh
-   curl -I \
+   curl -i \
      -H "X-Upstream: afeld.me:80" \
      http://localhost:8080/unknown/path
 
-   curl \
+   curl -i \
      -H 'X-Upstream-Scheme: https' \
      -H 'X-Upstream: afeld.me:443' \
      -H 'X-Upstream-Host: afeld.me' \
