@@ -1,8 +1,18 @@
 {
 	admin off
+
+	# https://caddyserver.com/docs/caddyfile/options#log
+	log default {
+		output stdout
+		# https://caddyserver.com/docs/caddyfile/directives/log#format-modules
+		# format json
+		format console
+	}
 }
 
 :8080 {
+	log
+
 	@https header X-Upstream-Scheme https
 	handle @https {
 		reverse_proxy {http.request.header.X-Upstream} {
