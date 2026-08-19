@@ -14,7 +14,9 @@ SERVER_ERROR_MESSAGE = (
 
 
 class CustomErrorMessages:
-    def response(self, flow: http.HTTPFlow) -> None:
+    """https://docs.mitmproxy.org/stable/api/events.html"""
+
+    def response(self, flow: http.HTTPFlow):
         if flow.response is None:
             return
 
@@ -27,6 +29,16 @@ class CustomErrorMessages:
             return
 
         flow.response.headers["content-type"] = "text/plain; charset=utf-8"
+
+    def error(self, flow: http.HTTPFlow):
+        if flow.response is None:
+            flow.response = http.Response.make(502)
+        if flow.error:
+            flow.error.msg = "Error with error. -proxy"
+        self.response(flow)
+
+    def http_connect_error(self, flow: http.HTTPFlow):
+        self.error(flow)
 
 
 addons = [CustomErrorMessages()]
