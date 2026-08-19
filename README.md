@@ -105,17 +105,10 @@ Considering the following options for the resolution layer:
    ```
 
 1. In another terminal, test the proxy.
-   - cURL
 
-     ```sh
-     curl -i -x http://localhost:8080 http://mitm.it/
-     ```
-
-   - Python
-
-     ```sh
-     uv run pytest
-     ```
+   ```sh
+   uv run pytest
+   ```
 
 #### Option 2: DuckDB extension
 

@@ -1,20 +1,34 @@
+import subprocess
+
 import pytest
 import requests
 
-# https://docs.python-requests.org/en/latest/user/advanced/#proxies
-
-PROXY = "http://localhost:8080/"
-PROXIES = {"http": PROXY, "https": PROXY}
+PROXY_ORIGIN = "localhost:8080"
+PROXY_URL = f"http://{PROXY_ORIGIN}/"
 
 
-@pytest.mark.parametrize(
-    "url",
-    [
+@pytest.fixture(
+    params=[
         pytest.param("http://mitm.it/", id="HTTP"),
         pytest.param("https://mitm.it/", id="HTTPS"),
         pytest.param("https://httpbin.org/ip", id="HTTPS third-party"),
-    ],
+    ]
 )
-def test_proxy(url):
-    resp = requests.get(url, proxies=PROXIES, timeout=10)
+def url(request):
+    return request.param
+
+
+def test_requests_pkg(url):
+    """https://docs.python-requests.org/en/latest/user/advanced/#proxies"""
+
+    proxies = {"http": PROXY_URL, "https": PROXY_URL}
+    resp = requests.get(url, proxies=proxies, timeout=10)
     print(resp.text)
+
+
+def test_curl(url):
+    """https://everything.curl.dev/usingcurl/proxies/http.html"""
+    subprocess.run(
+        ["curl", "-i", "--proxy", PROXY_ORIGIN, url],
+        check=True,
+    )
