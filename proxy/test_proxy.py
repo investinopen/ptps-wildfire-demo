@@ -32,6 +32,16 @@ def test_requests_pkg(url):
     print(resp.text)
 
 
+def test_requests_pkg_env_vars(monkeypatch, url):
+    monkeypatch.setenv("ALL_PROXY", PROXY_URL)
+    monkeypatch.setenv("REQUESTS_CA_BUNDLE", str(CERT_PATH))
+
+    assert requests.utils.getproxies() == {"all": PROXY_URL}  # pyright: ignore[reportPrivateImportUsage]
+
+    resp = requests.get(url, timeout=10)
+    print(resp.text)
+
+
 def test_curl(url):
     """https://everything.curl.dev/usingcurl/proxies/http.html"""
 
@@ -42,3 +52,15 @@ def test_curl(url):
         cmd,
         check=True,
     )
+
+
+def test_curl_env_vars(monkeypatch, url):
+    """
+    - https://curl.se/docs/manpage.html -> Environment
+    - https://curl.se/docs/sslcerts.html#use-a-custom-ca-store
+    """
+
+    monkeypatch.setenv("ALL_PROXY", PROXY_URL)
+    monkeypatch.setenv("CURL_CA_BUNDLE", str(CERT_PATH))
+
+    subprocess.run(["curl", "-i", url], check=True)
