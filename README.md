@@ -98,7 +98,7 @@ Considering the following options for the resolution layer:
 #### Option 1: HTTP proxy
 
 1. [Install mitmproxy.](https://docs.mitmproxy.org/stable/overview/installation/)
-1. [Start the proxy.](https://docs.mitmproxy.org/stable/overview/getting-started/#launch-the-tool-you-need)
+1. [Start the proxy.](https://docs.mitmproxy.org/stable/overview/getting-started/#launch-the-tool-you-need)\*
 
    ```sh
    mitmdump -s proxy/custom_error_messages.py
@@ -116,6 +116,8 @@ Considering the following options for the resolution layer:
       ```sh
       uv run pytest
       ```
+
+\*If you want to debug the addon, use the `Debug mitmdump` [launch configuration in VSCode](https://code.visualstudio.com/docs/debugtest/debugging-configuration#_start-a-debugging-session-with-a-launch-configuration).
 
 #### Option 2: DuckDB extension
 
