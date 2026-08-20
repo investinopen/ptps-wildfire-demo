@@ -22,7 +22,11 @@ class CustomErrorMessages:
 
         status_code = flow.response.status_code
         if status_code == 404:
-            flow.response.text = NOT_FOUND_MESSAGE
+            # temporarily hard-coded
+            if flow.request.url.startswith("https://www.epa.gov/ejscreen"):
+                flow.response.text = "That site is no longer available. Try the Harvard Dataverse, deposit doi:10.7910/DVN/RLR5AX."
+            else:
+                flow.response.text = NOT_FOUND_MESSAGE
         elif status_code >= 500:
             flow.response.text = SERVER_ERROR_MESSAGE
         else:

@@ -124,4 +124,4 @@ uv run pytest
 
 ## See also
 
-- [Protype app from **@jring-o**](https://github.com/jring-o/scsd/tree/main)
+- [Protype app from **@jring-o**](https://github.com/jring-o/scsd)
