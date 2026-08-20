@@ -122,6 +122,8 @@ uv run pytest
 
 #### Option 3: Python package
 
+#### Option 4: Browser extension
+
 ## See also
 
 - [Protype app from **@jring-o**](https://github.com/jring-o/scsd)
