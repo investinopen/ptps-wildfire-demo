@@ -2,14 +2,14 @@
 
 A networked data infrastructure demo for the "Investing in Open Infra to Safeguard Critical Scientific Data" project. There are a couple explorations happening in parallel — see the headings below.
 
-## Analysis
+## [Analysis](analysis/)
 
 Requires [DuckDB](https://duckdb.org/).
 
 For Python dependencies managed with `uv`, use a regular CPython build (for example `3.14.6`), not a free-threaded build (for example `3.14.6t` / `3.14.6+freethreaded`). Some binary packages used by this project (such as `lonboard` -> `geoarrow-rust-core`) do not currently publish free-threaded wheels.
 
-1. [Download the burn probability data.](burn_prob.ipynb)
-1. [Run the analysis.](risk.ipynb)
+1. [Download the burn probability data.](analysis/burn_prob.ipynb)
+1. [Run the analysis.](analysis/risk.ipynb)
 
 ## Fallback
 
@@ -95,7 +95,7 @@ flowchart TD
 
 Considering the following options for the resolution layer:
 
-#### Option 1: HTTP proxy
+#### Option 1: [HTTP proxy](proxy/)
 
 1. [Install mitmproxy.](https://docs.mitmproxy.org/stable/overview/installation/)
 1. [Start the proxy.](https://docs.mitmproxy.org/stable/overview/getting-started/#launch-the-tool-you-need)\*
