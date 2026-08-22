@@ -9,11 +9,6 @@ from mitmproxy import http
 
 from proxy.resolver import Resolver
 
-NOT_FOUND_MESSAGE = "Oops! The page you're looking for could not be found. -proxy\n"
-SERVER_ERROR_MESSAGE = (
-    "Something went wrong on the server. Please try again later. -proxy\n"
-)
-
 
 class CustomErrorMessages:
     """https://docs.mitmproxy.org/stable/api/events.html"""
