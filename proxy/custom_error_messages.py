@@ -28,20 +28,18 @@ class CustomErrorMessages:
             return
 
         status_code = flow.response.status_code
-        if status_code == 404:
+        if status_code == 404 or status_code >= 500:
             fallback = self.resolver.find_fallback_url(flow.request.url)
             if fallback:
-                flow.response.text = (
-                    f"That site is no longer available. Try {fallback}."
-                )
-            else:
-                flow.response.text = NOT_FOUND_MESSAGE
-        elif status_code >= 500:
-            flow.response.text = SERVER_ERROR_MESSAGE
-        else:
-            return
+                flow.response.headers["content-type"] = "text/plain; charset=utf-8"
+                if status_code == 404:
+                    flow.response.text = (
+                        f"That URL is no longer available. Try {fallback}."
+                    )
+                else:
+                    flow.response.text = f"Unable to load that URL. Try {fallback}."
 
-        flow.response.headers["content-type"] = "text/plain; charset=utf-8"
+        return
 
     def error(self, flow: http.HTTPFlow):
         if flow.response is None:
