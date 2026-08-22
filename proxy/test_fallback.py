@@ -10,9 +10,14 @@ def test_404():
 
 
 def test_404_fallback():
-    resp = requests_get("https://www.epa.gov/ejscreen")
+    resp = requests_get(
+        "https://www.fema.gov/about/openfema/data-sets/grant-programs-directorate-preparedness-non-disasterassistance-firefighter-grants"
+    )
     assert resp.status_code == 404
-    assert "Harvard" in resp.text
+    assert (
+        "https://www.datalumos.org/datalumos/project/218702/version/V1/view"
+        in resp.text
+    )
 
 
 @pytest.mark.xfail(reason="https://github.com/mitmproxy/mitmproxy/pull/7999")

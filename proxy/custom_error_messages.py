@@ -7,6 +7,8 @@ https://docs.mitmproxy.org/stable/addons/overview/
 
 from mitmproxy import http
 
+from proxy.resolver import Resolver
+
 NOT_FOUND_MESSAGE = "Oops! The page you're looking for could not be found. -proxy\n"
 SERVER_ERROR_MESSAGE = (
     "Something went wrong on the server. Please try again later. -proxy\n"
@@ -16,15 +18,22 @@ SERVER_ERROR_MESSAGE = (
 class CustomErrorMessages:
     """https://docs.mitmproxy.org/stable/api/events.html"""
 
+    resolver: Resolver
+
+    def __init__(self) -> None:
+        self.resolver = Resolver()
+
     def response(self, flow: http.HTTPFlow):
         if flow.response is None:
             return
 
         status_code = flow.response.status_code
         if status_code == 404:
-            # temporarily hard-coded
-            if flow.request.url.startswith("https://www.epa.gov/ejscreen"):
-                flow.response.text = "That site is no longer available. Try the Harvard Dataverse, deposit doi:10.7910/DVN/RLR5AX."
+            fallback = self.resolver.find_fallback_url(flow.request.url)
+            if fallback:
+                flow.response.text = (
+                    f"That site is no longer available. Try {fallback}."
+                )
             else:
                 flow.response.text = NOT_FOUND_MESSAGE
         elif status_code >= 500:
