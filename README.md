@@ -126,4 +126,5 @@ uv run pytest
 
 ## See also
 
+- [The Data Resilience Funding Landscape: A Preliminary Analysis](https://investinopen.org/blog/data-resilience-funding-landscape/)
 - [Protype app from **@jring-o**](https://github.com/jring-o/scsd)
