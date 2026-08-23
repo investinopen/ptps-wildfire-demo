@@ -4,6 +4,10 @@ from ptps_wildfire_demo.proxy.constants import CERT_PATH, PROXY_URL
 
 
 def requests_get(url: str):
-    proxies = {"http": PROXY_URL, "https": PROXY_URL}
-    resp = requests.get(url, proxies=proxies, verify=str(CERT_PATH), timeout=10)
+    resp = requests.get(
+        url,
+        proxies={"all": PROXY_URL},
+        verify=str(CERT_PATH),
+        timeout=10,
+    )
     return resp
