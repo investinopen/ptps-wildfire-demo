@@ -62,9 +62,8 @@ class Resolver:
         results = response.json()["archived_snapshots"]
         return results.get("closest", {}).get("url")
 
-    async def find_fallback_url(self, url: str) -> str | None:
-        return (
-            (await self.get_wayback_machine_match(url))
-            or self.get_drp_exact_match(url)
-            or self.get_drp_partial_match(url)
-        )
+    async def get_fallback_urls(self, url: str) -> list[str]:
+        wayback_match = await self.get_wayback_machine_match(url)
+        drp_match = self.get_drp_exact_match(url) or self.get_drp_partial_match(url)
+        urls = [wayback_match, drp_match]
+        return [url for url in urls if url]

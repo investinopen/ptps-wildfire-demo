@@ -25,15 +25,17 @@ class CustomErrorMessages:
 
         status_code = flow.response.status_code
         if status_code == 404 or status_code >= 500:
-            fallback = await self.resolver.find_fallback_url(flow.request.url)
-            if fallback:
+            fallbacks = await self.resolver.get_fallback_urls(flow.request.url)
+            if fallbacks:
                 flow.response.headers["content-type"] = "text/plain; charset=utf-8"
+
                 if status_code == 404:
-                    flow.response.text = (
-                        f"That URL is no longer available. Try {fallback}."
-                    )
+                    msg = "That URL is no longer available."
                 else:
-                    flow.response.text = f"Unable to load that URL. Try {fallback}."
+                    msg = "Unable to load that URL."
+
+                fallbacks_str = "\n\n".join(fallbacks)
+                flow.response.text = f"{msg} Try:\n{fallbacks_str}."
 
         return
 

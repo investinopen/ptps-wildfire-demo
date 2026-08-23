@@ -25,3 +25,7 @@ dependencies = [
     "toml>=0.10.2",               # for JupySQL
     "xarray>=2026.7.0",
 ]
+
+[tool.pytest.ini_options]
+# https://pytest-asyncio.readthedocs.io/en/stable/concepts.html#test-discovery-modes
+asyncio_mode = "auto"
