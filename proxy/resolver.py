@@ -8,7 +8,7 @@ class Resolver:
         self.refresh()
 
     def refresh(self):
-        # this is the data behind https://portal.datarescueproject.org/datasets/
+        # This is the data behind https://portal.datarescueproject.org/datasets/. We'll use https://github.com/datarescueproject/portal/pull/26 if/when it's merged.
         self.rescued_data = pd.read_csv(
             "https://raw.githubusercontent.com/datarescueproject/portal/refs/heads/main/baserow_exports/datarescue_backups.csv",
             dtype_backend="pyarrow",
@@ -18,8 +18,6 @@ class Resolver:
         matches = self.rescued_data[boolean_index]
         if len(matches) > 0:
             row = matches.iloc[0]
-            if pd.notna(row["metadata_url"]):
-                return row["metadata_url"]
             if pd.notna(row["download_location"]):
                 return row["download_location"]
 
