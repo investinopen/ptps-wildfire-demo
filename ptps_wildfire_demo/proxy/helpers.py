@@ -1,6 +1,6 @@
 import requests
 
-from proxy.constants import CERT_PATH, PROXY_URL
+from ptps_wildfire_demo.proxy.constants import CERT_PATH, PROXY_URL
 
 
 def requests_get(url: str):

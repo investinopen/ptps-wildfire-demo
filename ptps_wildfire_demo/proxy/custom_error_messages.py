@@ -5,9 +5,18 @@ with a custom message.
 https://docs.mitmproxy.org/stable/addons/overview/
 """
 
+import sys
+from pathlib import Path
+
 from mitmproxy import http
 
-from proxy.resolver import Resolver
+try:
+    from ptps_wildfire_demo.proxy.resolver import Resolver
+except ModuleNotFoundError:
+    # Support loading this file directly via: mitmdump -s ptps_wildfire_demo/proxy/custom_error_messages.py
+    repo_root = Path(__file__).resolve().parents[2]
+    sys.path.insert(0, str(repo_root))
+    from ptps_wildfire_demo.proxy.resolver import Resolver
 
 
 class CustomErrorMessages:

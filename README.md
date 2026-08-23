@@ -97,11 +97,19 @@ Considering the following options for the resolution layer:
 
 #### Option 1: [HTTP proxy](proxy/)
 
-1. [Install mitmproxy.](https://docs.mitmproxy.org/stable/overview/installation/)
+1. Install dependencies:
+   - Python
+   - [uv](https://docs.astral.sh/uv/getting-started/installation/)
+1. Install Python dependencies:
+
+   ```sh
+   uv sync
+   ```
+
 1. [Start the proxy.](https://docs.mitmproxy.org/stable/overview/getting-started/#launch-the-tool-you-need)\*
 
    ```sh
-   mitmdump -s proxy/custom_error_messages.py
+   uv run mitmdump -s ptps_wildfire_demo/proxy/custom_error_messages.py
    ```
 
 1. In another terminal, [install the certificate](https://docs.mitmproxy.org/stable/concepts/certificates/#installing-the-mitmproxy-ca-certificate-manually).

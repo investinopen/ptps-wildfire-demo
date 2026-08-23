@@ -2,7 +2,7 @@ import re
 
 import pytest
 
-from proxy.helpers import requests_get
+from ptps_wildfire_demo.proxy.helpers import requests_get
 
 
 def test_404():

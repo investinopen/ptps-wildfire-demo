@@ -29,3 +29,4 @@ dependencies = [
 [tool.pytest.ini_options]
 # https://pytest-asyncio.readthedocs.io/en/stable/concepts.html#test-discovery-modes
 asyncio_mode = "auto"
+pythonpath = ["."]

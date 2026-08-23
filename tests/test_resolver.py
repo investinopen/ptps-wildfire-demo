@@ -2,7 +2,7 @@ import re
 
 import pytest
 
-from proxy.resolver import Resolver
+from ptps_wildfire_demo.proxy.resolver import Resolver
 
 
 @pytest.fixture
