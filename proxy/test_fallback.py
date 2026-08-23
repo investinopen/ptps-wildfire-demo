@@ -1,3 +1,5 @@
+import re
+
 import pytest
 
 from proxy.helpers import requests_get
@@ -13,9 +15,10 @@ def test_404_fallback():
         "https://www.fema.gov/about/openfema/data-sets/grant-programs-directorate-preparedness-non-disasterassistance-firefighter-grants"
     )
     assert resp.status_code == 404
-    assert (
-        "https://www.datalumos.org/datalumos/project/218702/version/V1/view"
-        in resp.text
+    assert resp.text
+    assert re.search(
+        r"http://web\.archive\.org/web/\d+/https://www\.fema\.gov/about/openfema/data-sets/grant-programs-directorate-preparedness-non-disasterassistance-firefighter-grants",
+        resp.text,
     )
 
 

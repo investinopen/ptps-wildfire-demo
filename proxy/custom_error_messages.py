@@ -18,13 +18,14 @@ class CustomErrorMessages:
     def __init__(self) -> None:
         self.resolver = Resolver()
 
-    def response(self, flow: http.HTTPFlow):
+    # https://docs.mitmproxy.org/stable/addons/examples/#nonblocking
+    async def response(self, flow: http.HTTPFlow):
         if flow.response is None:
             return
 
         status_code = flow.response.status_code
         if status_code == 404 or status_code >= 500:
-            fallback = self.resolver.find_fallback_url(flow.request.url)
+            fallback = await self.resolver.find_fallback_url(flow.request.url)
             if fallback:
                 flow.response.headers["content-type"] = "text/plain; charset=utf-8"
                 if status_code == 404:
@@ -36,15 +37,15 @@ class CustomErrorMessages:
 
         return
 
-    def error(self, flow: http.HTTPFlow):
+    async def error(self, flow: http.HTTPFlow):
         if flow.response is None:
             flow.response = http.Response.make(502)
         if flow.error:
             flow.error.msg = "Error with error. -proxy"
-        self.response(flow)
+        await self.response(flow)
 
-    def http_connect_error(self, flow: http.HTTPFlow):
-        self.error(flow)
+    async def http_connect_error(self, flow: http.HTTPFlow):
+        await self.error(flow)
 
 
 addons = [CustomErrorMessages()]
