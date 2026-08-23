@@ -25,7 +25,7 @@ class Resolver:
 
     def find_fallback_url(self, url: str) -> str | None:
         is_exact_match = self.rescued_data["url"] == url
-        # look for record where the provided URL is based on the record's URL
+        # Look for record where the provided URL is based on the record's URL. This is intended to catch request URLs that are a sub-path, have parameters, etc. The matching could be even more robust.
         is_partial_match = self.rescued_data["url"].apply(
             lambda original_url: pd.notna(original_url) and url.startswith(original_url)
         )
