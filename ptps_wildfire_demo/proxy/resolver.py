@@ -28,20 +28,20 @@ class Resolver:
             dtype_backend="pyarrow",
         )
 
-    def _get_drp_match(self, boolean_index: pd.Series[bool]) -> str | None:
+    def _get_drp_match(self, boolean_index: pd.Series[bool]) -> list[str]:
         matches = self.drp_rescues[boolean_index]
         if len(matches) > 0:
             row = matches.iloc[0]
-            if pd.notna(row["download_location"]):
-                return row["download_location"]
+            urls = [row["metadata_url"], row["download_location"]]
+            return [url for url in urls if pd.notna(url)]
 
-        return None
+        return []
 
-    def get_drp_exact_match(self, url: str) -> str | None:
+    def get_drp_exact_match(self, url: str) -> list[str]:
         is_exact_match = self.drp_rescues["url"] == url
         return self._get_drp_match(is_exact_match)
 
-    def get_drp_partial_match(self, url: str) -> str | None:
+    def get_drp_partial_match(self, url: str) -> list[str]:
         """Look for record where the provided URL is based on the record's URL. This is intended to catch request URLs that are a sub-path, have parameters, etc. The matching could be even more robust."""
 
         is_partial_match = self.drp_rescues["url"].apply(
@@ -65,5 +65,5 @@ class Resolver:
     async def get_fallback_urls(self, url: str) -> list[str]:
         wayback_match = await self.get_wayback_machine_match(url)
         drp_match = self.get_drp_exact_match(url) or self.get_drp_partial_match(url)
-        urls = [wayback_match, drp_match]
+        urls = [wayback_match] + drp_match
         return [url for url in urls if url]

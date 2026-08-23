@@ -44,7 +44,7 @@ class CustomErrorMessages:
                     msg = "Unable to load that URL."
 
                 fallbacks_str = "\n\n".join(fallbacks)
-                flow.response.text = f"{msg} Try:\n{fallbacks_str}."
+                flow.response.text = f"{msg} Try:\n\n{fallbacks_str}"
 
         return
 
