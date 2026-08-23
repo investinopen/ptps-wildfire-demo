@@ -57,7 +57,7 @@ class Resolver:
             self.client = httpx.AsyncClient()
 
         response = await self.client.get(
-            "https://archive.org/wayback/available", params={"url": url}
+            "https://archive.org/wayback/available", params={"url": url}, timeout=5
         )
         results = response.json()["archived_snapshots"]
         return results.get("closest", {}).get("url")
