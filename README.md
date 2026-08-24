@@ -18,12 +18,16 @@ When source data (from a government, etc.) gets taken down, this can stop its us
 
 ## Use cases
 
+### User groups
+
 For this phase of the project, we are targeting the following user groups:
 
 - Researchers
 - Operational people
   - Emergency managers
   - Fire departments
+
+### Tools
 
 We aim to support the following tools:
 
@@ -45,7 +49,9 @@ We aim to support the following tools:
 
 We acknowledge that those other areas are valuable, they just aren’t in scope for this (phase of the) project.
 
-## Architecture
+## [HTTP proxy](proxy/)
+
+### Architecture
 
 ```mermaid
 flowchart TD
@@ -54,18 +60,18 @@ flowchart TD
     arcgis["ArcGIS"]
     qgis["QGIS"]
 
-    resolution(["resolution layer"])
+    proxy(["proxy"])
 
     source[("source")]
     rescue1[("rescued data")]
     rescue2[("rescued data")]
 
-    python --> resolution
-    r --> resolution
-    arcgis --> resolution
-    qgis --> resolution
+    python --> proxy
+    r --> proxy
+    arcgis --> proxy
+    qgis --> proxy
 
-    resolution --> source
+    proxy --> source
     source -->|falls back to| rescue1
     rescue1 -->|falls back to| rescue2
 
@@ -74,15 +80,13 @@ flowchart TD
     classDef datastore fill:#cfe2f3,stroke:#000,color:#000
 
     class python,r,arcgis,qgis sourceTool
-    class resolution process
+    class proxy process
     class source,rescue1,rescue2 datastore
 ```
 
-## Usage
+### Usage
 
-Considering the following options for the resolution layer:
-
-### Option 1: [HTTP proxy](proxy/)
+✅ **Implemented**
 
 1. Install dependencies:
    - Python
@@ -93,7 +97,7 @@ Considering the following options for the resolution layer:
    uv sync
    ```
 
-1. [Start the proxy.](https://docs.mitmproxy.org/stable/overview/getting-started/#launch-the-tool-you-need)\*
+1. [Start the proxy.](https://docs.mitmproxy.org/stable/overview/getting-started/#launch-the-tool-you-need)
 
    ```sh
    uv run mitmdump -s ptps_wildfire_demo/proxy/custom_error_messages.py
@@ -105,19 +109,19 @@ Considering the following options for the resolution layer:
    curl --proxy 127.0.0.1:8080 --cacert ~/.mitmproxy/mitmproxy-ca-cert.pem https://example.com/
    ```
 
-#### Testing
+1. Connect from [a supported tool](#tools) — see [demo notebook](proxy/demo.ipynb).
 
-```sh
-uv run pytest
-```
+## ~~DuckDB extension~~
 
-[Debugging in VSCode](https://code.visualstudio.com/docs/python/debugging) is supported.
+The proxy / Python package can be used instead.
 
-### Option 2: DuckDB extension
+## Python package
 
-### Option 3: Python package
+⚠️ **Planned**
 
-### Option 4: Browser extension
+## Browser extension
+
+⚠️ **Planned**
 
 ## See also
 
