@@ -8,6 +8,7 @@ https://docs.mitmproxy.org/stable/addons/overview/
 import sys
 from pathlib import Path
 
+import httpx
 from mitmproxy import http
 
 try:
@@ -25,7 +26,9 @@ class Fallback:
     resolver: Resolver
 
     def __init__(self) -> None:
-        self.resolver = Resolver()
+        # not worrying about closing the client, since it'll be cleaned up at process exit
+        client = httpx.AsyncClient()
+        self.resolver = Resolver(client)
 
     # https://docs.mitmproxy.org/stable/addons/examples/#nonblocking
     async def response(self, flow: http.HTTPFlow):

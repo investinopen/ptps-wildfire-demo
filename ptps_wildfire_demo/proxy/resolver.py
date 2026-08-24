@@ -3,23 +3,12 @@ import pandas as pd
 
 
 class Resolver:
-    client: httpx.AsyncClient | None
+    client: httpx.AsyncClient
     drp_rescues: pd.DataFrame
 
-    def __init__(self) -> None:
-        self.client = None
+    def __init__(self, client: httpx.AsyncClient) -> None:
+        self.client = client
         self.refresh()
-
-    async def __aenter__(self):
-        return self
-
-    async def __aexit__(self, exc_type, exc, tb) -> None:
-        await self.aclose()
-
-    async def aclose(self) -> None:
-        if self.client is not None:
-            await self.client.aclose()
-            self.client = None
 
     def refresh(self):
         # This is the data behind https://portal.datarescueproject.org/datasets/. We'll use https://github.com/datarescueproject/portal/pull/26 if/when it's merged.
@@ -51,10 +40,6 @@ class Resolver:
 
     async def get_wayback_machine_match(self, url: str) -> str | None:
         """https://archive.org/help/wayback_api.php"""
-
-        # Lazily create the client. Did it this way so that the client can be used synchronously or asynchronously.
-        if self.client is None:
-            self.client = httpx.AsyncClient()
 
         response = await self.client.get(
             "https://archive.org/wayback/available", params={"url": url}, timeout=5

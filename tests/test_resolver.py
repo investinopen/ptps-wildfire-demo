@@ -1,5 +1,6 @@
 import re
 
+import httpx
 import pytest
 
 from ptps_wildfire_demo.proxy.resolver import Resolver
@@ -7,8 +8,8 @@ from ptps_wildfire_demo.proxy.resolver import Resolver
 
 @pytest.fixture
 async def resolver():
-    async with Resolver() as resolver:
-        yield resolver
+    async with httpx.AsyncClient() as client:
+        yield Resolver(client)
 
 
 async def test_get_fallback_urls_match(resolver):
