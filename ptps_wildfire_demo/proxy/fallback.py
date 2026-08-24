@@ -59,9 +59,7 @@ class Fallback:
         elif not rescue.wayback_newest_url:
             print(f"{original_url} doesn't exist in the Internet Archive — saving")
             loop = asyncio.get_event_loop()
-            loop.create_task(
-                self.resolver.internet_archive_client.save(flow.request.url)
-            )
+            loop.create_task(self.resolver.internet_archive_client.save(original_url))
 
         return
 
