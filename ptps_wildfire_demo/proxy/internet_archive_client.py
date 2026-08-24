@@ -18,7 +18,9 @@ class InternetArchiveClient:
         self.access_key = os.environ.get("INTERNET_ARCHIVE_ACCESS_KEY")
         self.secret_key = os.environ.get("INTERNET_ARCHIVE_SECRET_KEY")
 
-    async def request(self, url: str, method="GET", params: dict | None = None):
+    async def request(
+        self, url: str, *, method="GET", timeout=5, params: dict | None = None
+    ):
         # not using the official package because we want async support
         # https://archive.org/developers/internetarchive/index.html
 
@@ -33,7 +35,7 @@ class InternetArchiveClient:
             url=url,
             params=params,
             headers=headers,
-            timeout=5,
+            timeout=timeout,
         )
         return response
 
@@ -45,3 +47,8 @@ class InternetArchiveClient:
         )
         results = response.json()["archived_snapshots"]
         return results.get("closest", {}).get("url")
+
+    async def save(self, url: str):
+        """https://help.archive.org/help/save-pages-in-the-wayback-machine/"""
+
+        await self.request(f"https://web.archive.org/save/{url}", timeout=20)

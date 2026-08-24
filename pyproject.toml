@@ -30,4 +30,9 @@ dependencies = [
 [tool.pytest.ini_options]
 # https://pytest-asyncio.readthedocs.io/en/stable/concepts.html#test-discovery-modes
 asyncio_mode = "auto"
+# session-scoped fixtures (e.g. httpx_client) need a session-scoped loop, or
+# the loop they were created in closes before the test runs, raising
+# "RuntimeError: Event loop is closed"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
 pythonpath = ["."]

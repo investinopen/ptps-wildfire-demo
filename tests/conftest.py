@@ -3,11 +3,13 @@ import socket
 import threading
 import time
 
+import httpx
 import pytest
 from mitmproxy.options import Options
 from mitmproxy.tools.dump import DumpMaster
 
 from ptps_wildfire_demo.proxy.fallback import addons
+from ptps_wildfire_demo.proxy.resolver import Resolver
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -56,3 +58,9 @@ def mitmproxy_server():
         if master is not None:
             master.shutdown()
         thread.join(timeout=10)
+
+
+@pytest.fixture(scope="session")
+async def httpx_client():
+    async with httpx.AsyncClient() as client:
+        yield client

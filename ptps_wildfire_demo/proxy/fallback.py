@@ -5,6 +5,7 @@ with a custom message.
 https://docs.mitmproxy.org/stable/addons/overview/
 """
 
+import asyncio
 import sys
 from pathlib import Path
 
@@ -37,7 +38,8 @@ class Fallback:
 
         status_code = flow.response.status_code
         if status_code == 404 or status_code >= 500:
-            rescue = await self.resolver.get_rescue(flow.request.url)
+            original_url = flow.request.url
+            rescue = await self.resolver.get_rescue(original_url)
             if rescue:
                 flow.response.headers["content-type"] = "text/plain; charset=utf-8"
 
@@ -54,6 +56,13 @@ class Fallback:
 
                 fallbacks = "\n\n".join(url for url in fallback_urls if url)
                 flow.response.text = f"{msg} Try:\n\n{fallbacks}"
+
+                if not rescue.wayback_newest_url:
+                    print("Doesn't exist in the Internet Archive — saving")
+                    loop = asyncio.get_event_loop()
+                    loop.create_task(
+                        self.resolver.internet_archive_client.save(flow.request.url)
+                    )
 
         return
 
