@@ -37,32 +37,31 @@ class Fallback:
             return
 
         status_code = flow.response.status_code
+        original_url = flow.request.url
+        rescue = await self.resolver.get_rescue(original_url)
+
         if status_code == 404 or status_code >= 500:
-            original_url = flow.request.url
-            rescue = await self.resolver.get_rescue(original_url)
-            if rescue:
-                flow.response.headers["content-type"] = "text/plain; charset=utf-8"
+            flow.response.headers["content-type"] = "text/plain; charset=utf-8"
 
-                if status_code == 404:
-                    msg = "That URL is no longer available."
-                else:
-                    msg = "Unable to load that URL."
+            if status_code == 404:
+                msg = "That URL is no longer available."
+            else:
+                msg = "Unable to load that URL."
 
-                fallback_urls = [
-                    rescue.wayback_newest_url,
-                    rescue.drp_metadata_url,
-                    rescue.drp_download_location,
-                ]
+            fallback_urls = [
+                rescue.wayback_newest_url,
+                rescue.drp_metadata_url,
+                rescue.drp_download_location,
+            ]
 
-                fallbacks = "\n\n".join(url for url in fallback_urls if url)
-                flow.response.text = f"{msg} Try:\n\n{fallbacks}"
-
-                if not rescue.wayback_newest_url:
-                    print("Doesn't exist in the Internet Archive — saving")
-                    loop = asyncio.get_event_loop()
-                    loop.create_task(
-                        self.resolver.internet_archive_client.save(flow.request.url)
-                    )
+            fallbacks = "\n\n".join(url for url in fallback_urls if url)
+            flow.response.text = f"{msg} Try:\n\n{fallbacks}"
+        elif not rescue.wayback_newest_url:
+            print(f"{original_url} doesn't exist in the Internet Archive — saving")
+            loop = asyncio.get_event_loop()
+            loop.create_task(
+                self.resolver.internet_archive_client.save(flow.request.url)
+            )
 
         return
 
