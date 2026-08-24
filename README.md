@@ -99,6 +99,16 @@ flowchart TD
    uv sync
    ```
 
+1. Optional: Set up credentials for the Internet Archive. This avoids rate limits.
+   1. [Get credentials.](https://archive.org/developers/tutorial-get-ia-credentials.html)
+   1. Create environment variables file.
+
+      ```sh
+      cp .env.sample .env
+      ```
+
+   1. Fill out that file.
+
 1. [Start the proxy.](https://docs.mitmproxy.org/stable/overview/getting-started/#launch-the-tool-you-need)
 
    ```sh
