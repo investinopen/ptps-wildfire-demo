@@ -1,6 +1,8 @@
 import httpx
 import pandas as pd
 
+from ptps_wildfire_demo.proxy.constants import USER_AGENT
+
 
 class Resolver:
     client: httpx.AsyncClient
@@ -42,7 +44,10 @@ class Resolver:
         """https://archive.org/help/wayback_api.php"""
 
         response = await self.client.get(
-            "https://archive.org/wayback/available", params={"url": url}, timeout=5
+            "https://archive.org/wayback/available",
+            params={"url": url},
+            headers={"User-Agent": USER_AGENT},
+            timeout=5,
         )
         results = response.json()["archived_snapshots"]
         return results.get("closest", {}).get("url")
