@@ -2,6 +2,8 @@
 
 A networked data infrastructure demo for the "Investing in Open Infra to Safeguard Critical Scientific Data" project. Essentially, we are **making it easier to work with rescued data**.
 
+PtPS is the Portfolio to Protect Science.
+
 ## Background
 
 We are losing critical scientific knowledge every day. Urgent and increasing threats from funding cuts and policy changes impact the core datasets relied on globally for climate forecasting, public health, research, and scientific discovery.
@@ -100,7 +102,7 @@ flowchart TD
 1. [Start the proxy.](https://docs.mitmproxy.org/stable/overview/getting-started/#launch-the-tool-you-need)
 
    ```sh
-   uv run mitmdump -s ptps_wildfire_demo/proxy/custom_error_messages.py
+   uv run mitmdump -s ptps_wildfire_demo/proxy/fallback.py
    ```
 
 1. In another terminal, [install the certificate](https://docs.mitmproxy.org/stable/concepts/certificates/#installing-the-mitmproxy-ca-certificate-manually).
@@ -110,6 +112,7 @@ flowchart TD
    ```
 
 1. Connect from [a supported tool](#tools) — see [demo notebook](proxy/demo.ipynb).
+   - Instructions for the others to come.
 
 ## ~~DuckDB extension~~
 

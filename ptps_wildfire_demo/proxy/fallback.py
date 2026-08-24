@@ -13,13 +13,13 @@ from mitmproxy import http
 try:
     from ptps_wildfire_demo.proxy.resolver import Resolver
 except ModuleNotFoundError:
-    # Support loading this file directly via: mitmdump -s ptps_wildfire_demo/proxy/custom_error_messages.py
+    # Support loading this file directly via: mitmdump -s ptps_wildfire_demo/proxy/fallback.py
     repo_root = Path(__file__).resolve().parents[2]
     sys.path.insert(0, str(repo_root))
     from ptps_wildfire_demo.proxy.resolver import Resolver
 
 
-class CustomErrorMessages:
+class Fallback:
     """https://docs.mitmproxy.org/stable/api/events.html"""
 
     resolver: Resolver
@@ -59,4 +59,4 @@ class CustomErrorMessages:
         await self.error(flow)
 
 
-addons = [CustomErrorMessages()]
+addons = [Fallback()]
