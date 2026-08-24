@@ -12,32 +12,34 @@ async def resolver():
         yield Resolver(client)
 
 
-async def test_get_fallback_urls_match(resolver):
-    results = await resolver.get_fallback_urls(
+async def test_get_rescue_match(resolver):
+    rescue = await resolver.get_rescue(
         "https://www.fema.gov/about/openfema/data-sets/grant-programs-directorate-preparedness-non-disasterassistance-firefighter-grants"
     )
 
-    assert len(results) == 2
     assert re.search(
         r"http://web\.archive\.org/web/\d+/https://www\.fema\.gov/about/openfema/data-sets/grant-programs-directorate-preparedness-non-disasterassistance-firefighter-grants",
-        results[0],
+        rescue.wayback_newest_url,
     )
     assert (
-        results[1]
+        rescue.drp_download_location
         == "https://www.datalumos.org/datalumos/project/218702/version/V1/view"
     )
 
 
-async def test_get_fallback_urls_partial_match(resolver):
-    results = await resolver.get_fallback_urls(
+async def test_get_rescue_partial_match(resolver):
+    rescue = await resolver.get_rescue(
         "https://www.fema.gov/about/openfema/data-sets/grant-programs-directorate-preparedness-non-disasterassistance-firefighter-grants?some=params"
     )
 
-    assert results == [
-        "https://www.datalumos.org/datalumos/project/218702/version/V1/view"
-    ]
+    assert (
+        rescue.drp_download_location
+        == "https://www.datalumos.org/datalumos/project/218702/version/V1/view"
+    )
 
 
-async def test_get_fallback_urls_no_match(resolver):
-    results = await resolver.get_fallback_urls("http://nota.realdomainname")
-    assert results == []
+async def test_get_rescue_no_match(resolver):
+    rescue = await resolver.get_rescue("http://nota.realdomainname")
+    assert rescue.wayback_newest_url is None
+    assert rescue.drp_metadata_url is None
+    assert rescue.drp_download_location is None

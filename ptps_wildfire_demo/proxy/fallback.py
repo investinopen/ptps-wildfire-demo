@@ -37,8 +37,8 @@ class Fallback:
 
         status_code = flow.response.status_code
         if status_code == 404 or status_code >= 500:
-            fallbacks = await self.resolver.get_fallback_urls(flow.request.url)
-            if fallbacks:
+            rescue = await self.resolver.get_rescue(flow.request.url)
+            if rescue:
                 flow.response.headers["content-type"] = "text/plain; charset=utf-8"
 
                 if status_code == 404:
@@ -46,8 +46,14 @@ class Fallback:
                 else:
                     msg = "Unable to load that URL."
 
-                fallbacks_str = "\n\n".join(fallbacks)
-                flow.response.text = f"{msg} Try:\n\n{fallbacks_str}"
+                fallback_urls = [
+                    rescue.wayback_newest_url,
+                    rescue.drp_metadata_url,
+                    rescue.drp_download_location,
+                ]
+
+                fallbacks = "\n\n".join(url for url in fallback_urls if url)
+                flow.response.text = f"{msg} Try:\n\n{fallbacks}"
 
         return
 
