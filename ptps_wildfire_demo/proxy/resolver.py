@@ -1,13 +1,8 @@
-import os
-
 import httpx
 import pandas as pd
-from dotenv import load_dotenv
 
-from ptps_wildfire_demo.proxy.constants import USER_AGENT
+from ptps_wildfire_demo.proxy.internet_archive_client import InternetArchiveClient
 from ptps_wildfire_demo.proxy.rescue import Rescue
-
-load_dotenv()
 
 
 def str_or_none(val):
@@ -19,16 +14,13 @@ def str_or_none(val):
 
 
 class Resolver:
-    internet_archive_access_key: str | None
-    internet_archive_secret_key: str | None
-    client: httpx.AsyncClient
+    httpx_client: httpx.AsyncClient
+    internet_archive_client: InternetArchiveClient
     drp_rescues: pd.DataFrame
 
-    def __init__(self, client: httpx.AsyncClient) -> None:
-        self.internet_archive_access_key = os.environ.get("INTERNET_ARCHIVE_ACCESS_KEY")
-        self.internet_archive_secret_key = os.environ.get("INTERNET_ARCHIVE_SECRET_KEY")
-
-        self.client = client
+    def __init__(self, httpx_client: httpx.AsyncClient) -> None:
+        self.httpx_client = httpx_client
+        self.internet_archive_client = InternetArchiveClient(httpx_client)
         self.refresh()
 
     def refresh(self):
@@ -58,31 +50,8 @@ class Resolver:
         )
         return self._get_drp_match(is_partial_match)
 
-    async def get_wayback_machine_match(self, url: str) -> str | None:
-        """https://archive.org/help/wayback_api.php"""
-
-        # not using the official package because we want async support
-        # https://archive.org/developers/internetarchive/index.html
-
-        headers = {"User-Agent": USER_AGENT}
-
-        if self.internet_archive_access_key and self.internet_archive_secret_key:
-            # https://archive.org/developers/iarest.html#iarest-authentication
-            headers["Authorization"] = (
-                f"LOW {self.internet_archive_access_key}:{self.internet_archive_secret_key}"
-            )
-
-        response = await self.client.get(
-            "https://archive.org/wayback/available",
-            params={"url": url},
-            headers=headers,
-            timeout=5,
-        )
-        results = response.json()["archived_snapshots"]
-        return results.get("closest", {}).get("url")
-
     async def get_rescue(self, url: str) -> Rescue:
-        wayback_match = await self.get_wayback_machine_match(url)
+        wayback_match = await self.internet_archive_client.get_match(url)
         drp_metadata_url: str | None = None
         drp_download_location: str | None = None
 
