@@ -1,8 +1,6 @@
 # PtPS Wildfire Demo
 
-A networked data infrastructure demo for the "Investing in Open Infra to Safeguard Critical Scientific Data" project. Essentially, we are **making it easier to work with rescued data**. There are a couple explorations happening in parallel — see the [headings below](#analysis).
-
-_This is being written as [documentation-driven development](https://gist.github.com/zsup/9434452). In other words, this functionality doesn't all exist yet._
+A networked data infrastructure demo for the "Investing in Open Infra to Safeguard Critical Scientific Data" project. Essentially, we are **making it easier to work with rescued data**.
 
 ## Background
 
@@ -14,22 +12,11 @@ What is almost entirely absent in the projects and initiatives we are tracking i
 
 The project will design, build, and document a working end-to-end data infrastructure proof of concept organized around a specific use case: wildfire and disaster identification, prevention, and response. We have selected a fire and disaster relief scenario as our anchor case because it requires data across multiple disciplines including weather, GIS, health markers, environment and more, demonstrating the cross-domain assembly problem while connecting to urgent societal stakes that make visceral the "what happens if this goes dark" argument.
 
-## [Analysis](analysis/)
-
-This code was written to explore various relevant datasets in different formats, experimenting with how to bring them together in a cohesive way.
-
-Requires [DuckDB](https://duckdb.org/).
-
-For Python dependencies managed with `uv`, use a regular CPython build (for example `3.14.6`), not a free-threaded build (for example `3.14.6t` / `3.14.6+freethreaded`). Some binary packages used by this project (such as `lonboard` -> `geoarrow-rust-core`) do not currently publish free-threaded wheels.
-
-1. [Download the burn probability data.](analysis/burn_prob.ipynb)
-1. [Run the analysis.](analysis/risk.ipynb)
-
-## Fallback
+## Fallbacks
 
 When source data (from a government, etc.) gets taken down, this can stop its users dead in their tracks. Sometimes the data has been rescued by a third party, but it’s not always easy to find, use, or comprehend. This project aims to make that simpler, providing a “fallback” behavior when original data sources aren’t available. Essentially, we want to save data users from digging through the [Data Rescue Project (DRP) Portal](https://portal.datarescueproject.org/datasets/), if they even know to look for it.
 
-### Use cases
+## Use cases
 
 For this phase of the project, we are targeting the following user groups:
 
@@ -48,7 +35,7 @@ We aim to support the following tools:
   - DuckDB
   - PostgreSQL/PostGIS
 
-### Design decisions
+## Design decisions
 
 - Focus on low-velocity/historical data rather than high-velocity/real-time
 - Focusing on mirrors (direct copies), rather than fabricating new datasets / creating alternatives
@@ -58,7 +45,7 @@ We aim to support the following tools:
 
 We acknowledge that those other areas are valuable, they just aren’t in scope for this (phase of the) project.
 
-### Architecture
+## Architecture
 
 ```mermaid
 flowchart TD
@@ -91,11 +78,11 @@ flowchart TD
     class source,rescue1,rescue2 datastore
 ```
 
-### Usage
+## Usage
 
 Considering the following options for the resolution layer:
 
-#### Option 1: [HTTP proxy](proxy/)
+### Option 1: [HTTP proxy](proxy/)
 
 1. Install dependencies:
    - Python
@@ -118,7 +105,7 @@ Considering the following options for the resolution layer:
    curl --proxy 127.0.0.1:8080 --cacert ~/.mitmproxy/mitmproxy-ca-cert.pem https://example.com/
    ```
 
-##### Testing
+#### Testing
 
 ```sh
 uv run pytest
@@ -126,11 +113,11 @@ uv run pytest
 
 [Debugging in VSCode](https://code.visualstudio.com/docs/python/debugging) is supported.
 
-#### Option 2: DuckDB extension
+### Option 2: DuckDB extension
 
-#### Option 3: Python package
+### Option 3: Python package
 
-#### Option 4: Browser extension
+### Option 4: Browser extension
 
 ## See also
 
