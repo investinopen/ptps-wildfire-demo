@@ -29,6 +29,7 @@ dev = [
     "pytest-cov>=7.1.0",
     "pytest-httpx>=0.36.2",
     "pytz>=2026.3.post1",
+    "requests>=2.34.2",
     "toml>=0.10.2",          # for JupySQL
     "xarray>=2026.7.0",
 ]
