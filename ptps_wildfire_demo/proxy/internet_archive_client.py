@@ -18,9 +18,7 @@ class InternetArchiveClient:
         self.access_key = os.environ.get("INTERNET_ARCHIVE_ACCESS_KEY")
         self.secret_key = os.environ.get("INTERNET_ARCHIVE_SECRET_KEY")
 
-    async def get_match(self, url: str) -> str | None:
-        """https://archive.org/help/wayback_api.php"""
-
+    async def request(self, url: str, method="GET", params: dict | None = None):
         # not using the official package because we want async support
         # https://archive.org/developers/internetarchive/index.html
 
@@ -30,11 +28,20 @@ class InternetArchiveClient:
             # https://archive.org/developers/iarest.html#iarest-authentication
             headers["Authorization"] = f"LOW {self.access_key}:{self.secret_key}"
 
-        response = await self.httpx_client.get(
-            "https://archive.org/wayback/available",
-            params={"url": url},
+        response = await self.httpx_client.request(
+            method=method,
+            url=url,
+            params=params,
             headers=headers,
             timeout=5,
+        )
+        return response
+
+    async def get_match(self, url: str) -> str | None:
+        """https://archive.org/help/wayback_api.php"""
+
+        response = await self.request(
+            "https://archive.org/wayback/available", params={"url": url}
         )
         results = response.json()["archived_snapshots"]
         return results.get("closest", {}).get("url")
