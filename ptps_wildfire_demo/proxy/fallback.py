@@ -6,6 +6,7 @@ https://docs.mitmproxy.org/stable/addons/overview/
 """
 
 import asyncio
+import logging
 import sys
 from pathlib import Path
 
@@ -19,6 +20,9 @@ except ModuleNotFoundError:
     repo_root = Path(__file__).resolve().parents[2]
     sys.path.insert(0, str(repo_root))
     from ptps_wildfire_demo.proxy.resolver import Resolver
+
+
+logger = logging.getLogger(__name__)
 
 
 class Fallback:
@@ -57,7 +61,9 @@ class Fallback:
             fallbacks = "\n\n".join(url for url in fallback_urls if url)
             flow.response.text = f"{msg} Try:\n\n{fallbacks}"
         elif not rescue.wayback_newest_url:
-            print(f"{original_url} doesn't exist in the Internet Archive — saving")
+            logger.info(
+                f"{original_url} doesn't exist in the Internet Archive — saving"
+            )
             loop = asyncio.get_event_loop()
             loop.create_task(self.resolver.internet_archive_client.save(original_url))
 
