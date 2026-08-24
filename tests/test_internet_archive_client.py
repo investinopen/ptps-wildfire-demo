@@ -9,4 +9,5 @@ async def client(httpx_client):
 
 
 async def test_save(client):
-    await client.save("https://investinopen.org/")
+    response = await client.save("https://investinopen.org/")
+    assert 200 <= response.status_code < 400

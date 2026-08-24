@@ -1,4 +1,5 @@
 import os
+from json.decoder import JSONDecodeError
 
 import httpx
 from dotenv import load_dotenv
@@ -45,10 +46,15 @@ class InternetArchiveClient:
         response = await self.request(
             "https://archive.org/wayback/available", params={"url": url}
         )
-        results = response.json()["archived_snapshots"]
+
+        try:
+            results = response.json()["archived_snapshots"]
+        except JSONDecodeError:
+            return None
+
         return results.get("closest", {}).get("url")
 
     async def save(self, url: str):
         """https://help.archive.org/help/save-pages-in-the-wayback-machine/"""
 
-        await self.request(f"https://web.archive.org/save/{url}", timeout=20)
+        return await self.request(f"https://web.archive.org/save/{url}", timeout=20)
