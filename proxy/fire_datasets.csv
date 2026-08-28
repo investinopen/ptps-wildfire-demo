@@ -1,0 +1,24 @@
+access_type,name,description,webpage,example_data_url
+No auth,CarbonPlan Open Climate Risk,"Building-level wildfire risk.",https://source.coop/carbonplan/carbonplan-ocr,https://s3.us-west-2.amazonaws.com/us-west-2.opendata.source.coop/carbonplan/carbonplan-ocr/output/fire-risk/vector/production/v1.1.0/geoparquet/buildings.parquet
+No auth,cboettig fire,"Historical burned-area perimeters and hazard potential.",https://source.coop/cboettig/fire,https://data.source.coop/cboettig/fire/usgs-mtbs.parquet
+No auth,bkr observations,"Weather station, radiosonde, and aviation observations.",https://source.coop/bkr/obs,
+No auth,giswqs National Wetlands Inventory,"National Wetlands Inventory.",https://source.coop/giswqs/nwi,
+No auth,USFS probabilistic wildfire risk burn probability,"Burn probability and flame-length grids.",https://data-usfs.hub.arcgis.com/datasets/usfs::probabilistic-wildfire-risk-burn-probability-image-service/explore,"https://imagery.geoplatform.gov/iipp/rest/services/Fire_Aviation/USFS_EDW_RMRS_ProbabilisticWildfireRiskBurnProbability/ImageServer/exportImage?bbox=-2.00375070672E7,2135965.179399997,-7130157.067200001,1.1597575179399997E7&f=image"
+No auth,Wildfire Risk to Communities,"Wildfire risk data downloads.",https://wildfirerisk.org/download/,https://wildfirerisk.org/wp-content/uploads/2026/04/wrc_download_20260415.xlsx
+No auth,NOAA weather alerts,"Forecasts and active alerts, including Red Flag Warnings.",https://www.weather.gov/documentation/services-web-api,https://api.weather.gov/alerts/active?event=Red%20Flag%20Warning
+No auth,NOAA HMS fire and smoke product,"Daily smoke plume and fire detection polygons.",https://www.ospo.noaa.gov/products/land/hms.html,https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/KML/2026/07/hms_smoke20260701.kml
+No auth,NOAA Storm Events Database,"Historical disaster impacts by county.",https://www.ncdc.noaa.gov/stormevents/,https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2025_c20260819.csv.gz
+No auth,NASA FIRMS KML fire footprints,"Regional active-fire footprint polygons.",https://firms.modaps.eosdis.nasa.gov/,https://firms.modaps.eosdis.nasa.gov/data/active_fire/modis-c6.1/shapes/zips/MODIS_C6_1_USA_contiguous_and_Hawaii_24h.zip
+No auth,WFIGS / National Interagency Fire Center,"Current and historical fire perimeters from USFS, BLM, NPS, FWS, and BIA data.",https://data-nifc.opendata.arcgis.com/,https://gis.blm.gov/arcgis/rest/services/fire/BLM_Natl_FirePerimeter/MapServer/generateKml
+No auth,MODIS NDVI,"Vegetation-health data useful as a live fuel-condition proxy.",https://modis.gsfc.nasa.gov/data/dataprod/mod13.php,https://cmr.earthdata.nasa.gov/search/granules.json?short_name=MOD13Q1&page_size=1
+No auth,OpenStreetMap infrastructure extract,"Water lines, power lines, hydrants, and roads for response-capacity analysis.",https://overpass-api.de/,
+No auth,USDA LANDFIRE,"Wildland fire data, including seasonal fuels.",https://www.landfire.gov/,https://www.landfire.gov/data-downloads/SeasonalFuels/LF2025_FBFM40_SU26.zip
+Free key,Sentinel-2 NDVI via Copernicus Data Space,"Live fuel-condition proxy for dry or stressed vegetation.",https://dataspace.copernicus.eu/,
+Free key,NASA FIRMS Area API,"Near-real-time MODIS/VIIRS active-fire detections by bounding box; requires a free MAP_KEY.",https://firms.modaps.eosdis.nasa.gov/api/,https://firms.modaps.eosdis.nasa.gov/api/area/csv/[MAP_KEY]/VIIRS_NOAA20_NRT/[bbox]/[days]
+Free key,EPA AirNow API,"Real-time PM2.5/AQI and fire/smoke map data by location; requires a free key.",https://docs.airnowapi.org/,
+Bulk or analytic,CDC PLACES,"Census-tract and county chronic-disease prevalence, including asthma and COPD.",https://www.cdc.gov/places/,https://data.cdc.gov/resource/i46a-9kgh.geojson
+Bulk or analytic,CDC/ATSDR Social Vulnerability Index,"Census-tract and county social vulnerability data.",https://www.atsdr.cdc.gov/place-health/php/svi/index.html,https://svi2.cdc.gov/webapi/Documents/download?year=2022&type=csv&category=states_counties&name=SVI_2022_US_COUNTY
+Bulk or analytic,EPA EJScreen,"Block-group environmental justice index available as a static download and documented API.",https://www.epa.gov/ejscreen,
+Static files,DOE EAGLE-I power outage data,"County-level outage counts at 15-minute intervals for 2014-2024; live system access is restricted.",https://www.osti.gov/dataexplorer/biblio/dataset/1975203,
+Static files,Dryad WUMI2024a wildfire database,"Quality-controlled 1984-2024 fire events with per-fire burn grids.",https://doi.org/10.5061/dryad.63xsj3vd4,
+Static files,Dryad CA wildfire smoke PM2.5 exposure,"Modeled daily smoke PM2.5 by census tract for 2008-2018.",https://doi.org/10.5061/dryad.0zpc867bw,
