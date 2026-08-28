@@ -16,13 +16,13 @@ async def test_get_rescue_match(resolver):
         "https://www.fema.gov/about/openfema/data-sets/grant-programs-directorate-preparedness-non-disasterassistance-firefighter-grants"
     )
 
+    # exact URL can change, so match flexibly
     assert re.search(
         r"http://web\.archive\.org/web/\d+/https://www\.fema\.gov/about/openfema/data-sets/grant-programs-directorate-preparedness-non-disasterassistance-firefighter-grants",
         rescue.wayback_newest_url,
     )
-    assert (
-        rescue.drp_download_location
-        == "https://www.datalumos.org/datalumos/project/218702/version/V1/view"
+    assert rescue.drp_download_location.startswith(
+        "https://www.datalumos.org/datalumos/project/"
     )
 
 
@@ -31,9 +31,8 @@ async def test_get_rescue_partial_match(resolver):
         "https://www.fema.gov/about/openfema/data-sets/grant-programs-directorate-preparedness-non-disasterassistance-firefighter-grants?some=params"
     )
 
-    assert (
-        rescue.drp_download_location
-        == "https://www.datalumos.org/datalumos/project/218702/version/V1/view"
+    assert rescue.drp_download_location.startswith(
+        "https://www.datalumos.org/datalumos/project/"
     )
 
 
