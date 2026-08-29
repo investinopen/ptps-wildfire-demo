@@ -7,5 +7,4 @@ class Rescue:
 
     original_url: str
     wayback_newest_url: str | None
-    drp_metadata_url: str | None
-    drp_download_location: str | None
+    drp_url: str | None

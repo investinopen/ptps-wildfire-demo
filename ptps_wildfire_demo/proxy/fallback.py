@@ -52,12 +52,7 @@ class Fallback:
             else:
                 msg = "Unable to load that URL."
 
-            fallback_urls = [
-                rescue.wayback_newest_url,
-                rescue.drp_metadata_url,
-                rescue.drp_download_location,
-            ]
-
+            fallback_urls = [rescue.wayback_newest_url, rescue.drp_url]
             fallbacks = "\n\n".join(url for url in fallback_urls if url)
             flow.response.text = f"{msg} Try:\n\n{fallbacks}"
         elif not rescue.wayback_newest_url:

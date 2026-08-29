@@ -45,8 +45,7 @@ class Resolver:
 
     async def get_rescue(self, url: str) -> Rescue:
         wayback_match = await self.internet_archive_client.get_match(url)
-        drp_metadata_url: str | None = None
-        drp_download_location: str | None = None
+        drp_url: str | None = None
 
         drp_match = self.get_drp_exact_match(url)
         if drp_match is None:
@@ -54,13 +53,10 @@ class Resolver:
             drp_match = self.get_drp_partial_match(url)
 
         if drp_match is not None:
-            drp_metadata_url = str_or_none(drp_match["metadata_url"])
-            # there theoretically could be multiple; grab the first
-            drp_download_location = str_or_none(drp_match["resources"][0]["url"])
+            drp_path = str_or_none(drp_match["url"])
+            if drp_path:
+                drp_url = f"https://portal.datarescueproject.org{drp_path}"
 
         return Rescue(
-            original_url=url,
-            wayback_newest_url=wayback_match,
-            drp_metadata_url=drp_metadata_url,
-            drp_download_location=drp_download_location,
+            original_url=url, wayback_newest_url=wayback_match, drp_url=drp_url
         )

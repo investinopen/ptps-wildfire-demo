@@ -21,8 +21,9 @@ async def test_get_rescue_match(resolver):
         r"http://web\.archive\.org/web/\d+/https://www\.fema\.gov/about/openfema/data-sets/grant-programs-directorate-preparedness-non-disasterassistance-firefighter-grants",
         rescue.wayback_newest_url,
     )
-    assert rescue.drp_download_location.startswith(
-        "https://www.datalumos.org/datalumos/project/"
+    assert (
+        rescue.drp_url
+        == "https://portal.datarescueproject.org/datasets/non-disaster-and-assistance-to-firefighter-grants/"
     )
 
 
@@ -31,16 +32,16 @@ async def test_get_rescue_partial_match(resolver):
         "https://www.fema.gov/about/openfema/data-sets/grant-programs-directorate-preparedness-non-disasterassistance-firefighter-grants?some=params"
     )
 
-    assert rescue.drp_download_location.startswith(
-        "https://www.datalumos.org/datalumos/project/"
+    assert (
+        rescue.drp_url
+        == "https://portal.datarescueproject.org/datasets/declaration-denials/"
     )
 
 
 async def test_get_rescue_no_match(resolver):
     rescue = await resolver.get_rescue("http://nota.realdomainname")
     assert rescue.wayback_newest_url is None
-    assert rescue.drp_metadata_url is None
-    assert rescue.drp_download_location is None
+    assert rescue.drp_url is None
 
 
 async def test_get_rescue_no_connection(resolver, httpx_mock: HTTPXMock):
@@ -50,5 +51,4 @@ async def test_get_rescue_no_connection(resolver, httpx_mock: HTTPXMock):
 
     rescue = await resolver.get_rescue("https://investinopen.org/")
     assert rescue.wayback_newest_url is None
-    assert rescue.drp_metadata_url is None
-    assert rescue.drp_download_location is None
+    assert rescue.drp_url is None
