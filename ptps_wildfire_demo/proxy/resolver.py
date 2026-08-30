@@ -26,8 +26,11 @@ class Resolver:
     async def resolve(self, url: str):
         """Gets the URL after following any redirects"""
 
-        response = await self.httpx_client.head(url, follow_redirects=True)
-        return str(response.url)
+        try:
+            response = await self.httpx_client.head(url, follow_redirects=True)
+            return str(response.url)
+        except httpx.ConnectError:
+            return url
 
     def _get_drp_match(self, boolean_index: pd.Series[bool]) -> pd.Series | None:
         matches = self.drp_rescues[boolean_index]
