@@ -19,7 +19,7 @@ class Resolver:
     def refresh(self):
         # This is the data behind https://portal.datarescueproject.org/datasets/.
         self.drp_rescues = pd.read_json(
-            "https://portal.datarescueproject.org/datasets.json",
+            "https://portal.datarescueproject.org/datasets-full.json",
             dtype_backend="pyarrow",
         )
 
