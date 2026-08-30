@@ -42,7 +42,7 @@ class Resolver:
         return self._get_drp_match(is_exact_match)
 
     def get_drp_partial_match(self, url: str) -> pd.Series | None:
-        """Look for record where the provided URL is based on the record's URL. This is intended to catch request URLs that are a sub-path, have parameters, etc. The matching could be even more robust."""
+        """Look for record where the provided URL is based on the record's URL. This is intended to catch request URLs that are a sub-path, have parameters, etc. (The matching could be even more robust.)"""
 
         is_partial_match = self.drp_rescues["data_source"].apply(
             lambda original_url: pd.notna(original_url) and url.startswith(original_url)
@@ -50,6 +50,8 @@ class Resolver:
         return self._get_drp_match(is_partial_match)
 
     def get_drp_match(self, url: str) -> pd.Series | None:
+        """Gets the match from the Data Rescue Portal, favoring exact matches but allowing for partial matches."""
+
         drp_match = self.get_drp_exact_match(url)
         if drp_match is None:
             # try a partial match
@@ -68,8 +70,14 @@ class Resolver:
 
     async def get_rescue(self, url: str) -> Rescue:
         resolved_url = await self.resolve(url)
-        wayback_match = await self.internet_archive_client.get_match(resolved_url)
-        drp_url = self.get_drp_url(resolved_url)
+
+        wayback_match = await self.internet_archive_client.get_match(url)
+        if wayback_match is None:
+            wayback_match = await self.internet_archive_client.get_match(resolved_url)
+
+        drp_url = self.get_drp_url(url)
+        if drp_url is None:
+            drp_url = self.get_drp_url(resolved_url)
 
         return Rescue(
             original_url=url,
