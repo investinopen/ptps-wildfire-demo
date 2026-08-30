@@ -23,6 +23,12 @@ class Resolver:
             dtype_backend="pyarrow",
         )
 
+    async def resolve(self, url: str):
+        """Gets the URL after following any redirects"""
+
+        response = await self.httpx_client.head(url, follow_redirects=True)
+        return str(response.url)
+
     def _get_drp_match(self, boolean_index: pd.Series[bool]) -> pd.Series | None:
         matches = self.drp_rescues[boolean_index]
         if len(matches) > 0:
@@ -61,8 +67,13 @@ class Resolver:
         return None
 
     async def get_rescue(self, url: str) -> Rescue:
-        wayback_match = await self.internet_archive_client.get_match(url)
-        drp_url = self.get_drp_url(url)
+        resolved_url = await self.resolve(url)
+        wayback_match = await self.internet_archive_client.get_match(resolved_url)
+        drp_url = self.get_drp_url(resolved_url)
+
         return Rescue(
-            original_url=url, wayback_newest_url=wayback_match, drp_url=drp_url
+            original_url=url,
+            resolved_url=resolved_url,
+            wayback_newest_url=wayback_match,
+            drp_url=drp_url,
         )

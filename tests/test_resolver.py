@@ -10,6 +10,17 @@ async def resolver(httpx_client):
     return Resolver(httpx_client)
 
 
+async def test_resolve_self(resolver):
+    url = "https://www.ncei.noaa.gov/access/storm-events-database/"
+    resolved_url = await resolver.resolve(url)
+    assert resolved_url == url
+
+
+async def test_resolve_redirect(resolver):
+    resolved_url = await resolver.resolve("https://www.ncdc.noaa.gov/stormevents/")
+    assert resolved_url == "https://www.ncei.noaa.gov/access/storm-events-database/"
+
+
 async def test_get_rescue_match(resolver):
     rescue = await resolver.get_rescue(
         "https://www.fema.gov/about/openfema/data-sets/grant-programs-directorate-preparedness-non-disasterassistance-firefighter-grants"
