@@ -9,6 +9,8 @@ import pandas as pd
 from duckdb import DuckDBPyConnection
 from lonboard.colormap import apply_continuous_cmap
 
+from ptps_wildfire_demo.proxy.constants import USER_AGENT
+
 
 def run_script_in_db(conn: DuckDBPyConnection, path: Path | str):
     with open(path, "r") as f:
@@ -34,18 +36,26 @@ def get_geo_df(conn: DuckDBPyConnection, query: str, geom_col="geom"):
 
 
 async def get_status(client: httpx.AsyncClient, url: str) -> str:
+    headers = {"User-Agent": USER_AGENT}
+
     try:
-        response = await client.head(url, follow_redirects=True, timeout=20)
-        status = response.status_code
-        if 200 <= status < 300:
-            return f"🟢 {status}"
-        if 300 <= status < 400:
-            return f"🟡 {status}"
-        return f"🔴 {status}"
+        response = await client.head(
+            url,
+            headers=headers,
+            follow_redirects=True,
+            timeout=20,
+        )
     except httpx.TimeoutException:
         return "🔴 timeout"
     except httpx.HTTPError as error:
         return f"🔴 error: {error}"
+
+    status = response.status_code
+    if 200 <= status < 300:
+        return f"🟢 {status}"
+    if 300 <= status < 400:
+        return f"🟡 {status}"
+    return f"🔴 {status}"
 
 
 async def get_statuses(client: httpx.AsyncClient, urls: Iterable[str]) -> list[str]:
