@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Dataset rescue statuses</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --border: #d0d7de;
+      --header-bg: #f6f8fa;
+      --row-alt: #f6f8fa;
+    }
+
+    body {
+      font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
+        sans-serif;
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      line-height: 1.5;
+    }
+
+    h1 {
+      margin-bottom: 0.25rem;
+    }
+
+    h2 {
+      margin-bottom: 0.25rem;
+    }
+
+    p.subtitle {
+      color: #57606a;
+      margin-top: 0;
+    }
+
+    .dataset {
+      margin-top: 2.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .dataset p.description {
+      color: #57606a;
+      margin-top: 0.25rem;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    th,
+    td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--header-bg);
+    }
+
+    tbody tr:nth-child(even) {
+      background: var(--row-alt);
+    }
+
+    a {
+      word-break: break-all;
+    }
+
+    .empty {
+      color: #8b949e;
+      font-style: italic;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Dataset rescue statuses</h1>
+  <p class="subtitle">
+    Checks the rescue status of the
+    <a href="https://docs.google.com/document/d/1rYsP1I1-TAd3Tu-G6EJ-5o7IbQIHf_dKT3DjH8IpQuo/edit?tab=t.0#heading=h.87di2doy0z55"
+      target="_blank" rel="noopener">example data sources</a>.
+  </p>
+
+  {% for dataset in datasets %}
+  <section class="dataset">
+    <h2>{{ dataset.name }}</h2>
+    <p class="description">{{ dataset.description }}</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Status</th>
+          <th>
+            In
+            <a href="https://web.archive.org/" target="_blank" rel="noopener">Wayback Machine</a>?
+          </th>
+          <th>
+            In
+            <a href="https://portal.datarescueproject.org/" target="_blank" rel="noopener">Data Rescue Project
+              Portal</a>?
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in dataset.rows %}
+        <tr>
+          <td>{{ row.url | link_label(row.type) }}</td>
+          <td>{{ row.status }}</td>
+          <td>{{ row.wayback_url | yes_no }}</td>
+          <td>{{ row.drp_url | yes_no }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  {% endfor %}
+</body>
+
+</html>
