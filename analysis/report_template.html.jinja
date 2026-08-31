@@ -100,17 +100,14 @@
       const generatedAt = new Date(el.getAttribute("datetime"));
       const minutes = Math.round((Date.now() - generatedAt.getTime()) / 60000);
 
+      const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
       let relative;
-      if (minutes < 1) {
-        relative = "just now";
-      } else if (minutes < 60) {
-        relative = `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+      if (minutes < 60) {
+        relative = rtf.format(-minutes, "minute");
       } else if (minutes < 60 * 24) {
-        const hours = Math.round(minutes / 60);
-        relative = `${hours} hour${hours === 1 ? "" : "s"} ago`;
+        relative = rtf.format(-Math.round(minutes / 60), "hour");
       } else {
-        const days = Math.round(minutes / (60 * 24));
-        relative = `${days} day${days === 1 ? "" : "s"} ago`;
+        relative = rtf.format(-Math.round(minutes / (60 * 24)), "day");
       }
 
       el.textContent = `${relative} (${el.textContent})`;
