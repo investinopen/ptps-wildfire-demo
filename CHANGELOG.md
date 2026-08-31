@@ -1,62 +1,48 @@
 # Changelog
 
-## 2026-08-30 to 2026-08-31
+Only includes notable updates.
 
-- **Browser extension:**
-  - Established the initial extension with tests and build instructions.
-  - Added and refined Data Rescue Portal links, match-only overlays, and a modal experience.
+## 2026-08-31
 
-    ![modal showing over the EPA EJScreener](img/extension_modal_2026-08-31.png)
+- **Browser extension:** Introduced the extension, linking matched pages to the Data Rescue Portal through a modal overlay.
 
-  - Added extension documentation, tests, and GitHub Actions coverage.
-  - Prevented duplicate pull-request builds.
+  ![modal showing over the EPA EJScreener](img/extension_modal_2026-08-31.png)
 
 - **HTTP proxy:**
-  - Improved rescued-dataset matching, redirect handling, timeout and server-failure recovery, and duplicate-request avoidance.
-  - Moved fallback discovery fully into the proxy.
-  - Improved fallback responses for JSON clients and limited passive Internet Archive saves to GET requests.
+  - Added support for JSON responses
+  - Improved URL matching
+  - Improved error handling
 - **Wildfire analysis:** Expanded rescue-status analysis and updated its datasets and notebook output.
 
 ## 2026-08-28
 
-- **HTTP proxy:** Switched rescue-data discovery to the Data Rescue Portal dataset endpoint.
+- **HTTP proxy:**
+  - Centralized fallback discovery
+  - Improved URL matching
+  - Look for archives of redirect URLs, when archives of the original aren't available
+  - Improved error and JSON responses, plus passive archiving behavior.
 - Reworked wildfire dataset status analysis around a CSV source, broader URL coverage, and rescue-status reporting.
+- **HTTP proxy:**
+  - Introduced the mitmproxy fallback addon and demo.
+  - Added documentation, integration tests, and GitHub Actions automation.
 
-## 2026-08-21 to 2026-08-24
+## 2026-08-24
 
 - **HTTP proxy:**
-  - Added Data Rescue Project URL resolution and consolidated response-error handling.
-  - Added coverage-enabled tests and a proxy-free demo.
-  - Added Wayback Machine lookup to the fallback flow and improved resolver, event-loop, URL, and proxy configuration handling.
-  - Reorganized modules and surfaced metadata and all fallback URLs.
-  - Improved handling of Internet Archive timeouts and connection failures.
-  - Introduced `Rescue` and `InternetArchiveClient` abstractions, Internet Archive authentication, conditional passive archiving, and component-status reporting.
-  - Refined dependency organization, logging, and tests.
-- **Wildfire analysis:**
-  - Reorganized the project README and moved wildfire analysis into its own directory.
-  - Added rescued-data status exploration.
-  - Expanded the wildfire dataset inventory.
-  - Refined analysis documentation.
+  - Added Data Rescue Project and Wayback Machine lookup to the fallback flow.
+  - Improved resilience with reusable rescue and Internet Archive clients, authentication, error handling, and tests.
+- **Wildfire analysis:** Reorganized the analysis workspace and expanded rescued-data status coverage.
 
-## 2026-08-18 to 2026-08-20
+## 2026-08-20
 
-- **HTTP proxy:**
-  - Added mitmproxy usage documentation and pytest-based proxy and curl tests.
-  - Delivered the initial mitmproxy fallback addon with custom error messaging.
-  - Added proxy integration tests, debugging support, and GitHub Actions test automation.
-  - Added a demo and documented minimal fallback behavior.
-- **Browser extension:** Proposed the extension direction.
+- **HTTP proxy:** Introduced the mitmproxy fallback addon, demo, documentation, integration tests, and GitHub Actions automation.
+- **Browser extension:** Established the extension direction.
 
-## 2026-08-04 to 2026-08-10
+## 2026-08-10
 
 - **Wildfire analysis:**
-  - Added initial DuckDB setup, the Open Climate Risk notebook, and a simplified analysis workflow.
-  - Added FIRMS active-fire queries and Source Cooperative Data Proxy setup; corrected OCR data retrieval.
-  - Added native DuckDB notebook connectivity, Parquet-backed burn-probability data, and initial wildfire-risk queries.
-  - Created DuckDB views for wildfire sources, documented their metadata, and configured memory limits and HTTP caching.
-  - Added nationwide fire-risk data retrieval, state boundaries and risk mapping, burn-probability visualizations, and streamlined data-processing notebooks.
-  - Added nationwide burn-probability data and percentile-based views.
-  - Added red-flag alert mapping and improved map output.
+  - Established a DuckDB- and notebook-based workflow for wildfire, burn-probability, active-fire, and climate-risk data.
+  - Added nationwide risk and burn-probability visualizations, including state boundaries and red-flag alerts.
 
 ## 2026-07-29
 
