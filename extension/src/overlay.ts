@@ -1,27 +1,13 @@
-/** Mirrors the response-rewriting branch of Fallback.response, for the case where there's a DRP match. */
-export function buildFallbackMessage(
-  statusCode: number,
-  drpUrl: string,
-): string {
-  const msg =
-    statusCode === 404
-      ? "That URL is no longer available."
-      : "Unable to load that URL.";
-
-  return `${msg} Try:\n\n${drpUrl}`;
-}
-
 /**
  * Injected into the target page via browser.scripting.executeScript, so it must be
  * self-contained — it cannot close over anything outside its own arguments.
  */
-export function showFallbackOverlay(message: string): void {
+export function showFallbackOverlay(drpUrl: string): void {
   const bannerId = "ptps-wildfire-demo-fallback-banner";
   if (document.getElementById(bannerId)) return;
 
   const banner = document.createElement("div");
   banner.id = bannerId;
-  banner.textContent = message;
   Object.assign(banner.style, {
     position: "fixed",
     top: "0",
@@ -33,8 +19,13 @@ export function showFallbackOverlay(message: string): void {
     padding: "12px 16px",
     fontFamily: "sans-serif",
     fontSize: "14px",
-    whiteSpace: "pre-wrap",
   } satisfies Partial<CSSStyleDeclaration>);
+
+  const link = document.createElement("a");
+  link.href = drpUrl;
+  link.textContent = "This data has been rescued.";
+  link.style.color = "inherit";
+  banner.appendChild(link);
 
   document.documentElement.appendChild(banner);
 }

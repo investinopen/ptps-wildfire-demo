@@ -2,7 +2,7 @@ import browser, { WebRequest } from "webextension-polyfill";
 import { DRP_REFRESH_ALARM, DRP_REFRESH_PERIOD_MINUTES } from "./constants";
 import { refreshDrpCache } from "./drpClient";
 import { getRescue } from "./resolver";
-import { buildFallbackMessage, showFallbackOverlay } from "./overlay";
+import { showFallbackOverlay } from "./overlay";
 
 /** Mirrors the error-response branch of Fallback.response. webRequest.onCompleted is non-blocking, so this can't rewrite the body directly. */
 async function handleMainFrameResponse(
@@ -16,11 +16,10 @@ async function handleMainFrameResponse(
   const rescue = await getRescue(details.url);
   if (!rescue.drpUrl) return;
 
-  const message = buildFallbackMessage(statusCode, rescue.drpUrl);
   await browser.scripting.executeScript({
     target: { tabId: details.tabId },
     func: showFallbackOverlay,
-    args: [message],
+    args: [rescue.drpUrl],
   });
 }
 
