@@ -14,6 +14,8 @@ from pathlib import Path
 import httpx
 from mitmproxy import http
 
+from ptps_wildfire_demo.proxy.rescue import Rescue
+
 try:
     from ptps_wildfire_demo.proxy.resolver import Resolver
 except ModuleNotFoundError:
@@ -34,6 +36,29 @@ def wants_json(request: http.Request) -> bool:
     )
 
 
+def replace_error_response(flow: http.HTTPFlow, rescue: Rescue) -> None:
+    if flow.response is None:
+        return
+
+    msg = (
+        "That URL is no longer available."
+        if flow.response.status_code == 404
+        else "Unable to load that URL."
+    )
+    fallback_urls: list[str] = [
+        url for url in (rescue.wayback_newest_url, rescue.drp_url) if url is not None
+    ]
+    if wants_json(flow.request):
+        flow.response.headers["content-type"] = "application/json"
+        flow.response.text = json.dumps(
+            {"message": msg, "fallback_urls": fallback_urls}
+        )
+    else:
+        flow.response.headers["content-type"] = "text/plain; charset=utf-8"
+        fallbacks = "\n\n".join(fallback_urls)
+        flow.response.text = f"{msg} Try:\n\n{fallbacks}"
+
+
 class Fallback:
     """https://docs.mitmproxy.org/stable/api/events.html"""
 
@@ -44,41 +69,23 @@ class Fallback:
         client = httpx.AsyncClient()
         self.resolver = Resolver(client)
 
+    def save_to_internet_archive(self, original_url: str) -> None:
+        logger.info(f"{original_url} doesn't exist in the Internet Archive — saving")
+        loop = asyncio.get_event_loop()
+        loop.create_task(self.resolver.internet_archive_client.save(original_url))
+
     # https://docs.mitmproxy.org/stable/addons/examples/#nonblocking
     async def response(self, flow: http.HTTPFlow):
         if flow.response is None:
             return
 
-        status_code = flow.response.status_code
         original_url = flow.request.url
         rescue = await self.resolver.get_rescue(original_url)
 
-        if status_code == 404 or status_code >= 500:
-            if status_code == 404:
-                msg = "That URL is no longer available."
-            else:
-                msg = "Unable to load that URL."
-
-            fallback_urls: list[str] = [
-                url
-                for url in (rescue.wayback_newest_url, rescue.drp_url)
-                if url is not None
-            ]
-            if wants_json(flow.request):
-                flow.response.headers["content-type"] = "application/json"
-                flow.response.text = json.dumps(
-                    {"message": msg, "fallback_urls": fallback_urls}
-                )
-            else:
-                flow.response.headers["content-type"] = "text/plain; charset=utf-8"
-                fallbacks = "\n\n".join(fallback_urls)
-                flow.response.text = f"{msg} Try:\n\n{fallbacks}"
+        if flow.response.status_code == 404 or flow.response.status_code >= 500:
+            replace_error_response(flow, rescue)
         elif not rescue.wayback_newest_url:
-            logger.info(
-                f"{original_url} doesn't exist in the Internet Archive — saving"
-            )
-            loop = asyncio.get_event_loop()
-            loop.create_task(self.resolver.internet_archive_client.save(original_url))
+            self.save_to_internet_archive(original_url)
 
         return
 
