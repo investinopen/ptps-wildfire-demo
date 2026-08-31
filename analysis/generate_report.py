@@ -38,6 +38,14 @@ def get_datasets_to_check(datasets: pd.DataFrame) -> pd.DataFrame:
     return datasets[no_auth & not_src_coop & not_dryad & has_example_data_url]
 
 
+def is_drp_applicable(webpage: pd.Series) -> pd.Series:
+    """The Data Rescue Project Portal doesn't catalog source.coop or Dryad-hosted datasets."""
+
+    not_src_coop = ~webpage.str.startswith("https://source.coop/")
+    not_dryad = ~webpage.str.contains("/dryad.")
+    return not_src_coop & not_dryad
+
+
 async def get_example_data_url_results(
     client: httpx.AsyncClient, resolver: Resolver, datasets_to_check: pd.DataFrame
 ) -> pd.DataFrame:
@@ -85,6 +93,7 @@ async def get_webpage_results(
     results = pd.merge(
         datasets[["name", "description", "webpage"]], page_rescues_df, on="webpage"
     )
+    results["drp_applicable"] = is_drp_applicable(results["webpage"])
     return results.drop(columns="resolved_url")
 
 
@@ -106,6 +115,7 @@ def get_dataset_sections(
                 "status": dataset["webpage_status"],
                 "wayback_url": dataset["webpage_wayback_url"],
                 "drp_url": dataset["webpage_drp_url"],
+                "drp_applicable": dataset["drp_applicable"],
             }
         ]
         if pd.notna(dataset["example_data_url"]):
@@ -116,6 +126,7 @@ def get_dataset_sections(
                     "status": dataset["example_data_url_status"],
                     "wayback_url": dataset["example_data_url_wayback_url"],
                     "drp_url": dataset["example_data_url_drp_url"],
+                    "drp_applicable": dataset["drp_applicable"],
                 }
             )
 

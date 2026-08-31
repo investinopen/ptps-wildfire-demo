@@ -140,7 +140,8 @@
           <td>{{ row.url | link_label(row.type) }}</td>
           <td>{{ row.status }}</td>
           <td>{{ row.wayback_url | yes_no }}</td>
-          <td>{{ row.drp_url | yes_no }}</td>
+          <td>{% if row.drp_applicable %}{{ row.drp_url | yes_no }}{% else %}<span class="empty">N/A</span>{% endif %}
+          </td>
         </tr>
         {% endfor %}
       </tbody>
