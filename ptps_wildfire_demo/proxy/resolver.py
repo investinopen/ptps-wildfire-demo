@@ -19,7 +19,7 @@ class Resolver:
         self.refresh()
 
     def refresh(self):
-        # This is the data behind https://portal.datarescueproject.org/datasets/.
+        """Retrieve the data behind https://portal.datarescueproject.org/datasets/"""
         self.drp_rescues = pd.read_json(
             "https://portal.datarescueproject.org/datasets-full.json",
             dtype_backend="pyarrow",
@@ -64,7 +64,7 @@ class Resolver:
         return None
 
     def get_drp_match(self, url: str) -> pd.Series | None:
-        """Gets the match from the Data Rescue Portal, favoring exact matches but allowing for partial matches."""
+        """Gets the match from the Data Rescue Project, favoring exact matches but allowing for partial matches."""
 
         drp_match = self.get_drp_exact_match(url)
         if drp_match is None:

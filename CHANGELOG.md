@@ -15,20 +15,23 @@ Only includes notable updates.
     - This pattern can be expanded to save data to other repositories, such as [Dryad](https://datadryad.org/) / [Source Cooperative](https://docs.source.coop/data-upload).
   - Improved URL matching.
   - Improved error handling.
-- Expanded the [wildfire dataset status analysis](proxy/fire_datasets.ipynb) to include more URLs.
+- [**Analysis:**](README.md#analysis)
+  - Expanded the [wildfire dataset status analysis](analysis/fire_datasets.ipynb) to include the [full set of URLs](analysis/fire_datasets.csv) that don't require authentication.
 
 ## 2026-08-24
 
 - [**HTTP proxy:**](README.md#http-proxy) Find rescued data in the [Data Rescue Project](https://portal.datarescueproject.org/datasets/) and [Wayback Machine](https://web.archive.org/).
-- [Show the rescue status of the wildfire datasets.](proxy/fire_datasets.ipynb)
+- [**Analysis:**](README.md#analysis)
+  - [Show the rescue status of the wildfire datasets.](analysis/fire_datasets.ipynb)
+  - [Show the statuses of the source URLs archived by the Data Rescue Project.](analysis/rescues.ipynb)
 
 ## 2026-08-20
 
-- [**HTTP proxy:**](README.md#http-proxy) Introduced the mitmproxy fallback addon. [Demo.](https://drive.google.com/file/d/1IuWQqmfLEJsdH916C8GE9MWRktg6EKA9/view?usp=drivesdk)
+- [**HTTP proxy:**](README.md#http-proxy) Introduced the [mitmproxy](https://www.mitmproxy.org/) fallback addon. [Demo.](https://drive.google.com/file/d/1IuWQqmfLEJsdH916C8GE9MWRktg6EKA9/view?usp=drivesdk)
 
 ## 2026-08-10
 
-- [**Wildfire analysis:**](proxy/fire_datasets.ipynb)
+- [**Analysis:**](README.md#analysis) Started [working with wildfire risk data](analysis/risk.ipynb).
   - Established a DuckDB- and notebook-based workflow for wildfire, burn-probability, active-fire, and climate-risk data.
   - Added nationwide risk and burn-probability visualizations, including state boundaries and red-flag alerts.
 
