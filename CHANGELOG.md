@@ -17,7 +17,7 @@ Only includes notable updates.
   - Improved error handling.
 - [**Analysis:**](README.md#analysis) Expanded the [wildfire dataset status analysis](analysis/fire_datasets.ipynb).
   - Include [all datasets](analysis/fire_datasets.csv) that don't require authentication.
-  - Display the rescue status of each data URL and webpage.
+  - Display the source and rescue status of each data URL and webpage. This is meant to mimic the status dashboard from [**@jring-o**'s prototype](https://github.com/jring-o/scsd).
 
 ## 2026-08-24
 
