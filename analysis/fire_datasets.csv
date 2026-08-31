@@ -1,6 +1,6 @@
 access_type,name,description,webpage,example_data_url
-No auth,CarbonPlan Open Climate Risk,"Building-level wildfire risk.",https://source.coop/carbonplan/carbonplan-ocr,https://s3.us-west-2.amazonaws.com/us-west-2.opendata.source.coop/carbonplan/carbonplan-ocr/output/fire-risk/vector/production/v1.1.0/geoparquet/buildings.parquet
-No auth,cboettig fire,"Historical burned-area perimeters and hazard potential.",https://source.coop/cboettig/fire,https://data.source.coop/cboettig/fire/usgs-mtbs.parquet
+No auth,CarbonPlan Open Climate Risk,"Building-level wildfire risk.",https://source.coop/carbonplan/carbonplan-ocr,https://data.source.coop/carbonplan/carbonplan-ocr/output/fire-risk/vector/production/v1.1.0/geoparquet/consolidated-buildings.parquet
+No auth,cboettig fire,"Historical burned-area perimeters and hazard potential.",https://source.coop/cboettig/fire,https://data.source.coop/cboettig/fire/mtbs-perimeters-1984-2024.parquet
 No auth,bkr observations,"Weather station, radiosonde, and aviation observations.",https://source.coop/bkr/obs,
 No auth,giswqs National Wetlands Inventory,"National Wetlands Inventory.",https://source.coop/giswqs/nwi,
 No auth,USFS probabilistic wildfire risk burn probability,"Burn probability and flame-length grids.",https://data-usfs.hub.arcgis.com/datasets/usfs::probabilistic-wildfire-risk-burn-probability-image-service/explore,"https://imagery.geoplatform.gov/iipp/rest/services/Fire_Aviation/USFS_EDW_RMRS_ProbabilisticWildfireRiskBurnProbability/ImageServer/exportImage?bbox=-2.00375070672E7,2135965.179399997,-7130157.067200001,1.1597575179399997E7&f=image"
