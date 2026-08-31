@@ -163,7 +163,7 @@ async def main():
 
     env = Environment(loader=FileSystemLoader(ANALYSIS_DIR))
     env.filters["linkify"] = linkify
-    template = env.get_template("report_template.html")
+    template = env.get_template("report_template.html.jinja")
     html = template.render(datasets=consolidated_results)
 
     OUTPUT_PATH.write_text(html)
