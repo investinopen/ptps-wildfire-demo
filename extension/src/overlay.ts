@@ -56,6 +56,22 @@ export function showFallbackOverlay(drpUrl: string): void {
   });
   dialog.appendChild(ignoreLink);
 
+  const attribution = document.createElement("p");
+  Object.assign(attribution.style, {
+    fontSize: "10px",
+    fontStyle: "italic",
+    marginBottom: "0",
+  } satisfies Partial<CSSStyleDeclaration>);
+
+  const attributionLink = document.createElement("a");
+  attributionLink.textContent = "PtPS browser extension";
+  attributionLink.href =
+    "https://github.com/investinopen/ptps-wildfire-demo#browser-extension";
+  attributionLink.target = "_blank";
+  attribution.append(attributionLink);
+
+  dialog.appendChild(attribution);
+
   document.documentElement.appendChild(dialog);
   dialog.showModal();
   dialog.addEventListener("click", (event) => {
