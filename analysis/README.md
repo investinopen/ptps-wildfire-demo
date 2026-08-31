@@ -1,3 +1,7 @@
+# Analysis
+
+## [Wildfire risk](risk.ipynb)
+
 This code was written to explore various relevant datasets in different formats, experimenting with how to bring them together in a cohesive way.
 
 Requires [DuckDB](https://duckdb.org/).
@@ -20,3 +24,7 @@ uv run python generate_report.py
 Then open the generated `fire-datasets-report.html` in a browser.
 
 The report is also published automatically to GitHub Pages (via [`.github/workflows/publish-report.yml`](../.github/workflows/publish-report.yml)) whenever changes are pushed to `analysis/` on `main`. Enable this by setting the repo's Pages source to "GitHub Actions" under Settings > Pages.
+
+## [Data Rescue Project datasets](rescues.ipynb)
+
+Check the statuses of source data archived by the [Data Rescue Project](https://www.datarescueproject.org/).

@@ -169,10 +169,6 @@ It's recommended that you use this alongside the [official Internet Archive Wayb
 
 ## [Analysis](analysis/)
 
-- [**Wildfire risk:**](analysis/risk.ipynb) Experimenting with accessing wildfire data in different formats through DuckDB, XArray, etc.
-- [**Rescues:**](analysis/rescues.ipynb) Check the statuses of source data archived by the [Data Rescue Project](https://www.datarescueproject.org/).
-- [**Wildfire datasets:**](analysis/fire_datasets.ipynb) Check the rescue statuses of the [wildfire datasets](analysis/fire_datasets.csv).
-
 ## See also
 
 - [The Data Resilience Funding Landscape: A Preliminary Analysis](https://investinopen.org/blog/data-resilience-funding-landscape/)
