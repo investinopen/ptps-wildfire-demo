@@ -18,3 +18,5 @@ uv run python generate_report.py
 ```
 
 Then open the generated `fire-datasets-report.html` in a browser.
+
+The report is also published automatically to GitHub Pages (via [`.github/workflows/publish-report.yml`](../.github/workflows/publish-report.yml)) whenever changes are pushed to `analysis/` on `main`. Enable this by setting the repo's Pages source to "GitHub Actions" under Settings > Pages.
