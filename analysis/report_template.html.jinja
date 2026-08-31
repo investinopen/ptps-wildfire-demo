@@ -88,9 +88,34 @@
       target="_blank">example data sources</a>.
   </p>
   <p class="subtitle">
-    Generated {{ generated_at.strftime("%Y-%m-%d %H:%M UTC") }}. Updates daily. Source:
+    Generated
+    <time id="generated-at" datetime="{{ generated_at.isoformat() }}">{{ generated_at.strftime("%Y-%m-%d %H:%M UTC")
+      }}</time>.
+    Updates daily. Source:
     <a href="https://github.com/investinopen/ptps-wildfire-demo" target="_blank">investinopen/ptps-wildfire-demo</a>.
   </p>
+  <script>
+    (() => {
+      const el = document.getElementById("generated-at");
+      const generatedAt = new Date(el.getAttribute("datetime"));
+      const minutes = Math.round((Date.now() - generatedAt.getTime()) / 60000);
+
+      let relative;
+      if (minutes < 1) {
+        relative = "just now";
+      } else if (minutes < 60) {
+        relative = `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+      } else if (minutes < 60 * 24) {
+        const hours = Math.round(minutes / 60);
+        relative = `${hours} hour${hours === 1 ? "" : "s"} ago`;
+      } else {
+        const days = Math.round(minutes / (60 * 24));
+        relative = `${days} day${days === 1 ? "" : "s"} ago`;
+      }
+
+      el.textContent = `${relative} (${el.textContent})`;
+    })();
+  </script>
 
   {% for dataset in datasets %}
   <section class="dataset">
