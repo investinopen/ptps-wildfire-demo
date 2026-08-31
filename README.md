@@ -132,9 +132,9 @@ The proxy / Python package can be used instead.
 
 ⚠️ **Planned**
 
-## Browser extension
+## [Browser extension](extension/)
 
-⚠️ **Planned**
+⚠️ **In development**
 
 ## See also
 

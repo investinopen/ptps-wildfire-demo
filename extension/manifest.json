@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "PtPS Wildfire Demo Fallback",
+  "version": "0.1.0",
+  "description": "Shows rescued-data fallback links when a source URL 404s or errors.",
+  "permissions": ["webRequest", "scripting", "storage", "alarms"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  }
+}
