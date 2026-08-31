@@ -1,6 +1,7 @@
 import re
 
 import httpx
+import pandas as pd
 import pytest
 from pytest_httpx import HTTPXMock
 
@@ -50,8 +51,60 @@ async def test_get_rescue_partial_match(resolver):
 
     assert (
         rescue.drp_url
-        == "https://portal.datarescueproject.org/datasets/declaration-denials/"
+        == "https://portal.datarescueproject.org/datasets/non-disaster-and-assistance-to-firefighter-grants/"
     )
+
+
+def test_get_drp_match_prefers_longest_common_prefix():
+    resolver = Resolver.__new__(Resolver)
+    resolver.drp_rescues = pd.DataFrame(
+        {
+            "data_source": [
+                "https://example.com/",
+                "https://example.com/datasets/",
+                "https://example.com/datasets/forest",
+                "https://example.com/datasets/forest-floods",
+            ],
+            "url": [
+                "/",
+                "/datasets/",
+                "/datasets/other/",
+                "/datasets/specific/",
+            ],
+        }
+    )
+
+    match = resolver.get_drp_match(
+        "https://example.com/datasets/forest-floods?year=2026"
+    )
+
+    assert match is not None
+    assert match["url"] == "/datasets/specific/"
+
+
+def test_get_drp_match_prefers_no_common_prefix():
+    resolver = Resolver.__new__(Resolver)
+    resolver.drp_rescues = pd.DataFrame(
+        {
+            "data_source": [
+                "https://example.com/",
+                "https://example.com/datasets/",
+                "https://example.com/datasets/forest-cover",
+            ],
+            "url": [
+                "/",
+                "/datasets/",
+                "/datasets/other/",
+            ],
+        }
+    )
+
+    match = resolver.get_drp_match(
+        "https://example.com/datasets/forest-floods?year=2026"
+    )
+
+    assert match is not None
+    assert match["url"] == "/datasets/"
 
 
 async def test_get_rescue_no_match(resolver):
