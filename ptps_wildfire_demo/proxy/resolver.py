@@ -27,9 +27,11 @@ class Resolver:
         """Gets the URL after following any redirects"""
 
         try:
-            response = await self.httpx_client.head(url, follow_redirects=True)
+            response = await self.httpx_client.head(
+                url, timeout=5, follow_redirects=True
+            )
             return str(response.url)
-        except httpx.ConnectError:
+        except (httpx.ConnectError, httpx.ReadTimeout):
             return url
 
     def _get_drp_match(self, boolean_index: pd.Series[bool]) -> pd.Series | None:

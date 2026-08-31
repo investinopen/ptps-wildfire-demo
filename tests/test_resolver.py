@@ -1,6 +1,8 @@
 import re
 
+import httpx
 import pytest
+from pytest_httpx import HTTPXMock
 
 from ptps_wildfire_demo.proxy.resolver import Resolver
 
@@ -54,5 +56,17 @@ async def test_get_rescue_partial_match(resolver):
 
 async def test_get_rescue_no_match(resolver):
     rescue = await resolver.get_rescue("http://nota.realdomainname")
+    assert rescue.wayback_newest_url is None
+    assert rescue.drp_url is None
+
+
+async def test_get_rescue_timeout(resolver, httpx_mock: HTTPXMock):
+    """Imagining that the Resolver isn't able to reach the upstream servers sometimes"""
+
+    httpx_mock.add_exception(
+        httpx.ReadTimeout("Unable to read within timeout"), is_reusable=True
+    )
+
+    rescue = await resolver.get_rescue("https://investinopen.org/")
     assert rescue.wayback_newest_url is None
     assert rescue.drp_url is None
