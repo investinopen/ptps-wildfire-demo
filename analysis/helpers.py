@@ -1,6 +1,9 @@
+import asyncio
+from collections.abc import Iterable
 from pathlib import Path
 
 import geopandas as gpd
+import httpx
 import matplotlib
 import pandas as pd
 from duckdb import DuckDBPyConnection
@@ -28,3 +31,22 @@ def to_continuous_color_map(values: pd.Series, cmap: str):
 def get_geo_df(conn: DuckDBPyConnection, query: str, geom_col="geom"):
     df = conn.execute(query).df()
     return gpd.GeoDataFrame(df, geometry=geom_col)
+
+
+async def get_status(client: httpx.AsyncClient, url: str) -> str:
+    try:
+        response = await client.head(url, follow_redirects=True, timeout=20)
+        status = response.status_code
+        if 200 <= status < 300:
+            return f"🟢 {status}"
+        if 300 <= status < 400:
+            return f"🟡 {status}"
+        return f"🔴 {status}"
+    except httpx.TimeoutException:
+        return "🔴 timeout"
+    except httpx.HTTPError as error:
+        return f"🔴 error: {error}"
+
+
+async def get_statuses(client: httpx.AsyncClient, urls: Iterable[str]) -> list[str]:
+    return await asyncio.gather(*(get_status(client, url) for url in urls))
