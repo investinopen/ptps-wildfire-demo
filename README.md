@@ -134,7 +134,7 @@ The proxy / Python package can be used instead.
 
 ## [Browser extension](extension/)
 
-⚠️ **In development**
+✅ **Implemented**
 
 ### Usage
 

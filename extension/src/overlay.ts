@@ -18,7 +18,7 @@ export function showFallbackOverlay(drpUrl: string): void {
     color: "#fff",
     padding: "12px 16px",
     fontFamily: "sans-serif",
-    fontSize: "14px",
+    fontSize: "18px",
   } satisfies Partial<CSSStyleDeclaration>);
 
   const link = document.createElement("a");
