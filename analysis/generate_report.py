@@ -129,20 +129,27 @@ def get_dataset_sections(
     return sections
 
 
-def linkify(value: object) -> Markup:
-    """Renders a URL as a clickable link; passes through other values as escaped text."""
+def link_label(url: object, label: str) -> Markup:
+    """Renders a label as a link to the given URL."""
 
-    if value is None or (isinstance(value, float) and math.isnan(value)):
-        return Markup('<span class="empty">—</span>')
+    escaped_label = html.escape(label)
+    if url is None or (isinstance(url, float) and math.isnan(url)):
+        return Markup(escaped_label)
 
-    text = str(value)
-    if text.startswith(("http://", "https://")):
-        escaped = html.escape(text)
-        return Markup(
-            f'<a href="{escaped}" target="_blank" rel="noopener">{escaped}</a>'
-        )
+    escaped_url = html.escape(str(url))
+    return Markup(
+        f'<a href="{escaped_url}" target="_blank" rel="noopener">{escaped_label}</a>'
+    )
 
-    return Markup(html.escape(text))
+
+def yes_no(url: object) -> Markup:
+    """Renders "Yes" (linked to the given URL) or "No" if there's no URL."""
+
+    if url is None or (isinstance(url, float) and math.isnan(url)):
+        return Markup("No")
+
+    escaped_url = html.escape(str(url))
+    return Markup(f'<a href="{escaped_url}" target="_blank" rel="noopener">Yes</a>')
 
 
 async def main():
@@ -162,7 +169,8 @@ async def main():
     )
 
     env = Environment(loader=FileSystemLoader(ANALYSIS_DIR))
-    env.filters["linkify"] = linkify
+    env.filters["link_label"] = link_label
+    env.filters["yes_no"] = yes_no
     template = env.get_template("report_template.html.jinja")
     html = template.render(datasets=consolidated_results)
 
