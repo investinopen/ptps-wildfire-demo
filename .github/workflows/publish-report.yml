@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - analysis/**
+      - ptps_wildfire_demo/**
       - .github/workflows/publish-report.yml
   schedule:
     - cron: "0 0 * * *"
