@@ -3,31 +3,23 @@ import { DRP_REFRESH_ALARM, DRP_REFRESH_PERIOD_MINUTES } from "./constants";
 import { refreshDrpCache } from "./drpClient";
 import { getRescue } from "./resolver";
 import { buildFallbackMessage, showFallbackOverlay } from "./overlay";
-import { saveToWayback } from "./waybackClient";
 
-/** Mirrors Fallback.response. webRequest.onCompleted is non-blocking, so this can't rewrite the body directly. */
+/** Mirrors the error-response branch of Fallback.response. webRequest.onCompleted is non-blocking, so this can't rewrite the body directly. */
 async function handleMainFrameResponse(
   details: WebRequest.OnCompletedDetailsType,
 ): Promise<void> {
   if (details.tabId < 0) return;
 
   const statusCode = details.statusCode;
-  const originalUrl = details.url;
-  const rescue = await getRescue(originalUrl);
+  if (statusCode !== 404 && statusCode < 500) return;
 
-  if (statusCode === 404 || statusCode >= 500) {
-    const message = buildFallbackMessage(statusCode, rescue);
-    await browser.scripting.executeScript({
-      target: { tabId: details.tabId },
-      func: showFallbackOverlay,
-      args: [message],
-    });
-  } else if (!rescue.waybackNewestUrl) {
-    console.info(
-      `${originalUrl} doesn't exist in the Internet Archive — saving`,
-    );
-    void saveToWayback(originalUrl);
-  }
+  const rescue = await getRescue(details.url);
+  const message = buildFallbackMessage(statusCode, rescue);
+  await browser.scripting.executeScript({
+    target: { tabId: details.tabId },
+    func: showFallbackOverlay,
+    args: [message],
+  });
 }
 
 browser.webRequest.onCompleted.addListener(

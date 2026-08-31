@@ -25,15 +25,11 @@ describe("resolveUrl", () => {
 });
 
 describe("getRescue", () => {
-  it("finds a Wayback + DRP match", async () => {
+  it("finds a DRP exact match", async () => {
     const rescue = await getRescue(
       "https://www.fema.gov/about/openfema/data-sets/grant-programs-directorate-preparedness-non-disasterassistance-firefighter-grants",
     );
 
-    // exact URL can change, so match flexibly
-    expect(rescue.waybackNewestUrl).toMatch(
-      /^https?:\/\/web\.archive\.org\/web\/\d+\/https:\/\/www\.fema\.gov\/about\/openfema\/data-sets\/grant-programs-directorate-preparedness-non-disasterassistance-firefighter-grants$/,
-    );
     expect(rescue.drpUrl).toBe(
       "https://portal.datarescueproject.org/datasets/non-disaster-and-assistance-to-firefighter-grants/",
     );
@@ -49,13 +45,12 @@ describe("getRescue", () => {
     );
   });
 
-  it("returns nulls when nothing matches", async () => {
+  it("returns null when nothing matches", async () => {
     const rescue = await getRescue("http://nota.realdomainname");
-    expect(rescue.waybackNewestUrl).toBeNull();
     expect(rescue.drpUrl).toBeNull();
   });
 
-  it("returns nulls when upstream servers are unreachable", async () => {
+  it("returns null when upstream servers are unreachable", async () => {
     // Imagining that the resolver isn't able to reach the upstream servers sometimes
     vi.stubGlobal(
       "fetch",
@@ -65,7 +60,6 @@ describe("getRescue", () => {
     );
 
     const rescue = await getRescue("https://investinopen.org/");
-    expect(rescue.waybackNewestUrl).toBeNull();
     expect(rescue.drpUrl).toBeNull();
   });
 

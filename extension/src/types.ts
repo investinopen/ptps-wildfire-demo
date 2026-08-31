@@ -1,9 +1,8 @@
-/** Mirrors ptps_wildfire_demo/proxy/rescue.py's Rescue dataclass. */
+/** Mirrors ptps_wildfire_demo/proxy/rescue.py's Rescue dataclass, minus the Internet Archive fields. */
 export interface Rescue {
   originalUrl: string;
   /** Like originalUrl, but after following any redirects. */
   resolvedUrl: string;
-  waybackNewestUrl: string | null;
   drpUrl: string | null;
 }
 

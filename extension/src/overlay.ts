@@ -9,12 +9,9 @@ export function buildFallbackMessage(
     statusCode === 404
       ? "That URL is no longer available."
       : "Unable to load that URL.";
-  const fallbackUrls = [rescue.waybackNewestUrl, rescue.drpUrl].filter(
-    (url): url is string => Boolean(url),
-  );
 
-  if (fallbackUrls.length === 0) return msg;
-  return `${msg} Try:\n\n${fallbackUrls.join("\n\n")}`;
+  if (!rescue.drpUrl) return msg;
+  return `${msg} Try:\n\n${rescue.drpUrl}`;
 }
 
 /**
