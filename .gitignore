@@ -13,3 +13,7 @@ data/
 
 .coverage
 .env
+
+# extension/
+node_modules/
+dist/

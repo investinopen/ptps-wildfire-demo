@@ -132,9 +132,36 @@ The proxy / Python package can be used instead.
 
 ⚠️ **Planned**
 
-## Browser extension
+## [Browser extension](extension/)
 
-⚠️ **Planned**
+✅ **Implemented**
+
+### Usage
+
+1. Install dependencies:
+   - [Node.js](https://nodejs.org/)
+1. Install npm dependencies:
+
+   ```sh
+   cd extension
+   npm install
+   ```
+
+1. Build the extension:
+
+   ```sh
+   npm run build
+   ```
+
+1. Load the unpacked extension from `extension/dist/` into your browser:
+   - Chrome/Edge: `chrome://extensions` → enable "Developer mode" → "Load unpacked" → select `extension/dist/`
+   - Firefox: `about:debugging#/runtime/this-firefox` → "Load Temporary Add-on" → select `extension/dist/manifest.json`
+
+### Development
+
+- `npm run watch` — rebuild on file changes
+- `npm run typecheck` — type-check without emitting
+- `npm test` — run the test suite (hits live network endpoints, mirroring the [proxy](proxy/)'s Python tests)
 
 ## See also
 
