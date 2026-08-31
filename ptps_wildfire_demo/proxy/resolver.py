@@ -43,12 +43,16 @@ class Resolver:
         )
         return self._get_drp_match(is_partial_match)
 
-    def get_drp_url(self, url: str) -> str | None:
+    def get_drp_match(self, url: str) -> pd.Series | None:
         drp_match = self.get_drp_exact_match(url)
         if drp_match is None:
             # try a partial match
             drp_match = self.get_drp_partial_match(url)
 
+        return drp_match
+
+    def get_drp_url(self, url: str) -> str | None:
+        drp_match = self.get_drp_match(url)
         if drp_match is not None:
             drp_path = str_or_none(drp_match["url"])
             if drp_path:
