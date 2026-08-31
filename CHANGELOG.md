@@ -4,8 +4,12 @@
 
 - **Browser extension:**
   - Added and refined Data Rescue Portal links, match-only overlays, and a modal experience.
+
+    ![modal showing over the EPA EJScreener](img/extension_modal_2026-08-31.png)
+
   - Added extension documentation, tests, and GitHub Actions coverage.
   - Prevented duplicate pull-request builds.
+
 - **HTTP proxy:** Improved fallback responses for JSON clients and limited passive Internet Archive saves to GET requests.
 
 ## 2026-08-30
