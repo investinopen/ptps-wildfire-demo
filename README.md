@@ -53,6 +53,8 @@ We acknowledge that those other areas are valuable, they just aren’t in scope 
 
 ## [HTTP proxy](proxy/)
 
+The fallback behavior is available through a proxy, retrieving source data that's available or letting you know where to find data that's missing. The proxy will also passively archive URLs in the [Internet Archive](https://archive.org/) if they don't already exist there, preventing any future situation where a dataset disappears.
+
 ### Architecture
 
 ```mermaid
