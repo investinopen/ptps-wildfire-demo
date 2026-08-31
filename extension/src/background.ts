@@ -14,7 +14,9 @@ async function handleMainFrameResponse(
   if (statusCode !== 404 && statusCode < 500) return;
 
   const rescue = await getRescue(details.url);
-  const message = buildFallbackMessage(statusCode, rescue);
+  if (!rescue.drpUrl) return;
+
+  const message = buildFallbackMessage(statusCode, rescue.drpUrl);
   await browser.scripting.executeScript({
     target: { tabId: details.tabId },
     func: showFallbackOverlay,

@@ -1,17 +1,14 @@
-import type { Rescue } from "./types";
-
-/** Mirrors the response-rewriting branch of Fallback.response. */
+/** Mirrors the response-rewriting branch of Fallback.response, for the case where there's a DRP match. */
 export function buildFallbackMessage(
   statusCode: number,
-  rescue: Rescue,
+  drpUrl: string,
 ): string {
   const msg =
     statusCode === 404
       ? "That URL is no longer available."
       : "Unable to load that URL.";
 
-  if (!rescue.drpUrl) return msg;
-  return `${msg} Try:\n\n${rescue.drpUrl}`;
+  return `${msg} Try:\n\n${drpUrl}`;
 }
 
 /**
