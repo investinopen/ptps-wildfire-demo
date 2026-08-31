@@ -30,10 +30,13 @@ export async function getWaybackMatch(url: string): Promise<string | null> {
 }
 
 /** Mirrors InternetArchiveClient.save: https://help.archive.org/help/save-pages-in-the-wayback-machine/ */
-export async function saveToWayback(url: string): Promise<void> {
+export async function saveToWayback(
+  url: string,
+): Promise<Response | undefined> {
   try {
-    await fetch(`${WAYBACK_SAVE_BASE_URL}${url}`);
+    return await fetch(`${WAYBACK_SAVE_BASE_URL}${url}`);
   } catch (error) {
     console.warn(`Unable to save ${url} to the Internet Archive`, error);
+    return undefined;
   }
 }

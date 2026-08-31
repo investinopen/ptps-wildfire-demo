@@ -15,7 +15,7 @@ export async function refreshDrpCache(): Promise<void> {
   await browser.storage.local.set({ [STORAGE_KEY]: rows });
 }
 
-async function getDrpRows(): Promise<DrpRow[]> {
+export async function getDrpRows(): Promise<DrpRow[]> {
   const stored = await browser.storage.local.get(STORAGE_KEY);
   const rows = stored[STORAGE_KEY];
   if (Array.isArray(rows)) return rows as DrpRow[];
@@ -47,13 +47,13 @@ function getDrpPartialMatch(rows: DrpRow[], url: string): DrpRow | null {
 }
 
 /** Mirrors Resolver.get_drp_match: favors exact matches, falling back to partial matches. */
-async function getDrpMatch(url: string): Promise<DrpRow | null> {
-  const rows = await getDrpRows();
+export function getDrpMatch(rows: DrpRow[], url: string): DrpRow | null {
   return getDrpExactMatch(rows, url) ?? getDrpPartialMatch(rows, url);
 }
 
 /** Mirrors Resolver.get_drp_url. */
 export async function getDrpUrl(url: string): Promise<string | null> {
-  const match = await getDrpMatch(url);
+  const rows = await getDrpRows();
+  const match = getDrpMatch(rows, url);
   return match?.url ? `${DRP_BASE_URL}${match.url}` : null;
 }
