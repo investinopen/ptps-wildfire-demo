@@ -30,10 +30,10 @@ class Resolver:
 
         try:
             response = await self.httpx_client.head(
-                url, timeout=5, follow_redirects=True
+                url, timeout=20, follow_redirects=True
             )
             return str(response.url)
-        except (httpx.ConnectError, httpx.ReadTimeout):
+        except httpx.HTTPError:
             return url
 
     def _get_drp_match(self, boolean_index: pd.Series[bool]) -> pd.Series | None:
