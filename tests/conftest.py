@@ -8,7 +8,7 @@ import pytest
 from mitmproxy.options import Options
 from mitmproxy.tools.dump import DumpMaster
 
-from ptps_wildfire_demo.proxy.fallback import addons
+from ptps_wildfire_demo.proxy.fallback_addon import addons
 
 
 @pytest.fixture(scope="session", autouse=True)

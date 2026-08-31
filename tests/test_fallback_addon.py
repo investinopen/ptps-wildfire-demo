@@ -3,7 +3,7 @@ import re
 import pytest
 from mitmproxy import http
 
-from ptps_wildfire_demo.proxy.fallback import wants_json
+from ptps_wildfire_demo.proxy.fallback_addon import wants_json
 from ptps_wildfire_demo.proxy.helpers import requests_get
 
 

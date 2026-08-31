@@ -59,7 +59,7 @@ def replace_error_response(flow: http.HTTPFlow, rescue: Rescue) -> None:
         flow.response.text = f"{msg} Try:\n\n{fallbacks}"
 
 
-class Fallback:
+class FallbackAddon:
     """https://docs.mitmproxy.org/stable/api/events.html"""
 
     resolver: Resolver
@@ -100,4 +100,4 @@ class Fallback:
         await self.error(flow)
 
 
-addons = [Fallback()]
+addons = [FallbackAddon()]
