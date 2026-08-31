@@ -1,8 +1,31 @@
 import re
 
 import pytest
+from mitmproxy import http
 
+from ptps_wildfire_demo.proxy.fallback import wants_json
 from ptps_wildfire_demo.proxy.helpers import requests_get
+
+
+@pytest.mark.parametrize(
+    ("url", "headers"),
+    [
+        ("https://example.com/page", {"Accept": "application/json"}),
+        ("https://example.com/page.json", {}),
+        ("https://example.com/page.json?cache=true", {}),
+        ("https://example.com/page?format=json", {}),
+    ],
+)
+def test_wants_json(url, headers):
+    request = http.Request.make("GET", url, headers=headers)
+
+    assert wants_json(request)
+
+
+def test_wants_json_defaults_to_plain_text():
+    request = http.Request.make("GET", "https://example.com/page", headers={})
+
+    assert not wants_json(request)
 
 
 def test_404():

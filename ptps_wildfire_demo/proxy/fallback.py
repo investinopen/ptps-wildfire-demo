@@ -6,6 +6,7 @@ https://docs.mitmproxy.org/stable/addons/overview/
 """
 
 import asyncio
+import json
 import logging
 import sys
 from pathlib import Path
@@ -23,6 +24,14 @@ except ModuleNotFoundError:
 
 
 logger = logging.getLogger(__name__)
+
+
+def wants_json(request: http.Request) -> bool:
+    return (
+        "application/json" in request.headers.get("accept", "").lower()
+        or request.path.split("?", 1)[0].endswith(".json")
+        or request.query.get("format") == "json"
+    )
 
 
 class Fallback:
@@ -45,16 +54,25 @@ class Fallback:
         rescue = await self.resolver.get_rescue(original_url)
 
         if status_code == 404 or status_code >= 500:
-            flow.response.headers["content-type"] = "text/plain; charset=utf-8"
-
             if status_code == 404:
                 msg = "That URL is no longer available."
             else:
                 msg = "Unable to load that URL."
 
-            fallback_urls = [rescue.wayback_newest_url, rescue.drp_url]
-            fallbacks = "\n\n".join(url for url in fallback_urls if url)
-            flow.response.text = f"{msg} Try:\n\n{fallbacks}"
+            fallback_urls: list[str] = [
+                url
+                for url in (rescue.wayback_newest_url, rescue.drp_url)
+                if url is not None
+            ]
+            if wants_json(flow.request):
+                flow.response.headers["content-type"] = "application/json"
+                flow.response.text = json.dumps(
+                    {"message": msg, "fallback_urls": fallback_urls}
+                )
+            else:
+                flow.response.headers["content-type"] = "text/plain; charset=utf-8"
+                fallbacks = "\n\n".join(fallback_urls)
+                flow.response.text = f"{msg} Try:\n\n{fallbacks}"
         elif not rescue.wayback_newest_url:
             logger.info(
                 f"{original_url} doesn't exist in the Internet Archive — saving"
