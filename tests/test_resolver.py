@@ -15,11 +15,15 @@ async def test_get_rescue_match(resolver):
         "https://www.fema.gov/about/openfema/data-sets/grant-programs-directorate-preparedness-non-disasterassistance-firefighter-grants"
     )
 
+    assert rescue.wayback_newest_url
     # exact URL can change, so match flexibly
-    assert re.search(
-        r"http://web\.archive\.org/web/\d+/https://www\.fema\.gov/about/openfema/data-sets/grant-programs-directorate-preparedness-non-disasterassistance-firefighter-grants",
-        rescue.wayback_newest_url,
+    is_archive_url = bool(
+        re.search(
+            r"^http://web\.archive\.org/web/\d+/https://www\.fema\.gov/about/openfema/data-sets/grant-programs-directorate-preparedness-non-disasterassistance-firefighter-grants$",
+            rescue.wayback_newest_url,
+        )
     )
+    assert is_archive_url
     assert (
         rescue.drp_url
         == "https://portal.datarescueproject.org/datasets/non-disaster-and-assistance-to-firefighter-grants/"

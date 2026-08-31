@@ -16,10 +16,13 @@ def test_404_fallback():
     )
     assert resp.status_code == 404
     assert resp.text
-    assert re.search(
-        r"http://web\.archive\.org/web/\d+/https://www\.fema\.gov/about/openfema/data-sets/grant-programs-directorate-preparedness-non-disasterassistance-firefighter-grants",
-        resp.text,
+    has_wayback_url = bool(
+        re.search(
+            r"http://web\.archive\.org/web/\d+/https://www\.fema\.gov/about/openfema/data-sets/grant-programs-directorate-preparedness-non-disasterassistance-firefighter-grants",
+            resp.text,
+        )
     )
+    assert has_wayback_url
 
 
 @pytest.mark.xfail(reason="https://github.com/mitmproxy/mitmproxy/pull/7999")
