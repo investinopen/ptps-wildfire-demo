@@ -28,14 +28,16 @@ OUTPUT_PATH = ANALYSIS_DIR / "fire-datasets-report.html"
 
 
 def get_datasets_to_check(datasets: pd.DataFrame) -> pd.DataFrame:
-    """Only include the official government data sources that don't require auth."""
+    """Only include datasets that have an example data URL to check."""
 
-    no_auth = datasets["access_type"] != "Free key"
-    not_src_coop = ~datasets["webpage"].str.startswith("https://source.coop/")
-    not_dryad = ~datasets["webpage"].str.contains("/dryad.")
     has_example_data_url = datasets["example_data_url"].notna()
+    return datasets[has_example_data_url]
 
-    return datasets[no_auth & not_src_coop & not_dryad & has_example_data_url]
+
+def is_wayback_applicable(access_type: pd.Series) -> pd.Series:
+    """Free-key-gated example data URLs generally aren't archivable by the Wayback Machine."""
+
+    return access_type != "Free key"
 
 
 def is_drp_applicable(webpage: pd.Series) -> pd.Series:
@@ -66,11 +68,14 @@ async def get_example_data_url_results(
     rescues_df.insert(1, "example_data_url_status", statuses)
 
     results = pd.merge(
-        datasets_to_check[["name", "example_data_url"]],
+        datasets_to_check[["name", "access_type", "example_data_url"]],
         rescues_df,
         on="example_data_url",
     )
-    return results.drop(columns="resolved_url")
+    results["example_data_url_wayback_applicable"] = is_wayback_applicable(
+        results["access_type"]
+    )
+    return results.drop(columns=["access_type", "resolved_url"])
 
 
 async def get_webpage_results(
@@ -114,6 +119,7 @@ def get_dataset_sections(
                 "url": dataset["webpage"],
                 "status": dataset["webpage_status"],
                 "wayback_url": dataset["webpage_wayback_url"],
+                "wayback_applicable": True,
                 "drp_url": dataset["webpage_drp_url"],
                 "drp_applicable": dataset["drp_applicable"],
             }
@@ -125,6 +131,9 @@ def get_dataset_sections(
                     "url": dataset["example_data_url"],
                     "status": dataset["example_data_url_status"],
                     "wayback_url": dataset["example_data_url_wayback_url"],
+                    "wayback_applicable": dataset[
+                        "example_data_url_wayback_applicable"
+                    ],
                     "drp_url": dataset["example_data_url_drp_url"],
                     "drp_applicable": dataset["drp_applicable"],
                 }
