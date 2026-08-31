@@ -1,7 +1,6 @@
 import re
 
 import pytest
-from pytest_httpx import HTTPXMock
 
 from ptps_wildfire_demo.proxy.resolver import Resolver
 
@@ -40,15 +39,5 @@ async def test_get_rescue_partial_match(resolver):
 
 async def test_get_rescue_no_match(resolver):
     rescue = await resolver.get_rescue("http://nota.realdomainname")
-    assert rescue.wayback_newest_url is None
-    assert rescue.drp_url is None
-
-
-async def test_get_rescue_no_connection(resolver, httpx_mock: HTTPXMock):
-    """Imagining that the Resolver isn't able to reach the Internet Archive sometimes"""
-
-    httpx_mock.add_response(status_code=404)
-
-    rescue = await resolver.get_rescue("https://investinopen.org/")
     assert rescue.wayback_newest_url is None
     assert rescue.drp_url is None

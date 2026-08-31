@@ -1,3 +1,4 @@
+import logging
 import os
 from json.decoder import JSONDecodeError
 
@@ -7,6 +8,8 @@ from dotenv import load_dotenv
 from ptps_wildfire_demo.proxy.constants import USER_AGENT
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 
 class InternetArchiveClient:
@@ -47,7 +50,8 @@ class InternetArchiveClient:
             response = await self.request(
                 "https://archive.org/wayback/available", params={"url": url}
             )
-        except httpx.TimeoutException:
+        except httpx.RequestError as e:
+            logger.warning("Unable to reach the Internet Archive", exc_info=e)
             return None
 
         try:
