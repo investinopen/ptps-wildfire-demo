@@ -140,6 +140,8 @@ The proxy / Python package can be used instead.
 
 ### Usage
 
+It's recommended that you use this alongside the [official Internet Archive Wayback Machine extension](https://web.archive.org/).
+
 1. Install dependencies:
    - [Node.js](https://nodejs.org/)
 1. Install npm dependencies:
