@@ -48,14 +48,20 @@ async def get_example_data_url_results(
     )
 
     rescues_df = pd.DataFrame(rescues).rename(
-        columns={"original_url": "example_data_url"}
+        columns={
+            "original_url": "example_data_url",
+            "wayback_newest_url": "example_data_url_wayback_url",
+            "drp_url": "example_data_url_drp_url",
+        }
     )
     rescues_df.insert(1, "example_data_url_status", statuses)
 
-    results = pd.merge(datasets_to_check, rescues_df, on="example_data_url")
-    return results.drop(
-        columns=["access_type", "webpage", "description", "resolved_url"]
+    results = pd.merge(
+        datasets_to_check[["name", "example_data_url"]],
+        rescues_df,
+        on="example_data_url",
     )
+    return results.drop(columns="resolved_url")
 
 
 async def get_webpage_results(
@@ -66,10 +72,61 @@ async def get_webpage_results(
         asyncio.gather(*(resolver.get_rescue(url) for url in datasets["webpage"])),
     )
 
-    page_rescues_df = pd.DataFrame(page_rescues)
-    page_rescues_df.insert(2, "resolved_url_status", page_statuses)
+    page_rescues_df = pd.DataFrame(page_rescues).rename(
+        columns={
+            "original_url": "webpage",
+            "wayback_newest_url": "webpage_wayback_url",
+            "drp_url": "webpage_drp_url",
+        }
+    )
+    page_rescues_df.insert(1, "webpage_status", page_statuses)
 
-    return page_rescues_df.drop(columns="resolved_url")
+    results = pd.merge(
+        datasets[["name", "description", "webpage"]], page_rescues_df, on="webpage"
+    )
+    return results.drop(columns="resolved_url")
+
+
+def get_dataset_sections(
+    webpage_results: pd.DataFrame, example_data_url_results: pd.DataFrame
+) -> list[dict]:
+    """Builds one section per dataset, each with a row for its webpage and (if checked) example data URL."""
+
+    consolidated = pd.merge(
+        webpage_results, example_data_url_results, on="name", how="left"
+    )
+
+    sections = []
+    for dataset in consolidated.to_dict(orient="records"):
+        rows = [
+            {
+                "type": "Webpage",
+                "url": dataset["webpage"],
+                "status": dataset["webpage_status"],
+                "wayback_url": dataset["webpage_wayback_url"],
+                "drp_url": dataset["webpage_drp_url"],
+            }
+        ]
+        if pd.notna(dataset["example_data_url"]):
+            rows.append(
+                {
+                    "type": "Example data URL",
+                    "url": dataset["example_data_url"],
+                    "status": dataset["example_data_url_status"],
+                    "wayback_url": dataset["example_data_url_wayback_url"],
+                    "drp_url": dataset["example_data_url_drp_url"],
+                }
+            )
+
+        sections.append(
+            {
+                "name": dataset["name"],
+                "description": dataset["description"],
+                "rows": rows,
+            }
+        )
+
+    return sections
 
 
 def linkify(value: object) -> Markup:
@@ -95,20 +152,19 @@ async def main():
         datasets = pd.read_csv(ANALYSIS_DIR / "fire_datasets.csv")
         datasets_to_check = get_datasets_to_check(datasets)
 
-        example_data_url_results, webpage_results = await asyncio.gather(
-            get_example_data_url_results(client, resolver, datasets_to_check),
+        webpage_results, example_data_url_results = await asyncio.gather(
             get_webpage_results(client, resolver, datasets),
+            get_example_data_url_results(client, resolver, datasets_to_check),
         )
+
+    consolidated_results = get_dataset_sections(
+        webpage_results, example_data_url_results
+    )
 
     env = Environment(loader=FileSystemLoader(ANALYSIS_DIR))
     env.filters["linkify"] = linkify
     template = env.get_template("report_template.html")
-    html = template.render(
-        example_data_url_columns=list(example_data_url_results.columns),
-        example_data_url_rows=example_data_url_results.to_dict(orient="records"),
-        webpage_columns=list(webpage_results.columns),
-        webpage_rows=webpage_results.to_dict(orient="records"),
-    )
+    html = template.render(datasets=consolidated_results)
 
     OUTPUT_PATH.write_text(html)
     print(f"Wrote report to {OUTPUT_PATH}")

@@ -23,26 +23,26 @@
         margin-bottom: 0.25rem;
       }
       h2 {
-        margin-top: 2.5rem;
-        border-bottom: 1px solid var(--border);
-        padding-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
       }
       p.subtitle {
         color: #57606a;
         margin-top: 0;
+      }
+      .dataset {
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+      }
+      .dataset p.description {
+        color: #57606a;
+        margin-top: 0.25rem;
       }
       table {
         border-collapse: collapse;
         width: 100%;
         margin-top: 1rem;
         font-size: 0.9rem;
-      }
-      caption {
-        caption-side: bottom;
-        text-align: left;
-        color: #57606a;
-        font-size: 0.8rem;
-        margin-top: 0.5rem;
       }
       th,
       td {
@@ -53,8 +53,6 @@
       }
       th {
         background: var(--header-bg);
-        position: sticky;
-        top: 0;
       }
       tbody tr:nth-child(even) {
         background: var(--row-alt);
@@ -81,35 +79,33 @@
       >.
     </p>
 
-    {% macro render_table(columns, rows) -%}
-    <table>
-      <thead>
-        <tr>
-          {% for column in columns %}
-          <th>{{ column }}</th>
+    {% for dataset in datasets %}
+    <section class="dataset">
+      <h2>{{ dataset.name }}</h2>
+      <p class="description">{{ dataset.description }}</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>URL</th>
+            <th>Status</th>
+            <th>Wayback URL</th>
+            <th>DRP URL</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in dataset.rows %}
+          <tr>
+            <td>{{ row.type }}</td>
+            <td>{{ row.url | linkify }}</td>
+            <td>{{ row.status }}</td>
+            <td>{{ row.wayback_url | linkify }}</td>
+            <td>{{ row.drp_url | linkify }}</td>
+          </tr>
           {% endfor %}
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in rows %}
-        <tr>
-          {% for column in columns %}
-          <td>{{ row[column] | linkify }}</td>
-          {% endfor %}
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {%- endmacro %}
-
-    <h2>Example data URL status</h2>
-    <p>
-      Only includes the official government data sources that don't require
-      auth.
-    </p>
-    {{ render_table(example_data_url_columns, example_data_url_rows) }}
-
-    <h2>Webpage URL status</h2>
-    {{ render_table(webpage_columns, webpage_rows) }}
+        </tbody>
+      </table>
+    </section>
+    {% endfor %}
   </body>
 </html>
