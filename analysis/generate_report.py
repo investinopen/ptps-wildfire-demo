@@ -23,7 +23,7 @@ from helpers import get_statuses
 from ptps_wildfire_demo.proxy.resolver import Resolver
 
 ANALYSIS_DIR = Path(__file__).parent
-OUTPUT_PATH = ANALYSIS_DIR / "fire_datasets_report.html"
+OUTPUT_PATH = ANALYSIS_DIR / "fire-datasets-report.html"
 
 
 def get_datasets_to_check(datasets: pd.DataFrame) -> pd.DataFrame:
