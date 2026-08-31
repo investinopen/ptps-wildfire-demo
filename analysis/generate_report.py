@@ -4,6 +4,7 @@ import asyncio
 import html
 import math
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
 
 import httpx
@@ -172,7 +173,10 @@ async def main():
     env.filters["link_label"] = link_label
     env.filters["yes_no"] = yes_no
     template = env.get_template("report_template.html.jinja")
-    html = template.render(datasets=consolidated_results)
+    html = template.render(
+        datasets=consolidated_results,
+        generated_at=datetime.now(UTC),
+    )
 
     OUTPUT_PATH.write_text(html)
     print(f"Wrote report to {OUTPUT_PATH}")

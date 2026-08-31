@@ -84,8 +84,12 @@
   <h1>Dataset rescue statuses</h1>
   <p class="subtitle">
     Checks the rescue status of the
-    <a href="https://docs.google.com/document/d/1rYsP1I1-TAd3Tu-G6EJ-5o7IbQIHf_dKT3DjH8IpQuo/edit?tab=t.0#heading=h.87di2doy0z55"
-      target="_blank" rel="noopener">example data sources</a>.
+    <a href="https://github.com/investinopen/ptps-wildfire-demo/blob/main/analysis/fire_datasets.csv"
+      target="_blank">example data sources</a>.
+  </p>
+  <p class="subtitle">
+    Generated {{ generated_at.strftime("%Y-%m-%d %H:%M UTC") }}. Updates daily. Source:
+    <a href="https://github.com/investinopen/ptps-wildfire-demo" target="_blank">investinopen/ptps-wildfire-demo</a>.
   </p>
 
   {% for dataset in datasets %}
@@ -99,11 +103,11 @@
           <th>Status</th>
           <th>
             In
-            <a href="https://web.archive.org/" target="_blank" rel="noopener">Wayback Machine</a>?
+            <a href="https://web.archive.org/" target="_blank">Wayback Machine</a>?
           </th>
           <th>
             In
-            <a href="https://portal.datarescueproject.org/" target="_blank" rel="noopener">Data Rescue Project
+            <a href="https://portal.datarescueproject.org/" target="_blank">Data Rescue Project
               Portal</a>?
           </th>
         </tr>
