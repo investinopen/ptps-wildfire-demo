@@ -13,7 +13,7 @@ For Python dependencies managed with `uv`, use a regular CPython build (for exam
 
 ## Dataset rescue status report
 
-[`generate_report.py`](generate_report.py) checks the rescue status of the example data sources (the same checks as [`fire_datasets.ipynb`](fire_datasets.ipynb)) and writes the results to a standalone `fire-datasets-report.html` page with clickable links.
+[`generate_report.py`](generate_report.py) checks the rescue status of the example data sources and writes the results to a standalone `fire-datasets-report.html` page with clickable links.
 
 From the `analysis/` directory, run:
 

@@ -1,4 +1,4 @@
-"""Generates an HTML report equivalent to fire_datasets.ipynb, with clickable links."""
+"""Generates an HTML report checking the rescue status of the example wildfire datasets, with clickable links."""
 
 import asyncio
 import html
