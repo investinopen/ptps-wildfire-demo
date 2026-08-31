@@ -75,11 +75,11 @@ class Resolver:
         resolved_url = await self.resolve(url)
 
         wayback_match = await self.internet_archive_client.get_match(url)
-        if wayback_match is None:
+        if wayback_match is None and resolved_url != url:
             wayback_match = await self.internet_archive_client.get_match(resolved_url)
 
         drp_url = self.get_drp_url(url)
-        if drp_url is None:
+        if drp_url is None and resolved_url != url:
             drp_url = self.get_drp_url(resolved_url)
 
         return Rescue(
