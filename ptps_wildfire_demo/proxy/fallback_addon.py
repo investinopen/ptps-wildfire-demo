@@ -19,7 +19,7 @@ from ptps_wildfire_demo.proxy.rescue import Rescue
 try:
     from ptps_wildfire_demo.proxy.resolver import Resolver
 except ModuleNotFoundError:
-    # Support loading this file directly via: mitmdump -s ptps_wildfire_demo/proxy/fallback.py
+    # Support loading this file directly via: mitmdump -s ptps_wildfire_demo/proxy/fallback_addon.py
     repo_root = Path(__file__).resolve().parents[2]
     sys.path.insert(0, str(repo_root))
     from ptps_wildfire_demo.proxy.resolver import Resolver
@@ -69,10 +69,10 @@ class FallbackAddon:
         client = httpx.AsyncClient()
         self.resolver = Resolver(client)
 
-    def save_to_internet_archive(self, original_url: str) -> None:
-        logger.info(f"{original_url} doesn't exist in the Internet Archive — saving")
+    def save_to_internet_archive(self, url: str) -> None:
+        logger.info(f"{url} doesn't exist in the Internet Archive — saving")
         loop = asyncio.get_event_loop()
-        loop.create_task(self.resolver.internet_archive_client.save(original_url))
+        loop.create_task(self.resolver.internet_archive_client.save(url))
 
     # https://docs.mitmproxy.org/stable/addons/examples/#nonblocking
     async def response(self, flow: http.HTTPFlow):
@@ -84,7 +84,8 @@ class FallbackAddon:
 
         if flow.response.status_code == 404 or flow.response.status_code >= 500:
             replace_error_response(flow, rescue)
-        elif not rescue.wayback_newest_url:
+
+        if flow.request.method == "GET" and not rescue.wayback_newest_url:
             self.save_to_internet_archive(original_url)
 
         return
