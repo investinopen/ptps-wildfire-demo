@@ -15,8 +15,9 @@ Only includes notable updates.
     - This pattern can be expanded to save data to other repositories, such as [Dryad](https://datadryad.org/) / [Source Cooperative](https://docs.source.coop/data-upload).
   - Improved URL matching.
   - Improved error handling.
-- [**Analysis:**](README.md#analysis)
-  - Expanded the [wildfire dataset status analysis](analysis/fire_datasets.ipynb) to include the [full set of URLs](analysis/fire_datasets.csv) that don't require authentication.
+- [**Analysis:**](README.md#analysis) Expanded the [wildfire dataset status analysis](analysis/fire_datasets.ipynb).
+  - Include [all datasets](analysis/fire_datasets.csv) that don't require authentication.
+  - Display the rescue status of each data URL and webpage.
 
 ## 2026-08-24
 
