@@ -8,6 +8,19 @@ from ptps_wildfire_demo.internet_archive_client import InternetArchiveClient
 from ptps_wildfire_demo.rescue import Rescue
 
 
+def get_drp_rescues():
+    """Retrieve the data behind https://portal.datarescueproject.org/datasets/"""
+
+    df = pd.read_json(
+        "https://portal.datarescueproject.org/datasets-full.json",
+        dtype_backend="pyarrow",
+    )
+    # make full URLs
+    df["url"] = "https://portal.datarescueproject.org" + df["url"]
+
+    return df
+
+
 class Resolver:
     httpx_client: httpx.AsyncClient
     internet_archive_client: InternetArchiveClient
@@ -19,16 +32,7 @@ class Resolver:
         self.refresh()
 
     def refresh(self):
-        """Retrieve the data behind https://portal.datarescueproject.org/datasets/"""
-
-        self.drp_rescues = pd.read_json(
-            "https://portal.datarescueproject.org/datasets-full.json",
-            dtype_backend="pyarrow",
-        )
-        # make full URLs
-        self.drp_rescues["url"] = (
-            "https://portal.datarescueproject.org" + self.drp_rescues["url"]
-        )
+        self.drp_rescues = get_drp_rescues()
 
     async def resolve(self, url: str):
         """Gets the URL after following any redirects"""
