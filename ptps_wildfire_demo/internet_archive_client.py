@@ -5,7 +5,7 @@ from json.decoder import JSONDecodeError
 import httpx
 from dotenv import load_dotenv
 
-from ptps_wildfire_demo.proxy.constants import USER_AGENT
+from ptps_wildfire_demo.constants import USER_AGENT
 
 load_dotenv()
 

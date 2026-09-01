@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 from pytest_httpx import HTTPXMock
 
-from ptps_wildfire_demo.proxy import Resolver
+from ptps_wildfire_demo import Resolver
 
 
 @pytest.fixture

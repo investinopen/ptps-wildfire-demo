@@ -3,9 +3,9 @@ from typing import cast
 import httpx
 import pandas as pd
 
-from ptps_wildfire_demo.proxy.helpers import str_or_none
-from ptps_wildfire_demo.proxy.internet_archive_client import InternetArchiveClient
-from ptps_wildfire_demo.proxy.rescue import Rescue
+from ptps_wildfire_demo.helpers import str_or_none
+from ptps_wildfire_demo.internet_archive_client import InternetArchiveClient
+from ptps_wildfire_demo.rescue import Rescue
 
 
 class Resolver:

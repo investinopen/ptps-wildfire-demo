@@ -151,7 +151,7 @@ Use `Resolver` to look up available rescue sources for a URL:
 ```python
 import httpx
 
-from ptps_wildfire_demo.proxy import Resolver
+from ptps_wildfire_demo import Resolver
 
 async with httpx.AsyncClient() as client:
    rescue = await Resolver(client).get_rescue("https://example.com/data.csv")

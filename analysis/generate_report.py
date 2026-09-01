@@ -21,7 +21,7 @@ sys.path.insert(0, str(repo_root))
 
 from helpers import get_statuses
 
-from ptps_wildfire_demo.proxy.resolver import Resolver
+from ptps_wildfire_demo import Resolver
 
 ANALYSIS_DIR = Path(__file__).parent
 OUTPUT_PATH = ANALYSIS_DIR / "fire-datasets-report.html"

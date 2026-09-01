@@ -5,8 +5,8 @@ import urllib.request
 import pytest
 import requests
 
+from ptps_wildfire_demo.helpers import requests_get
 from ptps_wildfire_demo.proxy.constants import CERT_PATH, PROXY_ORIGIN, PROXY_URL
-from ptps_wildfire_demo.proxy.helpers import requests_get
 
 
 @pytest.fixture(

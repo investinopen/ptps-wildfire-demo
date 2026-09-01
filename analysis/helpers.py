@@ -9,7 +9,7 @@ import pandas as pd
 from duckdb import DuckDBPyConnection
 from lonboard.colormap import apply_continuous_cmap
 
-from ptps_wildfire_demo.proxy.constants import USER_AGENT
+from ptps_wildfire_demo.constants import USER_AGENT
 
 
 def run_script_in_db(conn: DuckDBPyConnection, path: Path | str):

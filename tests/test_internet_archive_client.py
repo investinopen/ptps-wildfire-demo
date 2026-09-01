@@ -2,7 +2,7 @@ import httpx
 import pytest
 from pytest_httpx import HTTPXMock
 
-from ptps_wildfire_demo.proxy.internet_archive_client import InternetArchiveClient
+from ptps_wildfire_demo.internet_archive_client import InternetArchiveClient
 
 
 @pytest.fixture
