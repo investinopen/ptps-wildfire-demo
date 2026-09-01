@@ -7,6 +7,7 @@ import httpx
 import matplotlib
 import pandas as pd
 from duckdb import DuckDBPyConnection
+from IPython.display import HTML
 from lonboard.colormap import apply_continuous_cmap
 
 from ptps_wildfire_demo.constants import USER_AGENT
@@ -60,3 +61,7 @@ async def get_status(client: httpx.AsyncClient, url: str) -> str:
 
 async def get_statuses(client: httpx.AsyncClient, urls: Iterable[str]) -> list[str]:
     return await asyncio.gather(*(get_status(client, url) for url in urls))
+
+
+def render_links(data: pd.DataFrame):
+    return HTML(data.to_html(render_links=True))
