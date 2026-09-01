@@ -9,18 +9,11 @@ from pathlib import Path
 
 import httpx
 import pandas as pd
+from helpers import get_statuses
 from jinja2 import Environment, FileSystemLoader
 from markupsafe import Markup
 
-repo_root = next(
-    path
-    for path in (Path.cwd(), *Path.cwd().parents)
-    if (path / "ptps_wildfire_demo").is_dir()
-)
-sys.path.insert(0, str(repo_root))
-
-from helpers import get_statuses
-
+sys.path.insert(0, str(Path.cwd().parent))
 from ptps_wildfire_demo import Resolver
 
 ANALYSIS_DIR = Path(__file__).parent

@@ -17,12 +17,11 @@ from mitmproxy import http
 from ptps_wildfire_demo.rescue import Rescue
 
 try:
-    from ptps_wildfire_demo.resolver import Resolver
+    from ptps_wildfire_demo import Resolver
 except ModuleNotFoundError:
     # Support loading this file directly via: mitmdump -s ptps_wildfire_demo/proxy/fallback_addon.py
-    repo_root = Path(__file__).resolve().parents[2]
-    sys.path.insert(0, str(repo_root))
-    from ptps_wildfire_demo.resolver import Resolver
+    sys.path.insert(0, str(Path.cwd().parent.parent))
+    from ptps_wildfire_demo import Resolver
 
 
 logger = logging.getLogger(__name__)
