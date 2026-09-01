@@ -15,10 +15,10 @@ For Python dependencies managed with `uv`, use a regular CPython build (for exam
 
 [`generate_report.py`](generate_report.py) checks the rescue status of the example data sources and writes the results to a standalone `fire-datasets-report.html` page with clickable links.
 
-From the `analysis/` directory, run:
+From the repository root, run:
 
 ```sh
-uv run python generate_report.py
+uv run python -m analysis.generate_report
 ```
 
 Then open the generated `fire-datasets-report.html` in a browser.

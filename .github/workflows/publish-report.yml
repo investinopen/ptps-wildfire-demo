@@ -43,7 +43,7 @@ jobs:
         run: uv sync --locked
 
       - name: Generate report
-        run: uv run python analysis/generate_report.py
+        run: uv run python -m analysis.generate_report
 
       - name: Prepare site
         run: |

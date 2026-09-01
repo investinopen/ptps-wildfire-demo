@@ -3,17 +3,15 @@
 import asyncio
 import html
 import math
-import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
 import httpx
 import pandas as pd
-from helpers import get_statuses
 from jinja2 import Environment, FileSystemLoader
 from markupsafe import Markup
 
-sys.path.insert(0, str(Path.cwd().parent))
+from analysis.helpers import get_statuses
 from ptps_wildfire_demo import Resolver
 
 ANALYSIS_DIR = Path(__file__).parent
