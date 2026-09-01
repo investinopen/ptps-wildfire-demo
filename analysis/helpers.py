@@ -63,5 +63,10 @@ async def get_statuses(client: httpx.AsyncClient, urls: Iterable[str]) -> list[s
     return await asyncio.gather(*(get_status(client, url) for url in urls))
 
 
+def de_wayback(series: pd.Series[str]):
+    """Removes the Wayback Machine prefix from a Series of URLs"""
+    return series.str.replace(r"https?://web\.archive\.org/web/\d+/", "", regex=True)
+
+
 def render_links(data: pd.DataFrame):
     return HTML(data.to_html(render_links=True))
