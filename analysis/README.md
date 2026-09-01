@@ -23,8 +23,12 @@ uv run python generate_report.py
 
 Then open the generated `fire-datasets-report.html` in a browser.
 
-The report is also published automatically to GitHub Pages (via [`.github/workflows/publish-report.yml`](../.github/workflows/publish-report.yml)) whenever changes are pushed to `analysis/` on `main`. Enable this by setting the repo's Pages source to "GitHub Actions" under Settings > Pages.
+The report is also [published automatically to GitHub Pages](../.github/workflows/publish-report.yml).
 
 ## [Data Rescue Project datasets](rescues.ipynb)
 
 Check the statuses of source data archived by the [Data Rescue Project](https://www.datarescueproject.org/).
+
+## [Federal Data Terminations](federal_data_terminations.ipynb)
+
+Looking at the rescue status of terminated federal datasets.
