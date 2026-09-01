@@ -20,9 +20,14 @@ class Resolver:
 
     def refresh(self):
         """Retrieve the data behind https://portal.datarescueproject.org/datasets/"""
+
         self.drp_rescues = pd.read_json(
             "https://portal.datarescueproject.org/datasets-full.json",
             dtype_backend="pyarrow",
+        )
+        # make full URLs
+        self.drp_rescues["url"] = (
+            "https://portal.datarescueproject.org" + self.drp_rescues["url"]
         )
 
     async def resolve(self, url: str):
@@ -76,9 +81,7 @@ class Resolver:
     def get_drp_url(self, url: str) -> str | None:
         drp_match = self.get_drp_match(url)
         if drp_match is not None:
-            drp_path = str_or_none(drp_match["url"])
-            if drp_path:
-                return f"https://portal.datarescueproject.org{drp_path}"
+            return str_or_none(drp_match["url"])
 
         return None
 
