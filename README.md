@@ -132,7 +132,30 @@ The proxy / Python package can be used instead.
 
 ## Python package
 
-⚠️ **Planned**
+✅ **Implemented**
+
+Install the package directly from GitHub using [uv](https://docs.astral.sh/uv/) (preferred):
+
+```sh
+uv add git+https://github.com/investinopen/ptps-wildfire-demo.git
+```
+
+Or with pip:
+
+```sh
+pip install git+https://github.com/investinopen/ptps-wildfire-demo.git
+```
+
+Use `Resolver` to look up available rescue sources for a URL:
+
+```python
+import httpx
+
+from ptps_wildfire_demo.proxy import Resolver
+
+async with httpx.AsyncClient() as client:
+   rescue = await Resolver(client).get_rescue("https://example.com/data.csv")
+```
 
 ## [Browser extension](extension/)
 
