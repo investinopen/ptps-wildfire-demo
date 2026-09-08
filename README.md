@@ -196,3 +196,5 @@ It's recommended that you use this alongside the [official Internet Archive Wayb
 
 - [The Data Resilience Funding Landscape: A Preliminary Analysis](https://investinopen.org/blog/data-resilience-funding-landscape/)
 - [Protype app from **@jring-o**](https://github.com/jring-o/scsd)
+- [varve](https://github.com/tylere/varve) "dataset archiving service"
+- [Binoc:](https://harvard-lil.github.io/binoc/) "The missing changelog for datasets."
