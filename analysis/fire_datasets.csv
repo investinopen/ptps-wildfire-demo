@@ -13,6 +13,8 @@ No auth,WFIGS / National Interagency Fire Center,"Current and historical fire pe
 No auth,MODIS NDVI,"Vegetation-health data useful as a live fuel-condition proxy.",https://modis.gsfc.nasa.gov/data/dataprod/mod13.php,https://cmr.earthdata.nasa.gov/search/granules.json?short_name=MOD13Q1&page_size=1
 No auth,OpenStreetMap infrastructure extract,"Water lines, power lines, hydrants, and roads for response-capacity analysis.",https://overpass-api.de/,
 No auth,USDA LANDFIRE,"Wildland fire data, including seasonal fuels.",https://www.landfire.gov/,https://www.landfire.gov/data-downloads/SeasonalFuels/LF2025_FBFM40_SU26.zip
+No auth,Pyregence data repositories,"Wildfire modeling, fuels, and risk datasets.",https://www.pyregence.org/data-repositories/,https://data.pyregence.org/wg4/WBSE/daily%20emissions%202002_2020.csv
+No auth,AlertCalifornia,"Fire camera imagery and live fire monitoring network.",https://alertcalifornia.org/technology/,https://services8.arcgis.com/X84q166Srnyl4JMV/arcgis/rest/services/ALERTCalifornia_Camera_Feed/FeatureServer
 Free key,Sentinel-2 NDVI via Copernicus Data Space,"Live fuel-condition proxy for dry or stressed vegetation.",https://dataspace.copernicus.eu/,
 Free key,NASA FIRMS Area API,"Near-real-time MODIS/VIIRS active-fire detections by bounding box; requires a free MAP_KEY.",https://firms.modaps.eosdis.nasa.gov/api/,https://firms.modaps.eosdis.nasa.gov/api/area/csv/[MAP_KEY]/VIIRS_NOAA20_NRT/[bbox]/[days]
 Free key,EPA AirNow API,"Real-time PM2.5/AQI and fire/smoke map data by location; requires a free key.",https://docs.airnowapi.org/,
