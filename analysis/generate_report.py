@@ -155,13 +155,13 @@ def link_label(url: object, label: str) -> Markup:
 
 
 def yes_no(url: object) -> Markup:
-    """Renders "Yes" (linked to the given URL) or "No" if there's no URL."""
+    """Renders a green "Yes" (linked to the given URL) or red "No" if there's no URL."""
 
     if url is None or (isinstance(url, float) and math.isnan(url)):
-        return Markup("No")
+        return Markup("🔴 No")
 
     escaped_url = html.escape(str(url))
-    return Markup(f'<a href="{escaped_url}" target="_blank" rel="noopener">Yes</a>')
+    return Markup(f'🟢 <a href="{escaped_url}" target="_blank" rel="noopener">Yes</a>')
 
 
 async def main():
