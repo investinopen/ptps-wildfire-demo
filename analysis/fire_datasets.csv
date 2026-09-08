@@ -20,7 +20,7 @@ Free key,NASA FIRMS Area API,"Near-real-time MODIS/VIIRS active-fire detections 
 Free key,EPA AirNow API,"Real-time PM2.5/AQI and fire/smoke map data by location; requires a free key.",https://docs.airnowapi.org/,
 Bulk or analytic,CDC PLACES,"Census-tract and county chronic-disease prevalence, including asthma and COPD.",https://www.cdc.gov/places/,https://data.cdc.gov/resource/i46a-9kgh.geojson
 Bulk or analytic,CDC/ATSDR Social Vulnerability Index,"Census-tract and county social vulnerability data.",https://www.atsdr.cdc.gov/place-health/php/svi/index.html,https://svi2.cdc.gov/webapi/Documents/download?year=2022&type=csv&category=states_counties&name=SVI_2022_US_COUNTY
-Bulk or analytic,EPA EJScreen,"Block-group environmental justice index available as a static download and documented API.",https://www.epa.gov/ejscreen,
+Bulk or analytic,EPA EJScreen,"Block-group environmental justice index available as a static download and documented API.",https://www.epa.gov/ejscreen,https://gaftp.epa.gov/EJScreen/2024/2.31_August_useMe/EJScreen_2024_BG_with_AS_CNMI_GU_VI.csv.zip
 Static files,DOE EAGLE-I power outage data,"County-level outage counts at 15-minute intervals for 2014-2024; live system access is restricted.",https://www.osti.gov/dataexplorer/biblio/dataset/1975203,
 Static files,Dryad WUMI2024a wildfire database,"Quality-controlled 1984-2024 fire events with per-fire burn grids.",https://doi.org/10.5061/dryad.63xsj3vd4,
 Static files,Dryad CA wildfire smoke PM2.5 exposure,"Modeled daily smoke PM2.5 by census tract for 2008-2018.",https://doi.org/10.5061/dryad.0zpc867bw,
