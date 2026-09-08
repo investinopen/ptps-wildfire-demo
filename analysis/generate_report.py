@@ -53,6 +53,7 @@ async def get_example_data_url_results(
         columns={
             "original_url": "example_data_url",
             "wayback_newest_url": "example_data_url_wayback_url",
+            "common_crawl_url": "example_data_url_common_crawl_url",
             "drp_url": "example_data_url_drp_url",
         }
     )
@@ -81,6 +82,7 @@ async def get_webpage_results(
         columns={
             "original_url": "webpage",
             "wayback_newest_url": "webpage_wayback_url",
+            "common_crawl_url": "webpage_common_crawl_url",
             "drp_url": "webpage_drp_url",
         }
     )
@@ -111,6 +113,8 @@ def get_dataset_sections(
                 "status": dataset["webpage_status"],
                 "wayback_url": dataset["webpage_wayback_url"],
                 "wayback_applicable": True,
+                "common_crawl_url": dataset["webpage_common_crawl_url"],
+                "common_crawl_applicable": True,
                 "drp_url": dataset["webpage_drp_url"],
                 "drp_applicable": dataset["drp_applicable"],
             }
@@ -125,6 +129,10 @@ def get_dataset_sections(
                     "wayback_applicable": dataset[
                         "example_data_url_wayback_applicable"
                     ],
+                    "common_crawl_url": dataset[
+                        "example_data_url_common_crawl_url"
+                    ],
+                    "common_crawl_applicable": True,
                     "drp_url": dataset["example_data_url_drp_url"],
                     "drp_applicable": dataset["drp_applicable"],
                 }

@@ -9,4 +9,5 @@ class Rescue:
     resolved_url: str
     """Like the original_url, but after following any redirects."""
     wayback_newest_url: str | None
+    common_crawl_url: str | None
     drp_url: str | None

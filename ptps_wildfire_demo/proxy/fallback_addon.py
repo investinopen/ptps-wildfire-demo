@@ -45,7 +45,13 @@ def replace_error_response(flow: http.HTTPFlow, rescue: Rescue) -> None:
         else "Unable to load that URL."
     )
     fallback_urls: list[str] = [
-        url for url in (rescue.wayback_newest_url, rescue.drp_url) if url is not None
+        url
+        for url in (
+            rescue.wayback_newest_url,
+            rescue.common_crawl_url,
+            rescue.drp_url,
+        )
+        if url is not None
     ]
     if wants_json(flow.request):
         flow.response.headers["content-type"] = "application/json"

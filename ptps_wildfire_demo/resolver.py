@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 from typing import cast
 
 import httpx
 import pandas as pd
 
+from ptps_wildfire_demo.common_crawl_client import CommonCrawlClient
 from ptps_wildfire_demo.helpers import str_or_none
 from ptps_wildfire_demo.internet_archive_client import InternetArchiveClient
 from ptps_wildfire_demo.rescue import Rescue
@@ -24,11 +27,13 @@ def get_drp_rescues():
 class Resolver:
     httpx_client: httpx.AsyncClient
     internet_archive_client: InternetArchiveClient
+    common_crawl_client: CommonCrawlClient
     drp_rescues: pd.DataFrame
 
     def __init__(self, httpx_client: httpx.AsyncClient) -> None:
         self.httpx_client = httpx_client
         self.internet_archive_client = InternetArchiveClient(httpx_client)
+        self.common_crawl_client = CommonCrawlClient(httpx_client)
         self.refresh()
 
     def refresh(self):
@@ -96,6 +101,10 @@ class Resolver:
         if wayback_match is None and resolved_url != url:
             wayback_match = await self.internet_archive_client.get_match(resolved_url)
 
+        common_crawl_url = await self.common_crawl_client.get_match(url)
+        if common_crawl_url is None and resolved_url != url:
+            common_crawl_url = await self.common_crawl_client.get_match(resolved_url)
+
         drp_url = self.get_drp_url(url)
         if drp_url is None and resolved_url != url:
             drp_url = self.get_drp_url(resolved_url)
@@ -104,5 +113,6 @@ class Resolver:
             original_url=url,
             resolved_url=resolved_url,
             wayback_newest_url=wayback_match,
+            common_crawl_url=common_crawl_url,
             drp_url=drp_url,
         )

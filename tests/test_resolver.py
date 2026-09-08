@@ -1,4 +1,5 @@
 import re
+from unittest.mock import AsyncMock
 
 import httpx
 import pandas as pd
@@ -110,6 +111,7 @@ def test_get_drp_match_prefers_no_common_prefix():
 async def test_get_rescue_no_match(resolver):
     rescue = await resolver.get_rescue("http://nota.realdomainname")
     assert rescue.wayback_newest_url is None
+    assert rescue.common_crawl_url is None
     assert rescue.drp_url is None
 
 
@@ -122,4 +124,34 @@ async def test_get_rescue_timeout(resolver, httpx_mock: HTTPXMock):
 
     rescue = await resolver.get_rescue("https://investinopen.org/")
     assert rescue.wayback_newest_url is None
+    assert rescue.common_crawl_url is None
     assert rescue.drp_url is None
+
+
+async def test_get_rescue_common_crawl_falls_back_to_resolved_url():
+    class StubArchiveClient:
+        def __init__(self, matches):
+            self.matches = matches
+            self.calls = []
+
+        async def get_match(self, url: str):
+            self.calls.append(url)
+            return self.matches.get(url)
+
+    original_url = "https://example.com/old"
+    resolved_url = "https://example.com/new"
+    common_crawl_url = (
+        "https://index.commoncrawl.org/CC-MAIN-2026-10/20260202020202/"
+        "https://example.com/new"
+    )
+
+    resolver = Resolver.__new__(Resolver)
+    resolver.resolve = AsyncMock(return_value=resolved_url)
+    resolver.internet_archive_client = StubArchiveClient({})
+    resolver.common_crawl_client = StubArchiveClient({resolved_url: common_crawl_url})
+    resolver.get_drp_url = lambda url: None
+
+    rescue = await resolver.get_rescue(original_url)
+
+    assert rescue.common_crawl_url == common_crawl_url
+    assert resolver.common_crawl_client.calls == [original_url, resolved_url]

@@ -129,6 +129,10 @@
           </th>
           <th>
             In
+            <a href="https://index.commoncrawl.org/" target="_blank">Common Crawl</a>?
+          </th>
+          <th>
+            In
             <a href="https://portal.datarescueproject.org/" target="_blank">Data Rescue Project
               Portal</a>?
           </th>
@@ -141,6 +145,8 @@
           <td>{{ row.status }}</td>
           <td>{% if row.wayback_applicable %}{{ row.wayback_url | yes_no }}{% else %}<span class="empty">N/A</span>{%
             endif %}
+          </td>
+          <td>{% if row.common_crawl_applicable %}{{ row.common_crawl_url | yes_no }}{% else %}<span class="empty">N/A</span>{% endif %}
           </td>
           <td>{% if row.drp_applicable %}{{ row.drp_url | yes_no }}{% else %}<span class="empty">N/A</span>{% endif %}
           </td>
