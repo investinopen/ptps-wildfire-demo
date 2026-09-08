@@ -129,9 +129,7 @@ def get_dataset_sections(
                     "wayback_applicable": dataset[
                         "example_data_url_wayback_applicable"
                     ],
-                    "common_crawl_url": dataset[
-                        "example_data_url_common_crawl_url"
-                    ],
+                    "common_crawl_url": dataset["example_data_url_common_crawl_url"],
                     "common_crawl_applicable": True,
                     "drp_url": dataset["example_data_url_drp_url"],
                     "drp_applicable": dataset["drp_applicable"],
@@ -172,7 +170,7 @@ def yes_no(url: object) -> Markup:
     return Markup(f'🟢 <a href="{escaped_url}" target="_blank" rel="noopener">Yes</a>')
 
 
-async def main():
+async def get_consolidated_results() -> list[dict]:
     async with httpx.AsyncClient() as client:
         resolver = Resolver(client)
 
@@ -184,9 +182,11 @@ async def main():
             get_example_data_url_results(client, resolver, datasets_to_check),
         )
 
-    consolidated_results = get_dataset_sections(
-        webpage_results, example_data_url_results
-    )
+    return get_dataset_sections(webpage_results, example_data_url_results)
+
+
+async def main():
+    consolidated_results = await get_consolidated_results()
 
     env = Environment(loader=FileSystemLoader(ANALYSIS_DIR))
     env.filters["link_label"] = link_label
