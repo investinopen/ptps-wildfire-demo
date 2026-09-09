@@ -134,7 +134,9 @@ flowchart TD
      1. Set proxy type to `HTTP`.
      1. Set host to `127.0.0.1` and port to `8080`.
      1. If your dataset URL starts with `https://`, install/trust the mitmproxy CA certificate from the previous step.
-        - If you need help, open [http://mitm.it/](http://mitm.it/) in a browser that is configured to use this proxy (`127.0.0.1:8080`), then follow the install steps for your OS.
+        - To configure your browser for this temporarily: open browser settings, search for “proxy”, enable manual proxy, and set host `127.0.0.1` and port `8080`.
+        - Then open [http://mitm.it/](http://mitm.it/) in that browser and follow the install steps for your OS.
+        - After installing the certificate, turn off the browser proxy setting again.
      1. Click **OK** and restart QGIS.
      1. Load a web dataset URL (such as WMS/WFS/WCS), which will now use the proxy.
    - Instructions for the others to come.
