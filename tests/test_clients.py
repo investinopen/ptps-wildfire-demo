@@ -108,19 +108,8 @@ def test_duckdb():
     """https://duckdb.org/docs/current/core_extensions/httpfs/https"""
 
     with duckdb.connect() as conn:
-        try:
-            conn.execute("INSTALL httpfs")
-            conn.execute("LOAD httpfs")
-        except duckdb.IOException as error:
-            error_text = str(error)
-            if (
-                "Failed to download extension" in error_text
-                or 'Extension "/home/runner/.duckdb/extensions' in error_text
-            ):
-                pytest.skip("DuckDB httpfs extension unavailable in this environment")
-            if 'Extension "httpfs" is an existing extension.' not in error_text:
-                raise
-            conn.execute("LOAD httpfs")
+        conn.execute("INSTALL httpfs")
+        conn.execute("LOAD httpfs")
         conn.execute(f"SET http_proxy = '{PROXY_URL}'")
         conn.execute(f"SET ca_cert_file = '{CERT_PATH}'")
 
