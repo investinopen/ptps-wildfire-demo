@@ -92,12 +92,11 @@ def test_urllib(monkeypatch, url):
 
 
 def test_duckdb():
-    conn = duckdb.connect()
-    conn.execute(f"SET http_proxy = '{PROXY_URL}'")
+    with duckdb.connect() as conn:
+        conn.execute(f"SET http_proxy = '{PROXY_URL}'")
 
-    content = conn.execute(
-        "SELECT content FROM read_text('http://mitm.it/') LIMIT 1"
-    ).fetchone()[0]
-    conn.close()
+        content = conn.execute(
+            "SELECT content FROM read_text('http://mitm.it/') LIMIT 1"
+        ).fetchone()[0]
 
     assert "mitmproxy" in content.lower()
