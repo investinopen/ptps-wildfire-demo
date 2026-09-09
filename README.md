@@ -123,7 +123,16 @@ flowchart TD
    curl --proxy 127.0.0.1:8080 --cacert ~/.mitmproxy/mitmproxy-ca-cert.pem https://example.com/
    ```
 
-1. Connect from [a supported tool](#tools) — see [demo notebook](proxy/demo.ipynb).
+1. Connect from [a supported tool](#tools).
+   - Python: see [demo notebook](proxy/demo.ipynb).
+   - QGIS:
+     1. Open QGIS preferences.
+     1. Navigate to **Network** → **Proxy**.
+     1. Enable **Use proxy for web access**.
+     1. Set proxy type to `HTTP`.
+     1. Set host to `127.0.0.1` and port to `8080`.
+     1. Click **OK** and restart QGIS.
+     1. Load a web dataset URL (such as WMS/WFS/WCS), which will now use the proxy.
    - Instructions for the others to come.
 
 ## ~~DuckDB extension~~
