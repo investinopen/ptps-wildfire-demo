@@ -124,22 +124,14 @@ flowchart TD
    ```
 
 1. Connect from [a supported tool](#tools).
-   - Python: see [demo notebook](proxy/demo.ipynb).
-   - QGIS:
-     - A **proxy** is a local helper that sits between QGIS and the data website. Here, that helper is the proxy you started at `127.0.0.1:8080`.
-     - A **certificate** lets QGIS trust secure (`https://`) traffic from that local proxy.
-     1. Open QGIS preferences.
-     1. Navigate to **Network** → **Proxy**.
-     1. Enable **Use proxy for web access**.
-     1. Set proxy type to `HTTP`.
-     1. Set host to `127.0.0.1` and port to `8080`.
-     1. If your dataset URL starts with `https://`, install/trust the mitmproxy CA certificate from the previous step.
-        - To configure your browser for this temporarily: open browser settings, search for “proxy”, enable manual proxy, and set host `127.0.0.1` and port `8080`.
-        - Then open [http://mitm.it/](http://mitm.it/) in that browser and follow the install steps for your OS.
-        - After installing the certificate, turn off the browser proxy setting again.
-     1. Click **OK** and restart QGIS.
-     1. Load a web dataset URL (such as WMS/WFS/WCS), which will now use the proxy.
-   - Instructions for the others to come.
+   1. Python: see [demo notebook](proxy/demo.ipynb).
+   1. QGIS:
+      1. Open **Preferences** → **Network** → **Proxy**.
+      1. Enable **Use proxy for web access**, then set type `HTTP`, host `127.0.0.1`, and port `8080` (this sends QGIS web traffic through the local proxy).
+      1. For `https://` dataset URLs, install/trust the mitmproxy CA certificate from the previous step (so QGIS trusts secure traffic from the proxy).
+      1. To install it with [http://mitm.it/](http://mitm.it/): temporarily enable manual browser proxy `127.0.0.1:8080`, open that URL, follow the steps for your OS, then disable the browser proxy again.
+      1. Click **OK**, restart QGIS, and load a web dataset URL (WMS/WFS/WCS).
+   1. Instructions for the others to come.
 
 ## ~~DuckDB extension~~
 
