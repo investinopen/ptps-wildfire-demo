@@ -152,8 +152,9 @@ Use `Resolver` to look up available rescue sources for a URL:
 import httpx
 
 from ptps_wildfire_demo import Resolver
+from ptps_wildfire_demo.proxy.constants import CERT_PATH, PROXY_URL
 
-async with httpx.AsyncClient() as client:
+async with httpx.AsyncClient(proxy=PROXY_URL, verify=str(CERT_PATH)) as client:
    rescue = await Resolver(client).get_rescue("https://example.com/data.csv")
 ```
 
