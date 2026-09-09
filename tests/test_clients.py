@@ -93,6 +93,8 @@ def test_urllib(monkeypatch, url):
 
 def test_duckdb():
     with duckdb.connect() as conn:
+        conn.execute("INSTALL httpfs")
+        conn.execute("LOAD httpfs")
         conn.execute(f"SET http_proxy = '{PROXY_URL}'")
 
         content = conn.execute(
