@@ -55,6 +55,9 @@ We acknowledge that those other areas are valuable, they just aren’t in scope 
 
 The fallback behavior is available through a proxy, retrieving source data that's available or letting you know where to find data that's missing. The proxy will also passively archive URLs in the [Internet Archive](https://archive.org/) if they don't already exist there, preventing any future situation where a dataset disappears.
 
+A **proxy** routes web requests through another service (here, `127.0.0.1:8080`).
+A **certificate** lets tools trust secure (`https://`) traffic from that proxy.
+
 ### Architecture
 
 ```mermaid
@@ -124,8 +127,6 @@ flowchart TD
    ```
 
 1. Connect from [a supported tool](#tools).
-   A **proxy** routes web requests through another service (here, `127.0.0.1:8080`).
-   A **certificate** lets tools trust secure (`https://`) traffic from that proxy.
    1. Python: see [demo notebook](proxy/demo.ipynb).
    1. QGIS:
       1. Open **Preferences** → **Network** → **Proxy**.
