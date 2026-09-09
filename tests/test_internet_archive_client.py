@@ -34,9 +34,7 @@ async def test_get_match_timeout(client, httpx_mock: HTTPXMock):
     assert match is None
 
 
-async def test_requests_are_throttled(
-    client, httpx_mock: HTTPXMock, monkeypatch
-):
+async def test_requests_are_throttled(client, httpx_mock: HTTPXMock, monkeypatch):
     """Concurrent callers should be spaced out by request_interval."""
 
     monkeypatch.setattr(client, "request_interval", 0.1)
