@@ -95,15 +95,9 @@ def test_duckdb():
     conn = duckdb.connect()
     conn.execute(f"SET http_proxy = '{PROXY_URL}'")
 
-    try:
-        content = conn.execute(
-            "SELECT content FROM read_text('http://mitm.it/') LIMIT 1"
-        ).fetchone()[0]
-    except duckdb.Error as error:
-        if "required extension 'httpfs'" in str(error):
-            pytest.skip("DuckDB httpfs extension unavailable in this environment")
-        raise
-    finally:
-        conn.close()
+    content = conn.execute(
+        "SELECT content FROM read_text('http://mitm.it/') LIMIT 1"
+    ).fetchone()[0]
+    conn.close()
 
     assert "mitmproxy" in content.lower()
