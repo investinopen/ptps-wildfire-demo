@@ -3,6 +3,7 @@ import subprocess
 import urllib.request
 
 import duckdb
+import httpx
 import pytest
 import requests
 
@@ -89,6 +90,18 @@ def test_urllib(monkeypatch, url):
     # send request
     response = urllib.request.urlopen(url, context=myssl)
     assert response.status == 200
+
+
+def test_httpx(url):
+    """
+    - https://www.python-httpx.org/advanced/proxies/
+    - https://www.python-httpx.org/advanced/ssl/#configuring-client-instances
+    """
+
+    with httpx.Client(proxy=PROXY_URL, verify=str(CERT_PATH), timeout=10) as client:
+        response = client.get(url)
+
+    assert response.status_code == 200
 
 
 def test_duckdb():
