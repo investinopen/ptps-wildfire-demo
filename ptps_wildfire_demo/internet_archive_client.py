@@ -1,5 +1,7 @@
+import asyncio
 import logging
 import os
+import time
 from json.decoder import JSONDecodeError
 
 import httpx
@@ -11,22 +13,49 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
+# The Internet Archive rate-limits aggressively and asks clients to be gentle.
+# Serialize our requests and keep a minimum gap between them. Override with the
+# INTERNET_ARCHIVE_REQUEST_INTERVAL env var (seconds).
+DEFAULT_REQUEST_INTERVAL = 1.0
+
 
 class InternetArchiveClient:
     httpx_client: httpx.AsyncClient
     access_key: str | None
     secret_key: str | None
+    request_interval: float
+    _throttle_lock: asyncio.Lock
+    _last_request_at: float
 
     def __init__(self, httpx_client: httpx.AsyncClient) -> None:
         self.httpx_client = httpx_client
         self.access_key = os.environ.get("INTERNET_ARCHIVE_ACCESS_KEY")
         self.secret_key = os.environ.get("INTERNET_ARCHIVE_SECRET_KEY")
+        self.request_interval = float(
+            os.environ.get(
+                "INTERNET_ARCHIVE_REQUEST_INTERVAL", DEFAULT_REQUEST_INTERVAL
+            )
+        )
+        self._throttle_lock = asyncio.Lock()
+        self._last_request_at = 0.0
+
+    async def _throttle(self) -> None:
+        """Block until at least `request_interval` seconds have passed since the
+        previous request, so concurrent callers don't hammer the Internet Archive."""
+
+        async with self._throttle_lock:
+            wait = self._last_request_at + self.request_interval - time.monotonic()
+            if wait > 0:
+                await asyncio.sleep(wait)
+            self._last_request_at = time.monotonic()
 
     async def request(
         self, url: str, *, method="GET", timeout=10, params: dict | None = None
     ):
         # not using the official package because we want async support
         # https://archive.org/developers/internetarchive/index.html
+
+        await self._throttle()
 
         headers = {"User-Agent": USER_AGENT}
 

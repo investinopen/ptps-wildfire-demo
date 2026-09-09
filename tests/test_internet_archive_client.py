@@ -1,3 +1,6 @@
+import asyncio
+import time
+
 import httpx
 import pytest
 from pytest_httpx import HTTPXMock
@@ -29,3 +32,19 @@ async def test_get_match_timeout(client, httpx_mock: HTTPXMock):
 
     match = await client.get_match("https://investinopen.org/")
     assert match is None
+
+
+async def test_requests_are_throttled(
+    client, httpx_mock: HTTPXMock, monkeypatch
+):
+    """Concurrent callers should be spaced out by request_interval."""
+
+    monkeypatch.setattr(client, "request_interval", 0.1)
+    httpx_mock.add_response(is_reusable=True)
+
+    start = time.monotonic()
+    await asyncio.gather(*(client.request("https://archive.org/") for _ in range(4)))
+    elapsed = time.monotonic() - start
+
+    # 4 requests, 0.1s apart => at least ~0.3s for the gaps between them
+    assert elapsed >= 0.3
