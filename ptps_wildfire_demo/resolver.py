@@ -11,10 +11,13 @@ from ptps_wildfire_demo.rescue import Rescue
 def get_drp_rescues():
     """Retrieve the data behind https://portal.datarescueproject.org/datasets/"""
 
-    df = pd.read_json(
-        "https://portal.datarescueproject.org/datasets-full.json",
-        dtype_backend="pyarrow",
-    )
+    try:
+        df = pd.read_json(
+            "https://portal.datarescueproject.org/datasets-full.json",
+            dtype_backend="pyarrow",
+        )
+    except Exception:  # noqa: BLE001
+        return pd.DataFrame(columns=["data_source", "url"])
     # make full URLs
     df["url"] = "https://portal.datarescueproject.org" + df["url"]
 
@@ -45,7 +48,7 @@ class Resolver:
         except httpx.HTTPError:
             return url
 
-    def _get_drp_match(self, boolean_index: pd.Series[bool]) -> pd.Series | None:
+    def _get_drp_match(self, boolean_index: pd.Series) -> pd.Series | None:
         matches = self.drp_rescues[boolean_index]
         if len(matches) > 0:
             row = matches.iloc[0]
