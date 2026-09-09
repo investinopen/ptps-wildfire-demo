@@ -124,11 +124,13 @@ flowchart TD
    ```
 
 1. Connect from [a supported tool](#tools).
+   A **proxy** routes web requests through another service (here, `127.0.0.1:8080`).
+   A **certificate** lets tools trust secure (`https://`) traffic from that proxy.
    1. Python: see [demo notebook](proxy/demo.ipynb).
    1. QGIS:
       1. Open **Preferences** → **Network** → **Proxy**.
-      1. Enable **Use proxy for web access**, then set type `HTTP`, host `127.0.0.1`, and port `8080` (this sends QGIS web traffic through the local proxy).
-      1. For `https://` dataset URLs, install/trust the mitmproxy CA certificate from the previous step (so QGIS trusts secure traffic from the proxy).
+      1. Enable **Use proxy for web access**, then set type `HTTP`, host `127.0.0.1`, and port `8080`.
+      1. For `https://` dataset URLs, install/trust the mitmproxy CA certificate from the previous step.
       1. To install it with [http://mitm.it/](http://mitm.it/): temporarily enable manual browser proxy `127.0.0.1:8080`, open that URL, follow the steps for your OS, then disable the browser proxy again.
       1. Click **OK**, restart QGIS, and load a web dataset URL (WMS/WFS/WCS).
    1. Instructions for the others to come.
