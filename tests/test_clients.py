@@ -2,6 +2,7 @@ import ssl
 import subprocess
 import urllib.request
 
+import duckdb
 import pytest
 import requests
 
@@ -88,3 +89,21 @@ def test_urllib(monkeypatch, url):
     # send request
     response = urllib.request.urlopen(url, context=myssl)
     assert response.status == 200
+
+
+def test_duckdb():
+    conn = duckdb.connect()
+    conn.execute(f"SET http_proxy = '{PROXY_URL}'")
+
+    try:
+        content = conn.execute(
+            "SELECT content FROM read_text('http://mitm.it/') LIMIT 1"
+        ).fetchone()[0]
+    except duckdb.Error as error:
+        if "required extension 'httpfs'" in str(error):
+            pytest.skip("DuckDB httpfs extension unavailable in this environment")
+        raise
+    finally:
+        conn.close()
+
+    assert "mitmproxy" in content.lower()
