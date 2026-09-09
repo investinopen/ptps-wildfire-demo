@@ -55,6 +55,9 @@ We acknowledge that those other areas are valuable, they just aren’t in scope 
 
 The fallback behavior is available through a proxy, retrieving source data that's available or letting you know where to find data that's missing. The proxy will also passively archive URLs in the [Internet Archive](https://archive.org/) if they don't already exist there, preventing any future situation where a dataset disappears.
 
+A **proxy** routes web requests through another service (here, `127.0.0.1:8080`).
+A **certificate** lets tools trust secure (`https://`) traffic from that proxy.
+
 ### Architecture
 
 ```mermaid
@@ -123,8 +126,17 @@ flowchart TD
    curl --proxy 127.0.0.1:8080 --cacert ~/.mitmproxy/mitmproxy-ca-cert.pem https://example.com/
    ```
 
-1. Connect from [a supported tool](#tools) — see [demo notebook](proxy/demo.ipynb).
-   - Instructions for the others to come.
+1. Connect from [a supported tool](#tools).
+   1. Python: see [demo notebook](proxy/demo.ipynb).
+   1. QGIS:
+      1. Open **Preferences** → **Network** → **Proxy**.
+      1. Enable **Use proxy for web access**, then set type `HTTP`, host `127.0.0.1`, and port `8080`.
+      1. For `https://` dataset URLs, install/trust the mitmproxy CA certificate from the previous step:
+         1. Temporarily enable manual browser proxy `127.0.0.1:8080`.
+         1. Open [http://mitm.it/](http://mitm.it/) and follow the install steps for your OS.
+         1. Disable the browser proxy again.
+      1. Click **OK**, restart QGIS, and load a web dataset URL (WMS/WFS/WCS).
+   1. Instructions for the others to come.
 
 ## ~~DuckDB extension~~
 
