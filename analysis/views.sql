@@ -1,3 +1,13 @@
+-- ST_Transform's axis order depends on `geometry_always_xy`, which setup.sql sets on the
+-- connection it is run against -- but JupySQL executes %%sql cells on their own DuckDB
+-- cursor, which is a fresh session that never saw it. With the setting off, EPSG:4269 and
+-- EPSG:4326 are read as (lat, lon), and the result is silently NaN rather than an error.
+-- A macro lives in the catalog rather than the session, so every connection gets this
+-- one. Reproject through it, not through ST_Transform directly.
+CREATE OR REPLACE MACRO reproject(geom, source_crs, target_crs) AS
+ST_Transform(geom, source_crs, target_crs, always_xy := true);
+
+
 -- One source.coop fire-risk layer plus FIRMS active detections for a bounding box. Gets "risk" and "right now" on the same map with almost no auth friction.
 -- https://docs.google.com/document/d/1rYsP1I1-TAd3Tu-G6EJ-5o7IbQIHf_dKT3DjH8IpQuo/edit?tab=t.0#heading=h.87di2doy0z55
 CREATE OR REPLACE VIEW burn_prob_1km AS
@@ -28,9 +38,12 @@ FROM ST_Read(
 COMMENT ON VIEW fire_zones IS 'https://www.weather.gov/gis/FireZones';
 
 
--- the geom is empty, so backfill it from the fire_zones
+-- An alert is issued *for a zone*, and most carry `geometry: null`, so the shape has to
+-- be backfilled from fire_zones. One row per alert x zone -- this is the grain that
+-- zone-level analysis needs, and red_flag_warnings below collapses it back to one row
+-- per alert.
 -- https://github.com/weather-gov/api/discussions/278
-CREATE OR REPLACE VIEW red_flag_warnings AS WITH warnings AS (
+CREATE OR REPLACE VIEW red_flag_zones AS WITH warnings AS (
         SELECT DISTINCT * EXCLUDE geom,
             unnest(affectedZones) AS zone_url,
             regexp_extract(
@@ -41,18 +54,24 @@ CREATE OR REPLACE VIEW red_flag_warnings AS WITH warnings AS (
         FROM ST_Read(
                 'https://api.weather.gov/alerts/active?event=Red%20Flag%20Warning&status=actual' -- , open_options = ['FLATTEN_NESTED_ATTRIBUTES=YES']
             )
-    ),
-    zones_with_geom AS (
-        SELECT warnings.* EXCLUDE (zone_url, zone_parsed),
-            fire_zones.geom
-        FROM warnings
-            LEFT JOIN fire_zones ON warnings.zone_parsed.state = fire_zones.state
-            AND warnings.zone_parsed.zone = fire_zones.zone
     )
-SELECT zones_with_geom.* EXCLUDE geom,
+SELECT warnings.* EXCLUDE (zone_url, zone_parsed),
+    warnings.zone_parsed.state || 'Z' || warnings.zone_parsed.zone AS zone_id,
+    fire_zones.name AS zone_name,
+    fire_zones.state AS zone_state,
+    fire_zones.geom
+FROM warnings
+    LEFT JOIN fire_zones ON warnings.zone_parsed.state = fire_zones.state
+    AND warnings.zone_parsed.zone = fire_zones.zone;
+
+COMMENT ON VIEW red_flag_zones IS 'https://www.weather.gov/documentation/services-web-api#/default/alerts_active, exploded to one row per affected fire zone and joined to that zone''s geometry';
+
+
+CREATE OR REPLACE VIEW red_flag_warnings AS
+SELECT * EXCLUDE (zone_id, zone_name, zone_state, geom),
     -- ST_Union_Agg seems to return a WKB, so cast it
     ST_Union_Agg(geom)::GEOMETRY AS geom
-FROM zones_with_geom
+FROM red_flag_zones
 GROUP BY ALL;
 
 COMMENT ON VIEW red_flag_warnings IS 'https://www.weather.gov/documentation/services-web-api#/default/alerts_active, enriched with the combined geometries';
@@ -68,10 +87,37 @@ COMMENT ON VIEW active_fires IS '"Each MODIS active fire/thermal hotspot locatio
 - https://firms.modaps.eosdis.nasa.gov/active_fire/#firms-txt';
 
 
+-- read from the local copy: www2.census.gov currently answers GDAL's requests with a WAF
+-- "Request Rejected" page rather than the zip
 CREATE OR REPLACE VIEW state_boundaries AS
 SELECT *
-FROM ST_Read(
-        'zip://https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_state_20m.zip/cb_2018_us_state_20m.shp'
+FROM ST_Read('zip://data/cb_2018_us_state_20m.zip/cb_2018_us_state_20m.shp');
+
+COMMENT ON VIEW state_boundaries IS 'https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html
+
+Local copy of https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_state_20m.zip';
+
+
+-- Only the columns the analysis needs, so the remote read prunes the rest. The centroid
+-- columns ship as VARCHAR, hence the casts -- they make a cheap bounding-box prefilter
+-- possible without decoding every perimeter.
+CREATE OR REPLACE VIEW mtbs_perimeters AS
+SELECT Event_ID AS event_id,
+    Incid_Name AS incident,
+    Incid_Type AS incid_type,
+    BurnBndAc AS acres,
+    Ig_Date AS ig_date,
+    year(Ig_Date) AS ig_year,
+    TRY_CAST(BurnBndLon AS DOUBLE) AS centroid_lon,
+    TRY_CAST(BurnBndLat AS DOUBLE) AS centroid_lat,
+    geom
+FROM read_parquet(
+        'https://data.source.coop/cboettig/fire/mtbs-perimeters-1984-2024.parquet'
     );
 
-COMMENT ON VIEW state_boundaries IS 'https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html';
+COMMENT ON VIEW mtbs_perimeters IS 'Monitoring Trends in Burn Severity perimeters, 1984-2024.
+
+- https://source.coop/cboettig/fire
+- https://www.mtbs.gov/
+
+Note the size floor (~1000 acres in the west, 500 in the east) and the reporting lag of a year or more.';
