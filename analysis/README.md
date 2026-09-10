@@ -26,8 +26,8 @@ For Python dependencies managed with `uv`, use a regular CPython build (for exam
 
 The first run binds every view, which means fetching from every endpoint and takes a few
 minutes; afterwards `cache_httpfs` serves them and the whole notebook runs in seconds.
-Each run writes a timestamped CSV, GeoJSON, and provenance JSON -- because two of the four
-layers change by the hour, re-running does not reproduce an earlier result.
+Because two of the four layers change by the hour, re-running does not reproduce an
+earlier result, and nothing is written to disk -- capture anything you want to keep.
 
 ## Dataset rescue status report
 
