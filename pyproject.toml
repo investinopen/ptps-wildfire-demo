@@ -36,6 +36,12 @@ dev = [
     "xarray>=2026.7.0",
 ]
 
+# loaded by `%load_ext sql` in analysis/risk.ipynb
+# https://jupysql.readthedocs.io/en/latest/api/configuration.html#loading-from-a-file
+[tool.jupysql.SqlMagic]
+autopandas = true
+displaycon = false
+
 [tool.pytest.ini_options]
 # https://pytest-asyncio.readthedocs.io/en/stable/concepts.html#test-discovery-modes
 asyncio_mode = "auto"
