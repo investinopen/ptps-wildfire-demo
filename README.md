@@ -45,6 +45,9 @@ We aim to support the following tools:
 
 - Focus on low-velocity/historical data rather than high-velocity/real-time
 - Focusing on mirrors (direct copies), rather than fabricating new datasets / creating alternatives
+- Focused on ensuring there are greater than zero copies of datasets
+  - Greater than one is a nice-to-have.
+  - In other words, we're focused on avoiding data disruption crises rather than long-term [preservation](https://en.wikipedia.org/wiki/Digital_preservation).
 - Presenting rescued/identical data as-is rather than doing any cleaning
 - Shouldn't be reliant on specific cloud providers
 - While this is being built as a compatibility layer (behind the scenes), we will surface source dataset status and fallbacks to make it easier for people to understand.
