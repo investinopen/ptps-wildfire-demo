@@ -169,7 +169,7 @@ import httpx
 from ptps_wildfire_demo import Resolver
 
 async with httpx.AsyncClient() as client:
-   rescue = await Resolver(client).get_rescue("https://example.com/data.csv")
+    rescue = await Resolver(client).get_rescue("https://example.com/data.csv")
 ```
 
 ## [Browser extension](extension/)
