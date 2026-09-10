@@ -16,7 +16,7 @@ The project will design, build, and document a working end-to-end data infrastru
 
 ## Fallbacks
 
-When source data (from a government, etc.) gets taken down, this can stop its users dead in their tracks. Sometimes the data has been rescued by a third party, but it’s not always easy to find, use, or comprehend. This project aims to make that simpler, providing a “fallback” behavior when original data sources aren’t available. Essentially, we want to save data users from digging through the [Data Rescue Project (DRP) Portal](https://portal.datarescueproject.org/datasets/), if they even know to look for it.
+When source data (from a government, etc.) gets taken down, this can stop its users dead in their tracks. Sometimes the data has been rescued by a third party, but it's not always easy to find, use, or comprehend. This project aims to make that simpler, providing a “fallback” behavior when original data sources aren't available. Essentially, we want to save data users from digging through the [Data Rescue Project (DRP) Portal](https://portal.datarescueproject.org/datasets/), if they even know to look for it.
 
 ## Use cases
 
@@ -46,10 +46,10 @@ We aim to support the following tools:
 - Focus on low-velocity/historical data rather than high-velocity/real-time
 - Focusing on mirrors (direct copies), rather than fabricating new datasets / creating alternatives
 - Presenting rescued/identical data as-is rather than doing any cleaning
-- Shouldn’t be reliant on specific cloud providers
+- Shouldn't be reliant on specific cloud providers
 - While this is being built as a compatibility layer (behind the scenes), we will surface source dataset status and fallbacks to make it easier for people to understand.
 
-We acknowledge that those other areas are valuable, they just aren’t in scope for this (phase of the) project.
+We acknowledge that those other areas are valuable, they just aren't in scope for this (phase of the) project.
 
 ## [HTTP proxy](proxy/)
 
