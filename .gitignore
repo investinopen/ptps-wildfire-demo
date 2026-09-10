@@ -10,6 +10,7 @@
 .python-version
 __pycache__
 data/
+data_cache/
 
 .coverage
 .env
