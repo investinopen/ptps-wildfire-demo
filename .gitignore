@@ -11,8 +11,6 @@
 __pycache__
 data/
 data_cache/
-# timestamped exports written by analysis/risk.ipynb
-output/
 
 .coverage
 .env
