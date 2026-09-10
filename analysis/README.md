@@ -2,7 +2,20 @@
 
 ## [Wildfire risk](risk.ipynb)
 
-This code was written to explore various relevant datasets in different formats, experimenting with how to bring them together in a cohesive way.
+Brings four datasets of very different velocity together on one map, and ranks a state's
+NWS fire weather zones by a composite of standing hazard and current conditions:
+
+| Layer                  | Source                           | Velocity |
+| ---------------------- | -------------------------------- | -------- |
+| Burn probability       | CarbonPlan Open Climate Risk     | static   |
+| Burn history           | MTBS perimeters 1984-2024        | static   |
+| Red Flag Warnings      | NOAA/NWS active alerts API       | minutes  |
+| Active fire detections | NASA FIRMS (MODIS 24h)           | hours    |
+
+Each layer is a DuckDB view over the remote file ([`views.sql`](views.sql)), and the joins
+and geometry work happen in SQL through the `spatial` extension. Set `STATE` in the
+configuration cell to move it; one state keeps every layer small enough to work
+interactively.
 
 Requires [DuckDB](https://duckdb.org/).
 
@@ -10,6 +23,11 @@ For Python dependencies managed with `uv`, use a regular CPython build (for exam
 
 1. [Download the burn probability data.](burn_prob.ipynb)
 1. [Run the analysis.](risk.ipynb)
+
+The first run binds every view, which means fetching from every endpoint and takes a few
+minutes; afterwards `cache_httpfs` serves them and the whole notebook runs in seconds.
+Each run writes a timestamped CSV, GeoJSON, and provenance JSON -- because two of the four
+layers change by the hour, re-running does not reproduce an earlier result.
 
 ## Dataset rescue status report
 
