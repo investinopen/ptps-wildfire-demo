@@ -1,15 +1,11 @@
 import asyncio
-import base64
-import io
 from collections.abc import Iterable
 from pathlib import Path
 
-import folium
 import geopandas as gpd
 import httpx
 import matplotlib
 import matplotlib.colors as mcolors
-import matplotlib.pyplot as plt
 import pandas as pd
 from duckdb import DuckDBPyConnection
 from IPython.display import HTML
@@ -50,42 +46,6 @@ def read_geo(
         geometry=gpd.GeoSeries.from_wkt(df[geom_col]),
         crs=crs,
     )
-
-
-class MapWithImageFallback:
-    """One cell output that carries both a Folium map and a static PNG.
-
-    Folium's map is plain HTML/JS, not a Jupyter widget, so it renders anywhere that
-    executes embedded scripts; anything that does not (plain HTML export without
-    scripts) falls back to the image in the same MIME bundle -- so the map shows up
-    once, not twice.
-    """
-
-    def __init__(self, static_fig: plt.Figure, interactive_map: folium.Map | None = None):
-        buffer = io.BytesIO()
-        static_fig.savefig(buffer, format="png", dpi=110, bbox_inches="tight")
-        plt.close(static_fig)
-        self._png_base64 = base64.b64encode(buffer.getvalue()).decode("ascii")
-        self._map = interactive_map
-
-    def _repr_mimebundle_(self, include=None, exclude=None):
-        bundle = {
-            "text/plain": "interactive map (static image shown where scripts don't run)",
-            "image/png": self._png_base64,
-        }
-        if self._map is not None:
-            bundle["text/html"] = self._map._repr_html_()
-        return bundle
-
-
-def render_map(
-    static_fig: plt.Figure, interactive_map: folium.Map | None = None
-) -> MapWithImageFallback:
-    """Return a display object combining `static_fig` and an optional Folium map.
-
-    Use it as the last expression in a cell: `render_map(fig, folium_map)`.
-    """
-    return MapWithImageFallback(static_fig, interactive_map)
 
 
 async def get_status(client: httpx.AsyncClient, url: str) -> str:
