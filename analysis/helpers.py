@@ -4,19 +4,17 @@ import io
 from collections.abc import Iterable
 from pathlib import Path
 
+import folium
 import geopandas as gpd
 import httpx
 import matplotlib
+import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import pandas as pd
 from duckdb import DuckDBPyConnection
 from IPython.display import HTML
-from lonboard import Map
-from lonboard.colormap import apply_continuous_cmap
 
 from ptps_wildfire_demo.constants import USER_AGENT
-
-WIDGET_VIEW_MIME = "application/vnd.jupyter.widget-view+json"
 
 
 def run_script_in_db(conn: DuckDBPyConnection, path: Path | str):
@@ -26,15 +24,18 @@ def run_script_in_db(conn: DuckDBPyConnection, path: Path | str):
     conn.execute(sql)
 
 
-def to_continuous_color_map(values: pd.Series, cmap: str):
-    """cmap options: https://matplotlib.org/stable/gallery/color/colormap_reference.html"""
+def to_hex_color_map(values: pd.Series, cmap: str) -> pd.Series:
+    """Scale `values` into `cmap`, returned as hex strings for use in a Folium
+    `style_function`. cmap options:
+    https://matplotlib.org/stable/gallery/color/colormap_reference.html"""
 
     vmin = values.min()
     vmax = values.max()
-    scaled = (values - vmin) / (vmax - vmin)
+    span = vmax - vmin
+    scaled = (values - vmin) / span if span else pd.Series(0.0, index=values.index)
 
     cmap_obj = matplotlib.colormaps[cmap]
-    return apply_continuous_cmap(scaled, cmap_obj)
+    return scaled.apply(lambda v: mcolors.to_hex(cmap_obj(v)))
 
 
 def read_geo(
@@ -52,14 +53,15 @@ def read_geo(
 
 
 class MapWithImageFallback:
-    """One cell output that carries both a lonboard widget and a static PNG.
+    """One cell output that carries both a Folium map and a static PNG.
 
-    A widget frontend (JupyterLab, Notebook) renders the interactive map; anything
-    that does not execute widgets (GitHub, nbviewer, plain HTML export) falls back to
-    the image in the same MIME bundle -- so the map shows up once, not twice.
+    Folium's map is plain HTML/JS, not a Jupyter widget, so it renders anywhere that
+    executes embedded scripts; anything that does not (plain HTML export without
+    scripts) falls back to the image in the same MIME bundle -- so the map shows up
+    once, not twice.
     """
 
-    def __init__(self, static_fig: plt.Figure, interactive_map: Map | None = None):
+    def __init__(self, static_fig: plt.Figure, interactive_map: folium.Map | None = None):
         buffer = io.BytesIO()
         static_fig.savefig(buffer, format="png", dpi=110, bbox_inches="tight")
         plt.close(static_fig)
@@ -68,22 +70,20 @@ class MapWithImageFallback:
 
     def _repr_mimebundle_(self, include=None, exclude=None):
         bundle = {
-            "text/plain": "interactive map (static image shown where widgets are unavailable)",
+            "text/plain": "interactive map (static image shown where scripts don't run)",
             "image/png": self._png_base64,
         }
         if self._map is not None:
-            widget_bundle = self._map._repr_mimebundle_(include=include, exclude=exclude)
-            if widget_bundle and WIDGET_VIEW_MIME in widget_bundle:
-                bundle[WIDGET_VIEW_MIME] = widget_bundle[WIDGET_VIEW_MIME]
+            bundle["text/html"] = self._map._repr_html_()
         return bundle
 
 
 def render_map(
-    static_fig: plt.Figure, interactive_map: Map | None = None
+    static_fig: plt.Figure, interactive_map: folium.Map | None = None
 ) -> MapWithImageFallback:
-    """Return a display object combining `static_fig` and an optional lonboard map.
+    """Return a display object combining `static_fig` and an optional Folium map.
 
-    Use it as the last expression in a cell: `render_map(fig, Map(layer))`.
+    Use it as the last expression in a cell: `render_map(fig, folium_map)`.
     """
     return MapWithImageFallback(static_fig, interactive_map)
 
