@@ -15,6 +15,24 @@
         margin: 0;
         height: 100%;
       }
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+      #disclaimer-banner {
+        flex: none;
+        background: #fff3cd;
+        color: #664d03;
+        border-bottom: 1px solid #ffe69c;
+        padding: 6px 12px;
+        font: 13px/1.4 sans-serif;
+        text-align: center;
+      }
+      #map-container {
+        position: relative;
+        flex: 1;
+        min-height: 0;
+      }
       #map {
         width: 100%;
         height: 100%;
@@ -123,44 +141,50 @@
     </style>
   </head>
   <body>
-    <div id="map"></div>
-    <div id="hydrant-spinner" title="Loading fire hydrants…" hidden></div>
-    <div id="layer-controls">
-      <label>
-        <input type="checkbox" id="hillshade-toggle" checked />
-        <span class="swatch hillshade"></span>
-        Hillshade
-      </label>
-      <label>
-        <input type="checkbox" id="fuel-model-toggle" checked />
-        <span class="swatch hatch"></span>
-        Moderate/high fuel load
-      </label>
-      <label>
-        <input type="checkbox" id="buildings-toggle" checked />
-        <span class="swatch buildings"></span>
-        Buildings
-      </label>
-      <label>
-        <input type="checkbox" id="roads-toggle" checked />
-        <span class="swatch roads"></span>
-        Roads
-      </label>
-      <label>
-        <input type="checkbox" id="driveways-toggle" checked />
-        <span class="swatch driveways"></span>
-        Driveways & service roads
-      </label>
-      <label>
-        <input type="checkbox" id="trails-toggle" checked />
-        <span class="swatch trails"></span>
-        Trails
-      </label>
-      <label>
-        <input type="checkbox" id="hydrants-toggle" checked />
-        <span class="swatch hydrants"></span>
-        Fire hydrants
-      </label>
+    <div id="disclaimer-banner">
+      This is a proof of concept and hasn't been validated; use at your own
+      risk.
+    </div>
+    <div id="map-container">
+      <div id="map"></div>
+      <div id="hydrant-spinner" title="Loading fire hydrants…" hidden></div>
+      <div id="layer-controls">
+        <label>
+          <input type="checkbox" id="hillshade-toggle" checked />
+          <span class="swatch hillshade"></span>
+          Hillshade
+        </label>
+        <label>
+          <input type="checkbox" id="fuel-model-toggle" checked />
+          <span class="swatch hatch"></span>
+          Moderate/high fuel load
+        </label>
+        <label>
+          <input type="checkbox" id="buildings-toggle" checked />
+          <span class="swatch buildings"></span>
+          Buildings
+        </label>
+        <label>
+          <input type="checkbox" id="roads-toggle" checked />
+          <span class="swatch roads"></span>
+          Roads
+        </label>
+        <label>
+          <input type="checkbox" id="driveways-toggle" checked />
+          <span class="swatch driveways"></span>
+          Driveways & service roads
+        </label>
+        <label>
+          <input type="checkbox" id="trails-toggle" checked />
+          <span class="swatch trails"></span>
+          Trails
+        </label>
+        <label>
+          <input type="checkbox" id="hydrants-toggle" checked />
+          <span class="swatch hydrants"></span>
+          Fire hydrants
+        </label>
+      </div>
     </div>
     <script>
       // Vector tile archive of merged Google V3 / Microsoft / OSM building footprints,
