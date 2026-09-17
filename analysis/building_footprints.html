@@ -73,6 +73,7 @@
       const SOURCE_LAYER = "goog_msft_osm_building_footprints";
       const CENTER = [-105.375925, 40.052187]; // [lon, lat]
       const ZOOM = 16.03;
+      const BUILDING_MIN_ZOOM = 14.5;
 
       const protocol = new pmtiles.Protocol();
       maplibregl.addProtocol("pmtiles", protocol.tile);
@@ -135,7 +136,15 @@
               "source-layer": "waterway",
               paint: {
                 "line-color": "#a3d3e8",
-                "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.5, 18, 2],
+                "line-width": [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  10,
+                  0.5,
+                  18,
+                  2,
+                ],
               },
             },
             {
@@ -214,6 +223,7 @@
               type: "fill",
               source: "buildings",
               "source-layer": SOURCE_LAYER,
+              minzoom: BUILDING_MIN_ZOOM,
               paint: {
                 "fill-color": "#3fb1ce",
                 "fill-opacity": 0.6,
@@ -224,6 +234,7 @@
               type: "line",
               source: "buildings",
               "source-layer": SOURCE_LAYER,
+              minzoom: BUILDING_MIN_ZOOM,
               paint: {
                 "line-color": "#1f7a8c",
                 "line-width": 1,
@@ -252,7 +263,15 @@
               source: "hydrants",
               minzoom: 13,
               paint: {
-                "circle-radius": ["interpolate", ["linear"], ["zoom"], 13, 2, 18, 6],
+                "circle-radius": [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  13,
+                  2,
+                  18,
+                  6,
+                ],
                 "circle-color": "#e0342a",
                 "circle-stroke-color": "#ffffff",
                 "circle-stroke-width": 1,
@@ -271,24 +290,31 @@
 
       async function updateHydrants() {
         if (map.getZoom() < map.getLayer("hydrants").minzoom) {
-          map.getSource("hydrants").setData({ type: "FeatureCollection", features: [] });
+          map
+            .getSource("hydrants")
+            .setData({ type: "FeatureCollection", features: [] });
           return;
         }
         const b = map.getBounds();
         const query = `[out:json][timeout:25];node["emergency"="fire_hydrant"](${b.getSouth()},${b.getWest()},${b.getNorth()},${b.getEast()});out;`;
         hydrantSpinner.hidden = false;
         try {
-          const response = await fetch("https://overpass-api.de/api/interpreter", {
-            method: "POST",
-            body: "data=" + encodeURIComponent(query),
-          });
+          const response = await fetch(
+            "https://overpass-api.de/api/interpreter",
+            {
+              method: "POST",
+              body: "data=" + encodeURIComponent(query),
+            },
+          );
           const data = await response.json();
           const features = data.elements.map((el) => ({
             type: "Feature",
             geometry: { type: "Point", coordinates: [el.lon, el.lat] },
             properties: el.tags || {},
           }));
-          map.getSource("hydrants").setData({ type: "FeatureCollection", features });
+          map
+            .getSource("hydrants")
+            .setData({ type: "FeatureCollection", features });
         } catch (error) {
           console.error("Failed to load fire hydrants from Overpass:", error);
         } finally {
