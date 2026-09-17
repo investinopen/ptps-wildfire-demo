@@ -131,6 +131,10 @@
         height: 16px;
         border: 1px solid rgba(0, 0, 0, 0.2);
         flex: none;
+        /* browsers drop background colors/gradients when printing unless told otherwise,
+           which left these blank -- they're the whole point of a legend */
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
       }
       #layer-controls .swatch.hatch {
         background:
