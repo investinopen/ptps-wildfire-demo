@@ -46,6 +46,7 @@
               type: "raster",
               tiles: ["https://tile.opentopomap.org/{z}/{x}/{y}.png"],
               tileSize: 256,
+              maxzoom: 17, // OpenTopoMap doesn't render tiles past this; maplibre upscales instead
               attribution:
                 "&copy; OpenStreetMap contributors, SRTM | map style: &copy; OpenTopoMap (CC-BY-SA)",
             },
