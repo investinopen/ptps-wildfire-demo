@@ -79,6 +79,37 @@
       #layer-controls input[type="range"] {
         width: 90px;
       }
+
+      #fuel-legend {
+        position: absolute;
+        bottom: 12px;
+        left: 12px;
+        background: #ffffff;
+        border-radius: 4px;
+        box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
+        padding: 6px 10px;
+        font: 12px/1.4 sans-serif;
+        max-height: 280px;
+        overflow-y: auto;
+        z-index: 1;
+      }
+      #fuel-legend[hidden] {
+        display: none;
+      }
+      #fuel-legend h4 {
+        margin: 0 0 4px;
+        font-size: 12px;
+      }
+      #fuel-legend .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      #fuel-legend .legend-item img {
+        width: 16px;
+        height: 16px;
+        flex: none;
+      }
     </style>
   </head>
   <body>
@@ -91,6 +122,7 @@
         <input type="range" id="fuel-model-opacity" min="0" max="1" step="0.05" value="0.75" />
       </label>
     </div>
+    <div id="fuel-legend" hidden></div>
     <script>
       // Vector tile archive of merged Google V3 / Microsoft / OSM building footprints,
       // from https://beta.source.coop/repositories/vida/google-microsoft-osm-open-buildings/
@@ -103,9 +135,11 @@
       const ZOOM = 16.03;
       const BUILDING_MIN_ZOOM = 14.5;
       // Scott & Burgan 40 fire behavior fuel models, from LANDFIRE (USGS/USFS, public domain)
+      const FUEL_MODEL_SERVICE_URL =
+        "https://edcintl.cr.usgs.gov/arcgis/rest/services/Landfire_LF2024/LF2024_FBFM40_CONUS/ImageServer";
       const FUEL_MODEL_URL =
-        "https://edcintl.cr.usgs.gov/arcgis/rest/services/Landfire_LF2024/LF2024_FBFM40_CONUS/ImageServer/exportImage" +
-        "?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=256,256&format=png&interpolation=RSP_NearestNeighbor&f=image";
+        FUEL_MODEL_SERVICE_URL +
+        "/exportImage?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=256,256&format=png&interpolation=RSP_NearestNeighbor&f=image";
 
       const protocol = new pmtiles.Protocol();
       maplibregl.addProtocol("pmtiles", protocol.tile);
@@ -411,12 +445,36 @@
       map.addControl(new maplibregl.NavigationControl());
       map.addControl(new maplibregl.AttributionControl({ compact: false }));
 
+      const fuelLegend = document.getElementById("fuel-legend");
+      let fuelLegendLoaded = false;
+
+      // built from the service's own /legend endpoint rather than hand-copied, so it always
+      // matches the colors actually being drawn
+      async function loadFuelLegend() {
+        if (fuelLegendLoaded) return;
+        fuelLegendLoaded = true;
+        try {
+          const response = await fetch(FUEL_MODEL_SERVICE_URL + "/legend?f=json");
+          const data = await response.json();
+          const items = data.layers[0].legend
+            .filter((entry) => entry.label !== "Fill-NoData")
+            .map(
+              (entry) =>
+                `<div class="legend-item"><img src="data:${entry.contentType};base64,${entry.imageData}">${entry.label}</div>`,
+            )
+            .join("");
+          fuelLegend.innerHTML = "<h4>Fuel model (Scott &amp; Burgan 40)</h4>" + items;
+        } catch (error) {
+          console.error("Failed to load fuel model legend:", error);
+          fuelLegendLoaded = false;
+        }
+      }
+
       document.getElementById("fuel-model-toggle").addEventListener("change", (e) => {
-        map.setLayoutProperty(
-          "fuel-models",
-          "visibility",
-          e.target.checked ? "visible" : "none",
-        );
+        const visible = e.target.checked;
+        map.setLayoutProperty("fuel-models", "visibility", visible ? "visible" : "none");
+        fuelLegend.hidden = !visible;
+        if (visible) loadFuelLegend();
       });
       document.getElementById("fuel-model-opacity").addEventListener("input", (e) => {
         map.setPaintProperty("fuel-models", "raster-opacity", Number(e.target.value));
