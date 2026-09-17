@@ -59,5 +59,3 @@ Check the statuses of source data archived by the [Data Rescue Project](https://
 Looking at the rescue status of terminated federal datasets.
 
 ## [Firefigher map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map.html)
-
-A web map intended to be printable for small/rural fire departments.

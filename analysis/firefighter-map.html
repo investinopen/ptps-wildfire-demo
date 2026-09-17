@@ -44,9 +44,11 @@
           size: landscape;
           margin: 0.4in;
         }
+        /* #map isn't forced to 100vh here -- it already fills whatever's left below the
+           banner via the flex layout below; hardcoding it on top of that overflowed the
+           page by the banner's own height */
         html,
-        body,
-        #map {
+        body {
           height: 100vh;
           width: 100vw;
         }
@@ -165,8 +167,9 @@
   </head>
   <body>
     <div id="disclaimer-banner">
-      This is a proof of concept and hasn't been validated; use at your own
-      risk.
+      This is a map that's meant to be printed out for use by small/rural fire
+      departments. It's a proof of concept and hasn't been validated;
+      <strong>use at your own risk</strong>.
     </div>
     <form id="place-search" autocomplete="off">
       <input
@@ -182,7 +185,7 @@
         <label>
           <input type="checkbox" id="hillshade-toggle" checked />
           <span class="swatch hillshade"></span>
-          Hillshade
+          Topographic shading
         </label>
         <label>
           <input type="checkbox" id="fuel-model-toggle" checked />
