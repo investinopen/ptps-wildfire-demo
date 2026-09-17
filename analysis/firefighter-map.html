@@ -52,9 +52,27 @@
           height: 100vh;
           width: 100vw;
         }
+        /* the yellow background/border read as a screen warning color; on paper, plain
+           black text is more legible and doesn't rely on background-graphics being on */
+        #disclaimer-banner {
+          color: #000000;
+          border-bottom: none;
+        }
         /* zoom/compass buttons are meaningless on paper; attribution stays, license requires it */
         .maplibregl-ctrl-top-right {
           display: none !important;
+        }
+        /* the attribution control is a <details>/<summary> toggle; the summary is already
+           hidden on screen (compact:false skips it), but print rendering brings back its
+           native disclosure marker (the arrow) and the space it reserves -- kill it explicitly */
+        .maplibregl-ctrl-attrib-button {
+          display: none !important;
+        }
+        .maplibregl-ctrl-attrib-button::-webkit-details-marker {
+          display: none !important;
+        }
+        .maplibregl-ctrl-attrib-button::marker {
+          content: "" !important;
         }
         /* the toggle can't be clicked on paper, but the swatch + label still work as a legend key */
         #layer-controls input[type="checkbox"] {
