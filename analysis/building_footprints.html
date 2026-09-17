@@ -58,11 +58,39 @@
           transform: rotate(360deg);
         }
       }
+
+      #layer-controls {
+        position: absolute;
+        top: 12px;
+        left: 44px;
+        background: #ffffff;
+        border-radius: 4px;
+        box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
+        padding: 6px 10px;
+        font: 13px/1.4 sans-serif;
+        z-index: 1;
+      }
+      #layer-controls label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+      }
+      #layer-controls input[type="range"] {
+        width: 90px;
+      }
     </style>
   </head>
   <body>
     <div id="map"></div>
     <div id="hydrant-spinner" title="Loading fire hydrants…" hidden></div>
+    <div id="layer-controls">
+      <label>
+        <input type="checkbox" id="fuel-model-toggle" />
+        Fuel model (LANDFIRE)
+        <input type="range" id="fuel-model-opacity" min="0" max="1" step="0.05" value="0.75" />
+      </label>
+    </div>
     <script>
       // Vector tile archive of merged Google V3 / Microsoft / OSM building footprints,
       // from https://beta.source.coop/repositories/vida/google-microsoft-osm-open-buildings/
@@ -74,6 +102,10 @@
       const CENTER = [-105.375925, 40.052187]; // [lon, lat]
       const ZOOM = 16.03;
       const BUILDING_MIN_ZOOM = 14.5;
+      // Scott & Burgan 40 fire behavior fuel models, from LANDFIRE (USGS/USFS, public domain)
+      const FUEL_MODEL_URL =
+        "https://edcintl.cr.usgs.gov/arcgis/rest/services/Landfire_LF2024/LF2024_FBFM40_CONUS/ImageServer/exportImage" +
+        "?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=256,256&format=png&interpolation=RSP_NearestNeighbor&f=image";
 
       const protocol = new pmtiles.Protocol();
       maplibregl.addProtocol("pmtiles", protocol.tile);
@@ -85,6 +117,15 @@
         type: "hillshade",
         source: "hillshadeSource",
         paint: { "hillshade-exaggeration": 0.3 },
+      };
+
+      // off by default -- toggled on via the layer control
+      const FUEL_MODELS_LAYER = {
+        id: "fuel-models",
+        type: "raster",
+        source: "fuelModels",
+        layout: { visibility: "none" },
+        paint: { "raster-opacity": 0.75 },
       };
 
       const WATER_LAYER = {
@@ -291,11 +332,20 @@
               type: "geojson",
               data: { type: "FeatureCollection", features: [] },
             },
+            // LANDFIRE (USGS/USFS, public domain); exportImage per-tile via the
+            // {bbox-epsg-3857} template maplibre substitutes for ArcGIS image services
+            fuelModels: {
+              type: "raster",
+              tiles: [FUEL_MODEL_URL],
+              tileSize: 256,
+              attribution: "LANDFIRE",
+            },
           },
           glyphs: "https://fonts.undpgeohub.org/fonts/{fontstack}/{range}.pbf",
           // draw order, bottom to top -- reorder these to change what draws over what
           layers: [
             HILLSHADE_LAYER,
+            FUEL_MODELS_LAYER,
             WATER_LAYER,
             WATERWAYS_LAYER,
             BUILDINGS_FILL_LAYER,
@@ -360,6 +410,17 @@
 
       map.addControl(new maplibregl.NavigationControl());
       map.addControl(new maplibregl.AttributionControl({ compact: false }));
+
+      document.getElementById("fuel-model-toggle").addEventListener("change", (e) => {
+        map.setLayoutProperty(
+          "fuel-models",
+          "visibility",
+          e.target.checked ? "visible" : "none",
+        );
+      });
+      document.getElementById("fuel-model-opacity").addEventListener("input", (e) => {
+        map.setPaintProperty("fuel-models", "raster-opacity", Number(e.target.value));
+      });
 
       // resize so the canvas redraws at full page size instead of printing blank/clipped
       window.addEventListener("beforeprint", () => map.resize());
