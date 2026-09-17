@@ -939,6 +939,16 @@
 
       // resize so the canvas redraws at full page size instead of printing blank/clipped
       window.addEventListener("beforeprint", () => map.resize());
+
+      // caches this page, its scripts, and map tiles so a previously-viewed area still
+      // works offline/on a bad connection -- see sw.js for what's cached and why
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("sw.js")
+          .catch((error) =>
+            console.error("Service worker registration failed:", error),
+          );
+      }
     </script>
   </body>
 </html>
