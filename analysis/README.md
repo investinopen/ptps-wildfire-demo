@@ -57,3 +57,7 @@ Check the statuses of source data archived by the [Data Rescue Project](https://
 ## [Federal Data Terminations](federal_data_terminations.ipynb)
 
 Looking at the rescue status of terminated federal datasets.
+
+## [Building footprints](building_footprints.html)
+
+A standalone page (MapLibre GL JS + [PMTiles](https://github.com/protomaps/PMTiles) loaded from CDN, no build step) rendering the [Google/Microsoft/OSM open buildings](https://beta.source.coop/repositories/vida/google-microsoft-osm-open-buildings/) PMTiles archive as a vector layer, reproducing [this pmtiles.io view](https://pmtiles.io/#url=https://data.source.coop/vida/google-microsoft-osm-open-buildings/pmtiles/goog_msft_osm.pmtiles&map=16.03/40.052187/-105.375925). Open the file directly in a browser.
