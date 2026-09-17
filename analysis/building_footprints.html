@@ -106,7 +106,11 @@
       <label>
         <input type="checkbox" id="fuel-model-toggle" checked />
         <span class="swatch hatch"></span>
-        Medium/high fuel load (LANDFIRE)
+        Moderate/high fuel load (<a
+          href="https://landfire.gov/fuel/fbfm40"
+          target="_blank"
+          >LANDFIRE</a
+        >)
       </label>
     </div>
     <script>
@@ -179,7 +183,7 @@
       // stand-in for risk -- nonburnable and low/sparse-load models are left out; a few
       // models with no load word in their name (TU4, TL4, TL7, TL8) are judgment calls
       // based on what they describe
-      const MEDIUM_HIGH_RISK_CODES = [
+      const MODERATE_HIGH_RISK_CODES = [
         "GR4",
         "GR6",
         "GR7",
@@ -214,7 +218,7 @@
       const FUEL_MODEL_COLORMAP = JSON.stringify({
         rasterFunction: "Colormap",
         rasterFunctionArguments: {
-          colormap: MEDIUM_HIGH_RISK_CODES.map((code) => [
+          colormap: MODERATE_HIGH_RISK_CODES.map((code) => [
             FUEL_MODEL_VALUES[code],
             255,
             0,
@@ -251,7 +255,7 @@
       maplibregl.addProtocol("pmtiles", protocol.tile);
 
       // wraps the LANDFIRE tile fetch: keeps the colormap's opacity as a mask of where
-      // medium/high risk fuels are, but swaps its fill for the diagonal hatch instead of a
+      // moderate/high risk fuels are, but swaps its fill for the diagonal hatch instead of a
       // solid color, since risk areas should read as "hazard" rather than "this color means
       // this fuel type" -- registered as a protocol the same way pmtiles:// is above
       maplibregl.addProtocol("fuelhatch", async (params) => {
