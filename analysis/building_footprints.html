@@ -107,10 +107,11 @@
         gap: 5px;
         margin-bottom: 2px;
       }
-      #fuel-legend .legend-item img {
+      #fuel-legend .legend-item .swatch {
         width: 16px;
         height: 16px;
         margin-top: 1px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
         flex: none;
       }
     </style>
@@ -121,8 +122,15 @@
     <div id="layer-controls">
       <label>
         <input type="checkbox" id="fuel-model-toggle" />
-        Fuel model (LANDFIRE)
-        <input type="range" id="fuel-model-opacity" min="0" max="1" step="0.05" value="0.75" />
+        Fuel model, medium/high risk (LANDFIRE)
+        <input
+          type="range"
+          id="fuel-model-opacity"
+          min="0"
+          max="1"
+          step="0.05"
+          value="0.4"
+        />
       </label>
     </div>
     <div id="fuel-legend" hidden></div>
@@ -140,9 +148,138 @@
       // Scott & Burgan 40 fire behavior fuel models, from LANDFIRE (USGS/USFS, public domain)
       const FUEL_MODEL_SERVICE_URL =
         "https://edcintl.cr.usgs.gov/arcgis/rest/services/Landfire_LF2024/LF2024_FBFM40_CONUS/ImageServer";
+      // the raster's underlying pixel values for each code (LANDFIRE's standard FBFM40
+      // numbering: 9x nonburnable, 1xx grass, 12x grass-shrub, 14x shrub, 16x
+      // timber-understory, 18x timber-litter, 20x slash-blowdown), spot-checked against
+      // live /identify calls at a few points
+      const FUEL_MODEL_VALUES = {
+        NB1: 91,
+        NB2: 92,
+        NB3: 93,
+        NB8: 98,
+        NB9: 99,
+        GR1: 101,
+        GR2: 102,
+        GR3: 103,
+        GR4: 104,
+        GR5: 105,
+        GR6: 106,
+        GR7: 107,
+        GR8: 108,
+        GS1: 121,
+        GS2: 122,
+        GS3: 123,
+        GS4: 124,
+        SH1: 141,
+        SH2: 142,
+        SH3: 143,
+        SH4: 144,
+        SH5: 145,
+        SH6: 146,
+        SH7: 147,
+        SH8: 148,
+        SH9: 149,
+        TU1: 161,
+        TU2: 162,
+        TU3: 163,
+        TU4: 164,
+        TU5: 165,
+        TL1: 181,
+        TL2: 182,
+        TL3: 183,
+        TL4: 184,
+        TL5: 185,
+        TL6: 186,
+        TL7: 187,
+        TL8: 188,
+        TL9: 189,
+        SB1: 201,
+        SB2: 202,
+        SB3: 203,
+        SB4: 204,
+      };
+
+      // fire spreads faster and burns more intensely with more fuel, so we use the load
+      // LANDFIRE's own model names call out ("low"/"moderate"/"high"/"very high") as a
+      // stand-in for risk -- nonburnable and low/sparse-load models are left out; a few
+      // models with no load word in their name (TU4, TL4, TL7, TL8) are judgment calls
+      // based on what they describe
+      const MEDIUM_HIGH_RISK_CODES = [
+        "GR4",
+        "GR6",
+        "GR7",
+        "GR8",
+        "GS2",
+        "GS3",
+        "GS4",
+        "SH2",
+        "SH3",
+        "SH5",
+        "SH7",
+        "SH8",
+        "SH9",
+        "TU2",
+        "TU3",
+        "TU4",
+        "TU5",
+        "TL3",
+        "TL5",
+        "TL6",
+        "TL7",
+        "TL8",
+        "TL9",
+        "SB2",
+        "SB3",
+        "SB4",
+      ];
+
+      // RGB pulled from LANDFIRE's own /legend swatches, so the filtered map still matches
+      // their standard palette -- everything not listed here renders transparent
+      const FUEL_MODEL_COLORS = {
+        GR4: [255, 255, 115],
+        GR6: [230, 230, 64],
+        GR7: [205, 198, 115],
+        GR8: [139, 134, 78],
+        GS2: [255, 167, 127],
+        GS3: [255, 99, 0],
+        GS4: [205, 102, 0],
+        SH2: [215, 176, 158],
+        SH3: [205, 137, 102],
+        SH5: [205, 170, 102],
+        SH7: [205, 125, 57],
+        SH8: [168, 56, 0],
+        SH9: [115, 26, 0],
+        TU2: [170, 255, 0],
+        TU3: [180, 215, 158],
+        TU4: [112, 168, 0],
+        TU5: [38, 115, 0],
+        TL3: [190, 210, 255],
+        TL5: [190, 232, 255],
+        TL6: [0, 197, 255],
+        TL7: [0, 132, 168],
+        TL8: [0, 92, 230],
+        TL9: [77, 110, 145],
+        SB2: [197, 0, 255],
+        SB3: [255, 190, 232],
+        SB4: [255, 127, 127],
+      };
+
+      const FUEL_MODEL_COLORMAP = JSON.stringify({
+        rasterFunction: "Colormap",
+        rasterFunctionArguments: {
+          colormap: MEDIUM_HIGH_RISK_CODES.map((code) => [
+            FUEL_MODEL_VALUES[code],
+            ...FUEL_MODEL_COLORS[code],
+          ]),
+        },
+      });
+
       const FUEL_MODEL_URL =
         FUEL_MODEL_SERVICE_URL +
-        "/exportImage?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=256,256&format=png&interpolation=RSP_NearestNeighbor&f=image";
+        "/exportImage?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=256,256&format=png32" +
+        "&interpolation=RSP_NearestNeighbor&renderingRule=" +
+        encodeURIComponent(FUEL_MODEL_COLORMAP) +
+        "&f=image";
 
       // the service's own /legend endpoint only gives the short codes -- these are the
       // standard names for them, from Scott & Burgan 2005 (USFS RMRS-GTR-153)
@@ -211,7 +348,7 @@
         type: "raster",
         source: "fuelModels",
         layout: { visibility: "none" },
-        paint: { "raster-opacity": 0.75 },
+        paint: { "raster-opacity": 0.4 },
       };
 
       const WATER_LAYER = {
@@ -498,40 +635,41 @@
       map.addControl(new maplibregl.AttributionControl({ compact: false }));
 
       const fuelLegend = document.getElementById("fuel-legend");
-      let fuelLegendLoaded = false;
 
-      // built from the service's own /legend endpoint rather than hand-copied, so it always
-      // matches the colors actually being drawn
-      async function loadFuelLegend() {
-        if (fuelLegendLoaded) return;
-        fuelLegendLoaded = true;
-        try {
-          const response = await fetch(FUEL_MODEL_SERVICE_URL + "/legend?f=json");
-          const data = await response.json();
-          const items = data.layers[0].legend
-            .filter((entry) => entry.label !== "Fill-NoData")
-            .map(
-              (entry) =>
-                `<div class="legend-item"><img src="data:${entry.contentType};base64,${entry.imageData}">` +
-                `<span><b>${entry.label}</b> ${FUEL_MODEL_NAMES[entry.label] || ""}</span></div>`,
-            )
-            .join("");
-          fuelLegend.innerHTML = "<h4>Fuel model (Scott &amp; Burgan 40)</h4>" + items;
-        } catch (error) {
-          console.error("Failed to load fuel model legend:", error);
-          fuelLegendLoaded = false;
-        }
+      // built from the same MEDIUM_HIGH_RISK_CODES/FUEL_MODEL_COLORS driving the map itself,
+      // so the legend can't drift out of sync with what's actually shown
+      function buildFuelLegend() {
+        const items = MEDIUM_HIGH_RISK_CODES.map((code) => {
+          const [r, g, b] = FUEL_MODEL_COLORS[code];
+          return (
+            `<div class="legend-item"><span class="swatch" style="background:rgb(${r},${g},${b})"></span>` +
+            `<span><b>${code}</b> ${FUEL_MODEL_NAMES[code] || ""}</span></div>`
+          );
+        }).join("");
+        fuelLegend.innerHTML = "<h4>Medium/high risk fuel models</h4>" + items;
       }
 
-      document.getElementById("fuel-model-toggle").addEventListener("change", (e) => {
-        const visible = e.target.checked;
-        map.setLayoutProperty("fuel-models", "visibility", visible ? "visible" : "none");
-        fuelLegend.hidden = !visible;
-        if (visible) loadFuelLegend();
-      });
-      document.getElementById("fuel-model-opacity").addEventListener("input", (e) => {
-        map.setPaintProperty("fuel-models", "raster-opacity", Number(e.target.value));
-      });
+      document
+        .getElementById("fuel-model-toggle")
+        .addEventListener("change", (e) => {
+          const visible = e.target.checked;
+          map.setLayoutProperty(
+            "fuel-models",
+            "visibility",
+            visible ? "visible" : "none",
+          );
+          fuelLegend.hidden = !visible;
+          if (visible) buildFuelLegend();
+        });
+      document
+        .getElementById("fuel-model-opacity")
+        .addEventListener("input", (e) => {
+          map.setPaintProperty(
+            "fuel-models",
+            "raster-opacity",
+            Number(e.target.value),
+          );
+        });
 
       // resize so the canvas redraws at full page size instead of printing blank/clipped
       window.addEventListener("beforeprint", () => map.resize());
