@@ -79,6 +79,9 @@
 
       const map = new maplibregl.Map({
         container: "map",
+        // keeps #zoom/lat/lng in the URL in sync with the view, so a copied link reopens
+        // to the same place
+        hash: true,
         // default control collapses to an (i) icon that needs a click/hover to expand --
         // add our own always-expanded one instead, since attribution must show in print/exports
         attributionControl: false,
