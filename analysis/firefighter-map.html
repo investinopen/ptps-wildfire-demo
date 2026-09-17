@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Firefighter map</title>
     <link
       href="https://cdn.jsdelivr.net/npm/maplibre-gl@5/dist/maplibre-gl.css"
@@ -85,19 +86,21 @@
         }
       }
 
+      /* in normal document flow (like the disclaimer banner) rather than floated over the
+         map, so it can't collide with the legend at narrow widths */
       #place-search {
-        position: absolute;
-        top: 12px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 1;
+        flex: none;
+        padding: 8px 12px;
+        background: #f5f5f5;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.15);
       }
       #place-search input {
-        width: 240px;
+        width: 100%;
+        max-width: 320px;
+        box-sizing: border-box;
         padding: 6px 10px;
         border: 1px solid rgba(0, 0, 0, 0.2);
         border-radius: 4px;
-        box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
         font: 13px sans-serif;
       }
 
@@ -165,16 +168,16 @@
       This is a proof of concept and hasn't been validated; use at your own
       risk.
     </div>
+    <form id="place-search" autocomplete="off">
+      <input
+        type="search"
+        id="place-search-input"
+        placeholder="Search for a place…"
+      />
+    </form>
     <div id="map-container">
       <div id="map"></div>
       <div id="hydrant-spinner" title="Loading fire hydrants…" hidden></div>
-      <form id="place-search" autocomplete="off">
-        <input
-          type="search"
-          id="place-search-input"
-          placeholder="Search for a place…"
-        />
-      </form>
       <div id="layer-controls">
         <label>
           <input type="checkbox" id="hillshade-toggle" checked />
