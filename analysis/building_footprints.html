@@ -89,6 +89,7 @@
         box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
         padding: 6px 10px;
         font: 12px/1.4 sans-serif;
+        max-width: 280px;
         max-height: 280px;
         overflow-y: auto;
         z-index: 1;
@@ -102,12 +103,14 @@
       }
       #fuel-legend .legend-item {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 5px;
+        margin-bottom: 2px;
       }
       #fuel-legend .legend-item img {
         width: 16px;
         height: 16px;
+        margin-top: 1px;
         flex: none;
       }
     </style>
@@ -140,6 +143,55 @@
       const FUEL_MODEL_URL =
         FUEL_MODEL_SERVICE_URL +
         "/exportImage?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=256,256&format=png&interpolation=RSP_NearestNeighbor&f=image";
+
+      // the service's own /legend endpoint only gives the short codes -- these are the
+      // standard names for them, from Scott & Burgan 2005 (USFS RMRS-GTR-153)
+      const FUEL_MODEL_NAMES = {
+        NB1: "Urban/Developed",
+        NB2: "Snow/Ice",
+        NB3: "Agricultural",
+        NB8: "Open Water",
+        NB9: "Bare Ground",
+        GR1: "Short, sparse dry climate grass",
+        GR2: "Low load, dry climate grass",
+        GR3: "Low load, very coarse, humid climate grass",
+        GR4: "Moderate load, dry climate grass",
+        GR5: "Low load, humid climate grass",
+        GR6: "Moderate load, humid climate grass",
+        GR7: "High load, dry climate grass",
+        GR8: "High load, very coarse, humid climate grass",
+        GS1: "Low load, dry climate grass-shrub",
+        GS2: "Moderate load, dry climate grass-shrub",
+        GS3: "Moderate load, humid climate grass-shrub",
+        GS4: "High load, humid climate grass-shrub",
+        SH1: "Low load, dry climate shrub",
+        SH2: "Moderate load, dry climate shrub",
+        SH3: "Moderate load, humid climate shrub",
+        SH4: "Low load, humid climate timber-shrub",
+        SH5: "High load, dry climate shrub",
+        SH6: "Low load, humid climate shrub",
+        SH7: "Very high load, dry climate shrub",
+        SH8: "High load, humid climate shrub",
+        SH9: "Very high load, humid climate shrub",
+        TU1: "Light load, dry climate timber-grass-shrub",
+        TU2: "Moderate load, humid climate timber-shrub",
+        TU3: "Moderate load, humid climate timber-grass-shrub",
+        TU4: "Dwarf conifer with understory",
+        TU5: "Very high load, dry climate timber-shrub",
+        TL1: "Low load, compact conifer litter",
+        TL2: "Low load broadleaf litter",
+        TL3: "Moderate load conifer litter",
+        TL4: "Small downed logs",
+        TL5: "High load conifer litter",
+        TL6: "High load broadleaf litter",
+        TL7: "Large downed logs",
+        TL8: "Long-needle litter",
+        TL9: "Very high load broadleaf litter",
+        SB1: "Low load activity fuel",
+        SB2: "Moderate load activity fuel or low load blowdown",
+        SB3: "High load activity fuel or moderate load blowdown",
+        SB4: "High load blowdown",
+      };
 
       const protocol = new pmtiles.Protocol();
       maplibregl.addProtocol("pmtiles", protocol.tile);
@@ -460,7 +512,8 @@
             .filter((entry) => entry.label !== "Fill-NoData")
             .map(
               (entry) =>
-                `<div class="legend-item"><img src="data:${entry.contentType};base64,${entry.imageData}">${entry.label}</div>`,
+                `<div class="legend-item"><img src="data:${entry.contentType};base64,${entry.imageData}">` +
+                `<span><b>${entry.label}</b> ${FUEL_MODEL_NAMES[entry.label] || ""}</span></div>`,
             )
             .join("");
           fuelLegend.innerHTML = "<h4>Fuel model (Scott &amp; Burgan 40)</h4>" + items;
