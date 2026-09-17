@@ -5,12 +5,12 @@
 Brings four datasets of very different velocity together on one map, and ranks a state's
 NWS fire weather zones by a composite of standing hazard and current conditions:
 
-| Layer                  | Source                           | Velocity |
-| ---------------------- | -------------------------------- | -------- |
-| Burn probability       | CarbonPlan Open Climate Risk     | static   |
-| Burn history           | MTBS perimeters 1984-2024        | static   |
-| Red Flag Warnings      | NOAA/NWS active alerts API       | minutes  |
-| Active fire detections | NASA FIRMS (MODIS 24h)           | hours    |
+| Layer                  | Source                       | Velocity |
+| ---------------------- | ---------------------------- | -------- |
+| Burn probability       | CarbonPlan Open Climate Risk | static   |
+| Burn history           | MTBS perimeters 1984-2024    | static   |
+| Red Flag Warnings      | NOAA/NWS active alerts API   | minutes  |
+| Active fire detections | NASA FIRMS (MODIS 24h)       | hours    |
 
 Each layer is a DuckDB view over the remote file ([`views.sql`](views.sql)), and the joins
 and geometry work happen in SQL through the `spatial` extension. Set `STATE` in the
@@ -28,6 +28,13 @@ The first run binds every view, which means fetching from every endpoint and tak
 minutes; afterwards `cache_httpfs` serves them and the whole notebook runs in seconds.
 Because two of the four layers change by the hour, re-running does not reproduce an
 earlier result, and nothing is written to disk -- capture anything you want to keep.
+
+## [Wildfire overlap](fire_overlap.ipynb)
+
+Draws every mapped fire perimeter in a state since 1984 as a translucent polygon on one map, so places that have burned more than once show up darker where perimeters stack. Perimeters come from [WUMI](https://datadryad.org/dataset/doi:10.5061/dryad.63xsj3vd4), a merge of MTBS, CalFire, USGS, WFIGS, and IAFPH.
+
+1. [Download the fire perimeters.](wumi_perimeters.ipynb) Dryad's downloads sit behind bot detection that blocks automated requests, so this step needs a one-time manual download -- see that notebook for the exact steps.
+1. [Run the analysis.](fire_overlap.ipynb)
 
 ## Dataset rescue status report
 
