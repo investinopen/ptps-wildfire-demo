@@ -58,6 +58,6 @@ Check the statuses of source data archived by the [Data Rescue Project](https://
 
 Looking at the rescue status of terminated federal datasets.
 
-## [Building footprints](building_footprints.html)
+## [Firefigher map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map.html)
 
-A standalone page (MapLibre GL JS + [PMTiles](https://github.com/protomaps/PMTiles) loaded from CDN, no build step) rendering the [Google/Microsoft/OSM open buildings](https://beta.source.coop/repositories/vida/google-microsoft-osm-open-buildings/) PMTiles archive as a vector layer, reproducing [this pmtiles.io view](https://pmtiles.io/#url=https://data.source.coop/vida/google-microsoft-osm-open-buildings/pmtiles/goog_msft_osm.pmtiles&map=16.03/40.052187/-105.375925). Open the file directly in a browser.
+A web map intended to be printable for small/rural fire departments.

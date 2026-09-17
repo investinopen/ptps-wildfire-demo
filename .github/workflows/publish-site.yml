@@ -1,4 +1,4 @@
-name: Publish dataset rescue report
+name: Publish Pages site
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     paths:
       - analysis/**
       - ptps_wildfire_demo/**
-      - .github/workflows/publish-report.yml
+      - .github/workflows/publish-site.yml
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch:
@@ -49,6 +49,7 @@ jobs:
         run: |
           mkdir -p _site
           cp analysis/fire-datasets-report.html _site/index.html
+          cp analysis/firefighter-map.html _site/firefighter-map.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
