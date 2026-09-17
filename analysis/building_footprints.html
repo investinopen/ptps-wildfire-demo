@@ -79,6 +79,11 @@
               type: "vector",
               url: "pmtiles://" + PMTILES_URL,
             },
+            // fire hydrants aren't in OpenFreeMap's POI set -- fetched live from OSM below
+            hydrants: {
+              type: "geojson",
+              data: { type: "FeatureCollection", features: [] },
+            },
           },
           glyphs: "https://fonts.undpgeohub.org/fonts/{fontstack}/{range}.pbf",
           layers: [
@@ -215,10 +220,56 @@
                 "text-halo-width": 1,
               },
             },
+            {
+              id: "hydrants",
+              type: "circle",
+              source: "hydrants",
+              minzoom: 13,
+              paint: {
+                "circle-radius": ["interpolate", ["linear"], ["zoom"], 13, 2, 18, 6],
+                "circle-color": "#e0342a",
+                "circle-stroke-color": "#ffffff",
+                "circle-stroke-width": 1,
+              },
+            },
           ],
         },
         center: CENTER,
         zoom: ZOOM,
+      });
+
+      // fire hydrants aren't part of OpenFreeMap's POI set, so fetch them directly from
+      // OSM via Overpass for whatever's in view (open data, no API key), refetching as the
+      // map moves -- debounced so a drag/zoom doesn't fire a request per frame
+      async function updateHydrants() {
+        if (map.getZoom() < map.getLayer("hydrants").minzoom) {
+          map.getSource("hydrants").setData({ type: "FeatureCollection", features: [] });
+          return;
+        }
+        const b = map.getBounds();
+        const query = `[out:json][timeout:25];node["emergency"="fire_hydrant"](${b.getSouth()},${b.getWest()},${b.getNorth()},${b.getEast()});out;`;
+        try {
+          const response = await fetch("https://overpass-api.de/api/interpreter", {
+            method: "POST",
+            body: "data=" + encodeURIComponent(query),
+          });
+          const data = await response.json();
+          const features = data.elements.map((el) => ({
+            type: "Feature",
+            geometry: { type: "Point", coordinates: [el.lon, el.lat] },
+            properties: el.tags || {},
+          }));
+          map.getSource("hydrants").setData({ type: "FeatureCollection", features });
+        } catch (error) {
+          console.error("Failed to load fire hydrants from Overpass:", error);
+        }
+      }
+
+      let hydrantDebounce;
+      map.on("load", updateHydrants);
+      map.on("moveend", () => {
+        clearTimeout(hydrantDebounce);
+        hydrantDebounce = setTimeout(updateHydrants, 500);
       });
 
       map.addControl(new maplibregl.NavigationControl());
