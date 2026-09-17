@@ -64,13 +64,29 @@
           layers: [
             { id: "hillshade", type: "hillshade", source: "hillshadeSource" },
             {
+              // includes private roads/driveways (class "service", subclass "driveway") --
+              // styled thinner + gray to read as minor, same as OSM data allows
               id: "roads",
               type: "line",
               source: "roadsSource",
               "source-layer": "transportation",
               paint: {
-                "line-color": "#e58a1f",
-                "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.5, 18, 4],
+                "line-color": [
+                  "match",
+                  ["get", "class"],
+                  ["service", "track", "path"],
+                  "#999999",
+                  "#e58a1f",
+                ],
+                "line-width": [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  10,
+                  ["match", ["get", "class"], ["service", "track", "path"], 0.3, 0.5],
+                  18,
+                  ["match", ["get", "class"], ["service", "track", "path"], 1.5, 4],
+                ],
               },
             },
             {
