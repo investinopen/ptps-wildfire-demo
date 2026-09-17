@@ -364,7 +364,7 @@
 
       // an 12px tile of thin diagonal lines, repeated to fill the risk mask below
       const HATCH_SIZE = 12;
-      function makeHatchTile() {
+      const makeHatchTile = () => {
         const patternCanvas = new OffscreenCanvas(HATCH_SIZE, HATCH_SIZE);
         const pctx = patternCanvas.getContext("2d");
         pctx.strokeStyle = "#d62828";
@@ -376,12 +376,12 @@
           pctx.stroke();
         }
         return patternCanvas;
-      }
+      };
       const hatchTile = makeHatchTile();
 
       // a small right-pointing arrow, registered as a map image below -- line-placed symbols
       // orient a 0deg icon along the line's own direction, so "right" is the convention
-      function makeArrowIcon() {
+      const makeArrowIcon = () => {
         const size = 14;
         const canvas = new OffscreenCanvas(size, size);
         const ctx = canvas.getContext("2d");
@@ -396,7 +396,7 @@
         ctx.fill();
         ctx.stroke();
         return ctx.getImageData(0, 0, size, size);
-      }
+      };
 
       const protocol = new pmtiles.Protocol();
       maplibregl.addProtocol("pmtiles", protocol.tile);
@@ -787,7 +787,7 @@
       // be unreliable (see DRIVABLE_ROAD_CLASSES above). Both follow the same shape: zoom-gate
       // by the layer's own minzoom, refetch (debounced) as the map moves, convert Overpass's
       // response into GeoJSON.
-      async function fetchOverpass(query) {
+      const fetchOverpass = async (query) => {
         const response = await fetch(
           "https://overpass-api.de/api/interpreter",
           {
@@ -796,16 +796,16 @@
           },
         );
         return response.json();
-      }
+      };
 
-      function bindOverpassSource({
+      const bindOverpassSource = ({
         sourceId,
         layerId,
         buildQuery,
         toFeatures,
         onLoading,
-      }) {
-        async function update() {
+      }) => {
+        const update = async () => {
           if (map.getZoom() < map.getLayer(layerId).minzoom) {
             map
               .getSource(sourceId)
@@ -824,14 +824,14 @@
           } finally {
             onLoading?.(false);
           }
-        }
+        };
         let debounce;
         map.on("load", update);
         map.on("moveend", () => {
           clearTimeout(debounce);
           debounce = setTimeout(update, 500);
         });
-      }
+      };
 
       const hydrantSpinner = document.getElementById("hydrant-spinner");
       bindOverpassSource({
@@ -913,14 +913,14 @@
         });
 
       // wires a checkbox to show/hide one or more layers together
-      function bindLayerToggle(checkboxId, layerIds) {
+      const bindLayerToggle = (checkboxId, layerIds) => {
         document.getElementById(checkboxId).addEventListener("change", (e) => {
           const visibility = e.target.checked ? "visible" : "none";
           for (const id of layerIds) {
             map.setLayoutProperty(id, "visibility", visibility);
           }
         });
-      }
+      };
       bindLayerToggle("hillshade-toggle", ["hillshade"]);
       bindLayerToggle("fuel-model-toggle", ["fuel-models"]);
       bindLayerToggle("buildings-toggle", [
