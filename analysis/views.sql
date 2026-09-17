@@ -87,15 +87,15 @@ COMMENT ON VIEW active_fires IS '"Each MODIS active fire/thermal hotspot locatio
 - https://firms.modaps.eosdis.nasa.gov/active_fire/#firms-txt';
 
 
--- read from the local copy: www2.census.gov currently answers GDAL's requests with a WAF
--- "Request Rejected" page rather than the zip
+-- www2.census.gov answers DuckDB's own zip://https:// scheme with a WAF "Request Rejected"
+-- page rather than the zip, but GDAL's /vsizip/vsicurl/ request pattern gets through fine.
 CREATE OR REPLACE VIEW state_boundaries AS
 SELECT *
-FROM ST_Read('zip://data/cb_2018_us_state_20m.zip/cb_2018_us_state_20m.shp');
+FROM ST_Read(
+        '/vsizip/vsicurl/https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_state_20m.zip/cb_2018_us_state_20m.shp'
+    );
 
-COMMENT ON VIEW state_boundaries IS 'https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html
-
-Local copy of https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_state_20m.zip';
+COMMENT ON VIEW state_boundaries IS 'https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html';
 
 
 -- Only the columns the analysis needs, so the remote read prunes the rest. The centroid
