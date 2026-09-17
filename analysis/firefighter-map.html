@@ -829,21 +829,6 @@
 
       // resize so the canvas redraws at full page size instead of printing blank/clipped
       window.addEventListener("beforeprint", () => map.resize());
-
-      // click a building to see its properties, same as pmtiles.io's "Inspect features"
-      map.on("click", "buildings-fill", (e) => {
-        const props = e.features[0].properties;
-        new maplibregl.Popup()
-          .setLngLat(e.lngLat)
-          .setHTML("<pre>" + JSON.stringify(props, null, 2) + "</pre>")
-          .addTo(map);
-      });
-      map.on("mouseenter", "buildings-fill", () => {
-        map.getCanvas().style.cursor = "pointer";
-      });
-      map.on("mouseleave", "buildings-fill", () => {
-        map.getCanvas().style.cursor = "";
-      });
     </script>
   </body>
 </html>
