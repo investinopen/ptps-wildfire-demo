@@ -117,7 +117,7 @@
             #d62828,
             #d62828 0.6px,
             transparent 0.6px,
-            transparent 4px
+            transparent 6px
           ),
           #ffffff;
       }
@@ -254,22 +254,22 @@
         encodeURIComponent(FUEL_MODEL_COLORMAP) +
         "&f=image";
 
-      // an 8px tile of thin diagonal lines, repeated to fill the risk mask below
-      function makeHatchPattern() {
-        const size = 8;
-        const patternCanvas = new OffscreenCanvas(size, size);
+      // an 12px tile of thin diagonal lines, repeated to fill the risk mask below
+      const HATCH_SIZE = 12;
+      function makeHatchTile() {
+        const patternCanvas = new OffscreenCanvas(HATCH_SIZE, HATCH_SIZE);
         const pctx = patternCanvas.getContext("2d");
         pctx.strokeStyle = "#d62828";
         pctx.lineWidth = 0.6;
-        for (const offset of [-size, 0, size]) {
+        for (const offset of [-HATCH_SIZE, 0, HATCH_SIZE]) {
           pctx.beginPath();
-          pctx.moveTo(offset, size);
-          pctx.lineTo(offset + size, 0);
+          pctx.moveTo(offset, HATCH_SIZE);
+          pctx.lineTo(offset + HATCH_SIZE, 0);
           pctx.stroke();
         }
-        return pctx.createPattern(patternCanvas, "repeat");
+        return patternCanvas;
       }
-      const hatchPattern = makeHatchPattern();
+      const hatchTile = makeHatchTile();
 
       const protocol = new pmtiles.Protocol();
       maplibregl.addProtocol("pmtiles", protocol.tile);
@@ -279,11 +279,26 @@
       // solid color, since risk areas should read as "hazard" rather than "this color means
       // this fuel type" -- registered as a protocol the same way pmtiles:// is above
       maplibregl.addProtocol("fuelhatch", async (params) => {
-        const response = await fetch(params.url.replace("fuelhatch://", ""));
+        const url = params.url.replace("fuelhatch://", "");
+        const response = await fetch(url);
         const bitmap = await createImageBitmap(await response.blob());
         const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
         const ctx = canvas.getContext("2d");
-        ctx.fillStyle = hatchPattern;
+
+        // each tile draws the hatch starting from its own local (0,0), so without this the
+        // lines jump out of phase at every tile edge -- shift the pattern by this tile's
+        // real-world position (mod the tile size) so it reads as one continuous hatch
+        const [, xmin, , xmax, ymax] = url
+          .match(/bbox=(-?[\d.]+),(-?[\d.]+),(-?[\d.]+),(-?[\d.]+)/)
+          .map(Number);
+        const metersPerPixel = (xmax - xmin) / bitmap.width;
+        const mod = (n, m) => ((n % m) + m) % m;
+        const offsetX = mod(-xmin / metersPerPixel, HATCH_SIZE);
+        const offsetY = mod(ymax / metersPerPixel, HATCH_SIZE);
+        const pattern = ctx.createPattern(hatchTile, "repeat");
+        pattern.setTransform(new DOMMatrix().translate(offsetX, offsetY));
+
+        ctx.fillStyle = pattern;
         ctx.fillRect(0, 0, bitmap.width, bitmap.height);
         ctx.globalCompositeOperation = "destination-in";
         ctx.drawImage(bitmap, 0, 0);
