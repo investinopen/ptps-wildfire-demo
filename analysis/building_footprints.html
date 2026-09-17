@@ -76,41 +76,13 @@
         gap: 5px;
         white-space: nowrap;
       }
-      #fuel-legend {
-        position: absolute;
-        bottom: 12px;
-        left: 12px;
-        background: #ffffff;
-        border-radius: 4px;
-        box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
-        padding: 6px 10px;
-        font: 12px/1.4 sans-serif;
-        max-width: 280px;
-        max-height: 280px;
-        overflow-y: auto;
-        z-index: 1;
-      }
-      #fuel-legend[hidden] {
-        display: none;
-      }
-      #fuel-legend h4 {
-        margin: 0 0 4px;
-        font-size: 12px;
-      }
-      #fuel-legend .legend-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 5px;
-        margin-bottom: 2px;
-      }
-      #fuel-legend .legend-item .swatch {
+      #layer-controls .swatch {
         width: 16px;
         height: 16px;
-        margin-top: 1px;
         border: 1px solid rgba(0, 0, 0, 0.2);
         flex: none;
       }
-      #fuel-legend .legend-item .swatch.hatch {
+      #layer-controls .swatch.hatch {
         background:
           repeating-linear-gradient(
             135deg,
@@ -129,10 +101,10 @@
     <div id="layer-controls">
       <label>
         <input type="checkbox" id="fuel-model-toggle" checked />
+        <span class="swatch hatch"></span>
         Medium/high fuel load (LANDFIRE)
       </label>
     </div>
-    <div id="fuel-legend"></div>
     <script>
       // Vector tile archive of merged Google V3 / Microsoft / OSM building footprints,
       // from https://beta.source.coop/repositories/vida/google-microsoft-osm-open-buildings/
@@ -610,27 +582,14 @@
       map.addControl(new maplibregl.NavigationControl());
       map.addControl(new maplibregl.AttributionControl({ compact: false }));
 
-      const fuelLegend = document.getElementById("fuel-legend");
-
-      function buildFuelLegend() {
-        fuelLegend.innerHTML =
-          "<h4>Fuel risk (LANDFIRE)</h4>" +
-          '<div class="legend-item"><span class="swatch hatch"></span>' +
-          "<span>Medium/high fuel load</span></div>";
-      }
-      buildFuelLegend();
-
       document
         .getElementById("fuel-model-toggle")
         .addEventListener("change", (e) => {
-          const visible = e.target.checked;
           map.setLayoutProperty(
             "fuel-models",
             "visibility",
-            visible ? "visible" : "none",
+            e.target.checked ? "visible" : "none",
           );
-          fuelLegend.hidden = !visible;
-          if (visible) buildFuelLegend();
         });
 
       // resize so the canvas redraws at full page size instead of printing blank/clipped
