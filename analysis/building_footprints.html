@@ -35,6 +35,10 @@
         .maplibregl-ctrl-top-right {
           display: none !important;
         }
+        /* the toggle can't be clicked on paper, but the swatch + label still work as a legend key */
+        #layer-controls input[type="checkbox"] {
+          display: none;
+        }
       }
 
       #hydrant-spinner {
