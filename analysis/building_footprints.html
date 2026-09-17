@@ -76,10 +76,6 @@
         gap: 5px;
         white-space: nowrap;
       }
-      #layer-controls input[type="range"] {
-        width: 90px;
-      }
-
       #fuel-legend {
         position: absolute;
         bottom: 12px;
@@ -114,6 +110,17 @@
         border: 1px solid rgba(0, 0, 0, 0.2);
         flex: none;
       }
+      #fuel-legend .legend-item .swatch.hatch {
+        background:
+          repeating-linear-gradient(
+            135deg,
+            #d62828,
+            #d62828 0.6px,
+            transparent 0.6px,
+            transparent 4px
+          ),
+          #ffffff;
+      }
     </style>
   </head>
   <body>
@@ -122,15 +129,7 @@
     <div id="layer-controls">
       <label>
         <input type="checkbox" id="fuel-model-toggle" />
-        Fuel model, medium/high risk (LANDFIRE)
-        <input
-          type="range"
-          id="fuel-model-opacity"
-          min="0"
-          max="1"
-          step="0.05"
-          value="0.4"
-        />
+        Medium/high fuel load (LANDFIRE)
       </label>
     </div>
     <div id="fuel-legend" hidden></div>
@@ -233,105 +232,66 @@
         "SB4",
       ];
 
-      // RGB pulled from LANDFIRE's own /legend swatches, so the filtered map still matches
-      // their standard palette -- everything not listed here renders transparent
-      const FUEL_MODEL_COLORS = {
-        GR4: [255, 255, 115],
-        GR6: [230, 230, 64],
-        GR7: [205, 198, 115],
-        GR8: [139, 134, 78],
-        GS2: [255, 167, 127],
-        GS3: [255, 99, 0],
-        GS4: [205, 102, 0],
-        SH2: [215, 176, 158],
-        SH3: [205, 137, 102],
-        SH5: [205, 170, 102],
-        SH7: [205, 125, 57],
-        SH8: [168, 56, 0],
-        SH9: [115, 26, 0],
-        TU2: [170, 255, 0],
-        TU3: [180, 215, 158],
-        TU4: [112, 168, 0],
-        TU5: [38, 115, 0],
-        TL3: [190, 210, 255],
-        TL5: [190, 232, 255],
-        TL6: [0, 197, 255],
-        TL7: [0, 132, 168],
-        TL8: [0, 92, 230],
-        TL9: [77, 110, 145],
-        SB2: [197, 0, 255],
-        SB3: [255, 190, 232],
-        SB4: [255, 127, 127],
-      };
-
+      // every included code maps to the same opaque red -- we only need the colormap to
+      // decide what's transparent (the mask below replaces the actual fill), so there's no
+      // reason to carry a distinct color per fuel type anymore
       const FUEL_MODEL_COLORMAP = JSON.stringify({
         rasterFunction: "Colormap",
         rasterFunctionArguments: {
           colormap: MEDIUM_HIGH_RISK_CODES.map((code) => [
             FUEL_MODEL_VALUES[code],
-            ...FUEL_MODEL_COLORS[code],
+            255,
+            0,
+            0,
           ]),
         },
       });
 
-      const FUEL_MODEL_URL =
+      const FUEL_MODEL_EXPORT_URL =
         FUEL_MODEL_SERVICE_URL +
         "/exportImage?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=256,256&format=png32" +
         "&interpolation=RSP_NearestNeighbor&renderingRule=" +
         encodeURIComponent(FUEL_MODEL_COLORMAP) +
         "&f=image";
 
-      // the service's own /legend endpoint only gives the short codes -- these are the
-      // standard names for them, from Scott & Burgan 2005 (USFS RMRS-GTR-153)
-      const FUEL_MODEL_NAMES = {
-        NB1: "Urban/Developed",
-        NB2: "Snow/Ice",
-        NB3: "Agricultural",
-        NB8: "Open Water",
-        NB9: "Bare Ground",
-        GR1: "Short, sparse dry climate grass",
-        GR2: "Low load, dry climate grass",
-        GR3: "Low load, very coarse, humid climate grass",
-        GR4: "Moderate load, dry climate grass",
-        GR5: "Low load, humid climate grass",
-        GR6: "Moderate load, humid climate grass",
-        GR7: "High load, dry climate grass",
-        GR8: "High load, very coarse, humid climate grass",
-        GS1: "Low load, dry climate grass-shrub",
-        GS2: "Moderate load, dry climate grass-shrub",
-        GS3: "Moderate load, humid climate grass-shrub",
-        GS4: "High load, humid climate grass-shrub",
-        SH1: "Low load, dry climate shrub",
-        SH2: "Moderate load, dry climate shrub",
-        SH3: "Moderate load, humid climate shrub",
-        SH4: "Low load, humid climate timber-shrub",
-        SH5: "High load, dry climate shrub",
-        SH6: "Low load, humid climate shrub",
-        SH7: "Very high load, dry climate shrub",
-        SH8: "High load, humid climate shrub",
-        SH9: "Very high load, humid climate shrub",
-        TU1: "Light load, dry climate timber-grass-shrub",
-        TU2: "Moderate load, humid climate timber-shrub",
-        TU3: "Moderate load, humid climate timber-grass-shrub",
-        TU4: "Dwarf conifer with understory",
-        TU5: "Very high load, dry climate timber-shrub",
-        TL1: "Low load, compact conifer litter",
-        TL2: "Low load broadleaf litter",
-        TL3: "Moderate load conifer litter",
-        TL4: "Small downed logs",
-        TL5: "High load conifer litter",
-        TL6: "High load broadleaf litter",
-        TL7: "Large downed logs",
-        TL8: "Long-needle litter",
-        TL9: "Very high load broadleaf litter",
-        SB1: "Low load activity fuel",
-        SB2: "Moderate load activity fuel or low load blowdown",
-        SB3: "High load activity fuel or moderate load blowdown",
-        SB4: "High load blowdown",
-      };
+      // an 8px tile of thin diagonal lines, repeated to fill the risk mask below
+      function makeHatchPattern() {
+        const size = 8;
+        const patternCanvas = new OffscreenCanvas(size, size);
+        const pctx = patternCanvas.getContext("2d");
+        pctx.strokeStyle = "#d62828";
+        pctx.lineWidth = 0.6;
+        for (const offset of [-size, 0, size]) {
+          pctx.beginPath();
+          pctx.moveTo(offset, size);
+          pctx.lineTo(offset + size, 0);
+          pctx.stroke();
+        }
+        return pctx.createPattern(patternCanvas, "repeat");
+      }
+      const hatchPattern = makeHatchPattern();
 
       const protocol = new pmtiles.Protocol();
       maplibregl.addProtocol("pmtiles", protocol.tile);
+
+      // wraps the LANDFIRE tile fetch: keeps the colormap's opacity as a mask of where
+      // medium/high risk fuels are, but swaps its fill for the diagonal hatch instead of a
+      // solid color, since risk areas should read as "hazard" rather than "this color means
+      // this fuel type" -- registered as a protocol the same way pmtiles:// is above
+      maplibregl.addProtocol("fuelhatch", async (params) => {
+        const response = await fetch(params.url.replace("fuelhatch://", ""));
+        const bitmap = await createImageBitmap(await response.blob());
+        const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = hatchPattern;
+        ctx.fillRect(0, 0, bitmap.width, bitmap.height);
+        ctx.globalCompositeOperation = "destination-in";
+        ctx.drawImage(bitmap, 0, 0);
+        const blob = await canvas.convertToBlob({ type: "image/png" });
+        return { data: await blob.arrayBuffer() };
+      });
+
+      const FUEL_MODEL_URL = "fuelhatch://" + FUEL_MODEL_EXPORT_URL;
 
       // one const per layer -- keeping these standalone makes the draw order (the `layers`
       // array below) easy to see and rearrange without hunting through each definition
@@ -348,7 +308,9 @@
         type: "raster",
         source: "fuelModels",
         layout: { visibility: "none" },
-        paint: { "raster-opacity": 0.4 },
+        // a hatch pattern already reads as sparse, unlike a solid fill, so this can sit
+        // much closer to fully opaque
+        paint: { "raster-opacity": 0.9 },
       };
 
       const WATER_LAYER = {
@@ -442,7 +404,6 @@
         minzoom: BUILDING_MIN_ZOOM,
         paint: {
           "fill-color": "#3fb1ce",
-          "fill-opacity": 0.6,
         },
       };
 
@@ -636,17 +597,11 @@
 
       const fuelLegend = document.getElementById("fuel-legend");
 
-      // built from the same MEDIUM_HIGH_RISK_CODES/FUEL_MODEL_COLORS driving the map itself,
-      // so the legend can't drift out of sync with what's actually shown
       function buildFuelLegend() {
-        const items = MEDIUM_HIGH_RISK_CODES.map((code) => {
-          const [r, g, b] = FUEL_MODEL_COLORS[code];
-          return (
-            `<div class="legend-item"><span class="swatch" style="background:rgb(${r},${g},${b})"></span>` +
-            `<span><b>${code}</b> ${FUEL_MODEL_NAMES[code] || ""}</span></div>`
-          );
-        }).join("");
-        fuelLegend.innerHTML = "<h4>Medium/high risk fuel models</h4>" + items;
+        fuelLegend.innerHTML =
+          "<h4>Fuel risk (LANDFIRE)</h4>" +
+          '<div class="legend-item"><span class="swatch hatch"></span>' +
+          "<span>Medium/high fuel load</span></div>";
       }
 
       document
@@ -660,15 +615,6 @@
           );
           fuelLegend.hidden = !visible;
           if (visible) buildFuelLegend();
-        });
-      document
-        .getElementById("fuel-model-opacity")
-        .addEventListener("input", (e) => {
-          map.setPaintProperty(
-            "fuel-models",
-            "raster-opacity",
-            Number(e.target.value),
-          );
         });
 
       // resize so the canvas redraws at full page size instead of printing blank/clipped
