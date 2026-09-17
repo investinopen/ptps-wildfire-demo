@@ -33,7 +33,7 @@ earlier result, and nothing is written to disk -- capture anything you want to k
 
 Draws every mapped fire perimeter in a state since 1984 as a translucent polygon on one map, so places that have burned more than once show up darker where perimeters stack. Perimeters come from [WUMI](https://datadryad.org/dataset/doi:10.5061/dryad.63xsj3vd4), a merge of MTBS, CalFire, USGS, WFIGS, and IAFPH.
 
-1. [Download the fire perimeters.](wumi_perimeters.ipynb) Dryad's downloads sit behind bot detection that blocks automated requests, so this step needs a one-time manual download -- see that notebook for the exact steps.
+1. [Download the fire perimeters.](wumi_perimeters.ipynb) Dryad's website sits behind bot detection, but its REST API doesn't -- this step needs a [Dryad API account](https://datadryad.org/api#?route=overview--api-accounts) (`DRYAD_CLIENT_ID`/`DRYAD_SECRET` in `.env`; see `.env.sample`) rather than a manual download.
 1. [Run the analysis.](fire_overlap.ipynb)
 
 ## Dataset rescue status report
