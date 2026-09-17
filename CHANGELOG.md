@@ -2,6 +2,21 @@
 
 Only includes notable updates.
 
+## 2026-09-17
+
+- **[Wildfire risk map:](analysis/README.md#firefigher-map)** [Published a printable map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map.html) meant to be handed to small/rural fire departments, combining building footprints, fuel load, fire hydrants, roads, driveways, and trails for an area.
+  - Show a legend that doubles as the layer toggle, and highlight moderate/high fuel load risk with a hatch pattern.
+  - Add a "search for a place" box, and make the current view linkable.
+  - Add a disclaimer that it's a proof of concept and hasn't been validated.
+  - Tune it for printing (keep the legend fills, hide the layer toggles) and for mobile.
+- [**Analysis:**](README.md#analysis)
+  - [Rank a state's fire weather zones](analysis/risk.ipynb) by a composite of burn probability, burn history, active fire detections, and red flag warnings.
+  - [Map every fire perimeter that's burned a state since 1984](analysis/fire_overlap.ipynb), using WUMI perimeters fetched from Dryad.
+  - [Fuzzy-match terminated federal datasets](analysis/federal_data_terminations.ipynb) against Data Rescue Project rescues.
+  - Show when the [dataset rescue status report](analysis/README.md#dataset-rescue-status-report) was generated, and fix a few example dataset URLs.
+  - Consolidated the analysis documentation into [analysis/README.md](analysis/README.md).
+- [**HTTP proxy:**](README.md#http-proxy) Documented [QGIS and httpx usage](README.md#usage) against the proxy, and made passive archiving more tolerant of slow sites.
+
 ## 2026-08-31
 
 - [**Browser extension:**](README.md#browser-extension) Introduced the extension, linking matched pages to the [Data Rescue Project Portal](https://portal.datarescueproject.org/datasets/) through a modal overlay.
