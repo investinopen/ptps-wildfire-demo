@@ -58,4 +58,4 @@ Check the statuses of source data archived by the [Data Rescue Project](https://
 
 Looking at the rescue status of terminated federal datasets.
 
-## [Firefigher map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map.html)
+## [Firefigher map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map/)

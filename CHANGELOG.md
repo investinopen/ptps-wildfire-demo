@@ -4,7 +4,7 @@ Only includes notable updates.
 
 ## 2026-09-17
 
-- **[Wildfire risk map:](analysis/README.md#firefigher-map)** [Published a printable map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map.html) meant to be handed to small/rural fire departments, combining building footprints, fuel load, fire hydrants, roads, driveways, and trails for an area.
+- **[Wildfire risk map:](analysis/README.md#firefigher-map)** [Published a printable map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map/) meant to be handed to small/rural fire departments, combining building footprints, fuel load, fire hydrants, roads, driveways, and trails for an area.
   - Show a legend that doubles as the layer toggle, and highlight moderate/high fuel load risk with a hatch pattern.
   - Add a "search for a place" box, and make the current view linkable.
   - Add a disclaimer that it's a proof of concept and hasn't been validated.

@@ -47,9 +47,10 @@ jobs:
 
       - name: Prepare site
         run: |
-          mkdir -p _site
+          mkdir -p _site/firefighter-map
           cp analysis/fire-datasets-report.html _site/index.html
-          cp analysis/firefighter-map.html _site/firefighter-map.html
+          cp analysis/firefighter-map/index.html _site/firefighter-map/index.html
+          cp analysis/firefighter-map/sw.js _site/firefighter-map/sw.js
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
