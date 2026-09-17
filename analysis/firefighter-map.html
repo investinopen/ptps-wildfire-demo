@@ -232,7 +232,7 @@
         <label>
           <input type="checkbox" id="trails-toggle" checked />
           <span class="swatch trails"></span>
-          Trails
+          Sidewalks, paths, & trails
         </label>
         <label>
           <input type="checkbox" id="hydrants-toggle" checked />
@@ -770,6 +770,11 @@
       });
 
       map.addControl(new maplibregl.NavigationControl());
+      map.addControl(
+        new maplibregl.GeolocateControl({
+          positionOptions: { enableHighAccuracy: true },
+        }),
+      );
       map.addControl(new maplibregl.AttributionControl({ compact: false }));
 
       // geocodes via Nominatim (OSM's own search, open data, no API key)
