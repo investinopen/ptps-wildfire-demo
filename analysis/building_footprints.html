@@ -128,11 +128,11 @@
     <div id="hydrant-spinner" title="Loading fire hydrants…" hidden></div>
     <div id="layer-controls">
       <label>
-        <input type="checkbox" id="fuel-model-toggle" />
+        <input type="checkbox" id="fuel-model-toggle" checked />
         Medium/high fuel load (LANDFIRE)
       </label>
     </div>
-    <div id="fuel-legend" hidden></div>
+    <div id="fuel-legend"></div>
     <script>
       // Vector tile archive of merged Google V3 / Microsoft / OSM building footprints,
       // from https://beta.source.coop/repositories/vida/google-microsoft-osm-open-buildings/
@@ -302,12 +302,12 @@
         paint: { "hillshade-exaggeration": 0.3 },
       };
 
-      // off by default -- toggled on via the layer control
+      // on by default -- toggled via the layer control
       const FUEL_MODELS_LAYER = {
         id: "fuel-models",
         type: "raster",
         source: "fuelModels",
-        layout: { visibility: "none" },
+        layout: { visibility: "visible" },
         // a hatch pattern already reads as sparse, unlike a solid fill, so this can sit
         // much closer to fully opaque
         paint: { "raster-opacity": 0.9 },
@@ -603,6 +603,7 @@
           '<div class="legend-item"><span class="swatch hatch"></span>' +
           "<span>Medium/high fuel load</span></div>";
       }
+      buildFuelLegend();
 
       document
         .getElementById("fuel-model-toggle")
