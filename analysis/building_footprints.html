@@ -34,9 +34,10 @@
       sources: {
         basemap: {
           type: "raster",
-          tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+          tiles: ["https://tile.opentopomap.org/{z}/{x}/{y}.png"],
           tileSize: 256,
-          attribution: "&copy; OpenStreetMap contributors",
+          attribution:
+            "&copy; OpenStreetMap contributors, SRTM | map style: &copy; OpenTopoMap (CC-BY-SA)",
         },
         buildings: {
           type: "vector",
