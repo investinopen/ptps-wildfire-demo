@@ -458,15 +458,25 @@
         },
       };
 
+      // actual drivable road classes -- excluding this way (an allowlist) rather than just
+      // excluding driveways/tracks/paths means rail/transit/tram/ferry/aerialway lines,
+      // which the previous exclusion-only filter let through, don't render as "roads" too
+      // https://openmaptiles.org/schema/#transportation
+      const DRIVABLE_ROAD_CLASSES = [
+        "motorway",
+        "trunk",
+        "primary",
+        "secondary",
+        "tertiary",
+        "minor",
+      ];
+
       const ROADS_LAYER = {
         id: "roads",
         type: "line",
         source: "roadsSource",
         "source-layer": "transportation",
-        filter: [
-          "!",
-          ["in", ["get", "class"], ["literal", ["service", "track", "path"]]],
-        ],
+        filter: ["in", ["get", "class"], ["literal", DRIVABLE_ROAD_CLASSES]],
         layout: { visibility: "visible" },
         paint: {
           "line-color": "#e58a1f",
@@ -512,7 +522,7 @@
         type: "symbol",
         source: "roadsSource",
         "source-layer": "transportation_name",
-        filter: ["!", ["in", ["get", "class"], ["literal", ["track", "path"]]]],
+        filter: ["in", ["get", "class"], ["literal", DRIVABLE_ROAD_CLASSES]],
         layout: {
           visibility: "visible",
           "text-field": ["get", "name"],
