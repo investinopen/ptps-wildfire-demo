@@ -17,6 +17,114 @@ Only includes notable updates.
   - Consolidated the analysis documentation into [analysis/README.md](analysis/README.md).
 - [**HTTP proxy:**](README.md#http-proxy) Documented [QGIS and httpx usage](README.md#usage) against the proxy, and made passive archiving more tolerant of slow sites.
 
+## 2026-09-03 - status update
+
+After some initial scoping conversations, we landed on a technical goal of "making it easier to work with rescued data." This has resulted in several sub-projects:
+
+- Tools
+  - [HTTP proxy](README.md#http-proxy)
+  - [Python package](README.md#python-package)
+  - [Browser extension](README.md#browser-extension)
+- [Analysis/dashboards](analysis/)
+  - [Wildfire data](https://investinopen.github.io/ptps-wildfire-demo/)
+  - [Federal Data Terminations](analysis/federal_data_terminations.ipynb)
+
+The tools are all centered around the same problem: when a source URL (file, webpage, etc.) becomes unavailable, how do you find a backup? The tools leverage these mappings to answer that question:
+
+- Data Rescue Project — points to other repositories
+- Wayback Machine — points to its own repository
+- Possible add-ons:
+  - [Common Crawl](https://github.com/investinopen/ptps-wildfire-demo/issues/8) — points to its own repository
+  - [Radiant Earth project](https://docs.google.com/document/d/1YyXuWykSFSP9F7lcQrKp6uraAIKi45cdW6iCaNP-cV4/edit?tab=t.0) — will point to Source Cooperative / Dryad
+
+While there are [a number of efforts to archive data](https://github.com/investinopen/ptps-wildfire-demo/issues/21), the Data Rescue Project is unique in that they're trying to comprehensively catalog rescues across repositories. Therefore, their mapping is valuable for connecting data users with the backups. The tooling that we've been working on takes that mapping and makes it easier to leverage.
+
+All of this applies to data in any domain — it's not specific to wildfire. The question remains how we can best serve fire-related use cases.
+
+### Possible directions
+
+Here are some ideas of where we could go from here:
+
+#### User research
+
+This project was started with a hypothesis and input from others in the data platform/repository/rescue space, but we haven't communicated with \[potential\] users of that data. Doing some user research would help us:
+
+- Understand current pain points, especially on the operational side
+- See if what we've built already is useful
+
+#### Expanding the mappings
+
+The tools mentioned could be improved, but the core functionality is there. What would make them more and more valuable is expanding the mappings. We've suggested that the Data Rescue Project incorporate mappings from:
+
+- [Public Environmental Data Partners (PEDP)](https://github.com/datarescueproject/portal/issues/27)
+- [Sciop](https://github.com/datarescueproject/portal/issues/35)
+
+Granted, this wouldn't be the most exciting demo, since it's essentially "we made the number go from ~4,900 to ~5,500!"
+
+#### Data cleaning
+
+[**@zaneselvans**](https://github.com/zaneselvans) [pointed out](https://docs.google.com/document/d/1x1ZY33IR7BbviMN0-uof_PZ63Lcxzarju9H5y2Ew4EQ/edit?tab=t.0#bookmark=id.oe49nq1ymqfg) that the source data is likely messy, and there could be value in creating curated/cleaned datasets. In other words, mirror what [Catalyst Cooperative](https://catalyst.coop/) is doing for energy data, but for wildfire-relevant data. Doing this well would require pulling in subject matter experts.
+
+#### Data crawling
+
+Most(?) data rescue efforts rely on proactive capture of specific datasets. In other words, someone needs to:
+
+1. Identify a dataset that's at risk
+2. Download it, manually or through a pipeline
+3. Upload it to a repository
+
+This raises the questions:
+
+- What datasets have people not thought to back up?
+- What got backed up once but isn't capturing updates?
+
+This means there's likely a long tail of less-popular datasets that aren't getting captured.
+
+By contrast, Internet Archive and Common Crawl cast a wide net, crawling the internet and then saving the content of URLs. That said, [it's unclear how interested they are in saving data (CSVs, Excel files, etc)](https://github.com/investinopen/ptps-wildfire-demo/issues/7). If they aren't, a project could be crawling for and archiving datasets. This would get ahead of source datasets being taken down quietly / by surprise.
+
+This seems to be the direction [varve (the new Radiant Earth project)](https://github.com/tylere/varve) is going.
+
+#### Passive archiving
+
+As an alternative approach to active crawling: When using [the proxy](README.md#http-proxy), it checks if the URL is available in the Internet Archive. If it's not, the proxy automatically triggers a capture. This **archives data that people are actively using, when they're using it**. This idea could be expanded:
+
+- [Automatically saving data to other repositories](https://github.com/investinopen/ptps-wildfire-demo/issues/11) (that are more data-focused)
+- Assigning DOIs
+- etc.
+
+#### Maps/data for firefighters
+
+> There is very little data analysis in emergency management and the fire service, and relatively little technical expertise. Nobody writes code. I don't lament that fact, I think it's awesome. In essence the role of Emergency Management during an emergency is to create and support a human decision-making and information dissemination machine (called an Incident Command Structure) that is not reliant on digital technologies.
+
+–Dennis, volunteer firefighter / emergency manager in Colorado
+
+They don't even use GPS for navigation. He sent a picture of their map binder, which was dated 2011. Unclear if:
+
+- Using old maps is a problem for them
+- When/how the maps get updated
+- They use any other reference information ("data") related to fires
+
+[Watch Duty](https://www.watchduty.org/solutions/overview) is a player in this space, though presumably with a focus on digital. Presumably there are others.
+
+There may be an opportunity to provide more / better / up-to-date information to \[small\] fire departments, which might take the form of PDFs they can print.
+
+### Recommendations
+
+Our theory is that researchers are interested in:
+
+- Stability
+- Identifiers
+- Privacy
+- Sovereignty
+
+…while operational folks (firefighters, etc.) _just want the data_, lowest friction possible. If at all.
+
+**"Could we make firefighters better paper maps?"** is interesting — very different from other other data rescue efforts, yet data rescue/resilience nonetheless.
+
+The [**passive archiving**](#passive-archiving) also seems to be unique. The flip side of it, [**data crawling**](#data-crawling), may already be happening through other archival projects, but that data isn't surfaced. If it isn't happening, that could be a gap to fill.
+
+All that said, the best way to know what users want it is to talk to them 🙂 Pull quotes from firefighters and emergency managers would be a compelling part of any pitch.
+
 ## 2026-08-31
 
 - [**Browser extension:**](README.md#browser-extension) Introduced the extension, linking matched pages to the [Data Rescue Project Portal](https://portal.datarescueproject.org/datasets/) through a modal overlay.
