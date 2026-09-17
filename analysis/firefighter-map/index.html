@@ -68,7 +68,8 @@
         /* geolocate is its own group (no "you are here" on a printed page); unlike zoom
            it's the only button in its box, so hiding the whole group (not just the button)
            avoids leaving an empty bordered square behind */
-        .maplibregl-ctrl-top-right .maplibregl-ctrl-group:has(.maplibregl-ctrl-geolocate) {
+        .maplibregl-ctrl-top-right
+          .maplibregl-ctrl-group:has(.maplibregl-ctrl-geolocate) {
           display: none !important;
         }
         /* the compass's arrow is a background-image, which browsers drop when "print
@@ -610,7 +611,7 @@
           "symbol-placement": "line",
         },
         paint: {
-          "text-color": "#5c3a00",
+          "text-color": "#000000",
           "text-halo-color": "#ffffff",
           "text-halo-width": 1.5,
         },
@@ -630,7 +631,7 @@
           "symbol-placement": "line",
         },
         paint: {
-          "text-color": "#3f5716",
+          "text-color": "#000000",
           "text-halo-color": "#ffffff",
           "text-halo-width": 1.5,
         },
@@ -647,7 +648,7 @@
           "text-size": 12,
         },
         paint: {
-          "text-color": "#2f6a8c",
+          "text-color": "#000000",
           "text-halo-color": "#ffffff",
           "text-halo-width": 1.5,
         },
@@ -688,10 +689,10 @@
           visibility: "visible",
           "text-field": ["get", "housenumber"],
           "text-font": ["Noto Sans Bold"],
-          "text-size": 10,
+          "text-size": 12,
         },
         paint: {
-          "text-color": "#1f3d3a",
+          "text-color": "#000000",
           "text-halo-color": "#ffffff",
           "text-halo-width": 1,
         },
@@ -738,7 +739,7 @@
           ],
         },
         paint: {
-          "text-color": "#2b2b2b",
+          "text-color": "#000000",
           "text-halo-color": "#ffffff",
           "text-halo-width": 1.5,
         },
