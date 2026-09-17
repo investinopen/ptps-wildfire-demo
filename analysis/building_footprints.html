@@ -89,6 +89,25 @@
               paint: { "hillshade-exaggeration": 0.3 },
             },
             {
+              id: "water",
+              type: "fill",
+              source: "roadsSource",
+              "source-layer": "water",
+              paint: {
+                "fill-color": "#a3d3e8",
+              },
+            },
+            {
+              id: "waterways",
+              type: "line",
+              source: "roadsSource",
+              "source-layer": "waterway",
+              paint: {
+                "line-color": "#a3d3e8",
+                "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.5, 18, 2],
+              },
+            },
+            {
               // includes private roads/driveways (class "service", subclass "driveway") --
               // styled thinner + a different hue to read as minor, same as OSM data allows
               id: "roads",
@@ -139,6 +158,22 @@
               },
               paint: {
                 "text-color": "#5c3a00",
+                "text-halo-color": "#ffffff",
+                "text-halo-width": 1.5,
+              },
+            },
+            {
+              id: "water-labels",
+              type: "symbol",
+              source: "roadsSource",
+              "source-layer": "water_name",
+              layout: {
+                "text-field": ["get", "name"],
+                "text-font": ["Noto Sans Bold"],
+                "text-size": 12,
+              },
+              paint: {
+                "text-color": "#2f6a8c",
                 "text-halo-color": "#ffffff",
                 "text-halo-width": 1.5,
               },
