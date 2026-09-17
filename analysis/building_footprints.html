@@ -73,6 +73,9 @@
         padding: 6px 10px;
         font: 13px/1.4 sans-serif;
         z-index: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
       }
       #layer-controls label {
         display: flex;
@@ -97,6 +100,23 @@
           ),
           #ffffff;
       }
+      #layer-controls .swatch.buildings {
+        background: #3fb1ce;
+        border-color: #1f7a8c;
+      }
+      #layer-controls .swatch.roads {
+        background: #e58a1f;
+      }
+      #layer-controls .swatch.driveways {
+        background: #8855c8;
+      }
+      #layer-controls .swatch.hillshade {
+        background: linear-gradient(135deg, #ffffff, #6b6b6b);
+      }
+      #layer-controls .swatch.hydrants {
+        background: #e0342a;
+        border-radius: 50%;
+      }
     </style>
   </head>
   <body>
@@ -104,13 +124,34 @@
     <div id="hydrant-spinner" title="Loading fire hydrants…" hidden></div>
     <div id="layer-controls">
       <label>
+        <input type="checkbox" id="hillshade-toggle" checked />
+        <span class="swatch hillshade"></span>
+        Hillshade
+      </label>
+      <label>
         <input type="checkbox" id="fuel-model-toggle" checked />
         <span class="swatch hatch"></span>
-        Moderate/high fuel load (<a
-          href="https://landfire.gov/fuel/fbfm40"
-          target="_blank"
-          >LANDFIRE</a
-        >)
+        Moderate/high fuel load
+      </label>
+      <label>
+        <input type="checkbox" id="buildings-toggle" checked />
+        <span class="swatch buildings"></span>
+        Buildings
+      </label>
+      <label>
+        <input type="checkbox" id="roads-toggle" checked />
+        <span class="swatch roads"></span>
+        Roads
+      </label>
+      <label>
+        <input type="checkbox" id="driveways-toggle" checked />
+        <span class="swatch driveways"></span>
+        Driveways & trails
+      </label>
+      <label>
+        <input type="checkbox" id="hydrants-toggle" checked />
+        <span class="swatch hydrants"></span>
+        Fire hydrants
       </label>
     </div>
     <script>
@@ -294,6 +335,7 @@
         id: "hillshade",
         type: "hillshade",
         source: "hillshadeSource",
+        layout: { visibility: "visible" },
         paint: { "hillshade-exaggeration": 0.3 },
       };
 
@@ -329,30 +371,38 @@
         },
       };
 
-      // includes private roads/driveways (class "service", subclass "driveway") --
-      // styled thinner + a different hue to read as minor, same as OSM data allows
       const ROADS_LAYER = {
         id: "roads",
         type: "line",
         source: "roadsSource",
         "source-layer": "transportation",
+        filter: [
+          "!",
+          ["in", ["get", "class"], ["literal", ["service", "track", "path"]]],
+        ],
+        layout: { visibility: "visible" },
         paint: {
-          "line-color": [
-            "match",
-            ["get", "class"],
-            ["service", "track", "path"],
-            "#8855c8",
-            "#e58a1f",
-          ],
-          "line-width": [
-            "interpolate",
-            ["linear"],
-            ["zoom"],
-            10,
-            ["match", ["get", "class"], ["service", "track", "path"], 0.3, 0.5],
-            18,
-            ["match", ["get", "class"], ["service", "track", "path"], 1.5, 4],
-          ],
+          "line-color": "#e58a1f",
+          "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.5, 18, 4],
+        },
+      };
+
+      // private roads/driveways, plus tracks and paths (class "service", "track", "path") --
+      // styled thinner + a different hue to read as minor, same as OSM data allows
+      const DRIVEWAYS_LAYER = {
+        id: "driveways",
+        type: "line",
+        source: "roadsSource",
+        "source-layer": "transportation",
+        filter: [
+          "in",
+          ["get", "class"],
+          ["literal", ["service", "track", "path"]],
+        ],
+        layout: { visibility: "visible" },
+        paint: {
+          "line-color": "#8855c8",
+          "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.3, 18, 1.5],
         },
       };
 
@@ -362,6 +412,7 @@
         source: "roadsSource",
         "source-layer": "transportation_name",
         layout: {
+          visibility: "visible",
           "text-field": ["get", "name"],
           "text-font": ["Noto Sans Bold"],
           "text-size": 12,
@@ -397,6 +448,7 @@
         source: "buildings",
         "source-layer": SOURCE_LAYER,
         minzoom: BUILDING_MIN_ZOOM,
+        layout: { visibility: "visible" },
         paint: {
           "fill-color": "#3fb1ce",
         },
@@ -408,6 +460,7 @@
         source: "buildings",
         "source-layer": SOURCE_LAYER,
         minzoom: BUILDING_MIN_ZOOM,
+        layout: { visibility: "visible" },
         paint: {
           "line-color": "#1f7a8c",
           "line-width": 1,
@@ -421,6 +474,7 @@
         "source-layer": "housenumber",
         minzoom: 16,
         layout: {
+          visibility: "visible",
           "text-field": ["get", "housenumber"],
           "text-font": ["Noto Sans Bold"],
           "text-size": 10,
@@ -437,6 +491,7 @@
         type: "circle",
         source: "hydrants",
         minzoom: 13,
+        layout: { visibility: "visible" },
         paint: {
           "circle-radius": ["interpolate", ["linear"], ["zoom"], 13, 2, 18, 6],
           "circle-color": "#e0342a",
@@ -530,6 +585,7 @@
             WATER_LAYER,
             WATERWAYS_LAYER,
             BUILDINGS_FILL_LAYER,
+            DRIVEWAYS_LAYER,
             ROADS_LAYER,
             WATER_LABELS_LAYER,
             BUILDINGS_OUTLINE_LAYER,
@@ -592,15 +648,25 @@
       map.addControl(new maplibregl.NavigationControl());
       map.addControl(new maplibregl.AttributionControl({ compact: false }));
 
-      document
-        .getElementById("fuel-model-toggle")
-        .addEventListener("change", (e) => {
-          map.setLayoutProperty(
-            "fuel-models",
-            "visibility",
-            e.target.checked ? "visible" : "none",
-          );
+      // wires a checkbox to show/hide one or more layers together
+      function bindLayerToggle(checkboxId, layerIds) {
+        document.getElementById(checkboxId).addEventListener("change", (e) => {
+          const visibility = e.target.checked ? "visible" : "none";
+          for (const id of layerIds) {
+            map.setLayoutProperty(id, "visibility", visibility);
+          }
         });
+      }
+      bindLayerToggle("hillshade-toggle", ["hillshade"]);
+      bindLayerToggle("fuel-model-toggle", ["fuel-models"]);
+      bindLayerToggle("buildings-toggle", [
+        "buildings-fill",
+        "buildings-outline",
+        "housenumbers",
+      ]);
+      bindLayerToggle("roads-toggle", ["roads", "road-labels"]);
+      bindLayerToggle("driveways-toggle", ["driveways"]);
+      bindLayerToggle("hydrants-toggle", ["hydrants"]);
 
       // resize so the canvas redraws at full page size instead of printing blank/clipped
       window.addEventListener("beforeprint", () => map.resize());
