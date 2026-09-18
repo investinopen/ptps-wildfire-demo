@@ -41,6 +41,8 @@ We aim to support the following tools:
   - DuckDB
   - PostgreSQL/PostGIS
 
+Also paper! See [firefighter map](analysis/README.md#firefigher-map).
+
 ## Design decisions
 
 - Focus on low-velocity/historical data rather than high-velocity/real-time
@@ -65,6 +67,8 @@ A **certificate** lets tools trust secure (`https://`) traffic from that proxy.
 
 ```mermaid
 flowchart TD
+    user("user")
+
     python["Python"]
     r["R"]
     arcgis["ArcGIS"]
@@ -76,10 +80,21 @@ flowchart TD
     rescue1[("rescued data")]
     rescue2[("rescued data")]
 
+    wayback[("WayBack Machine")]
+    repo[("other repositories?")]
+
+    user --> python
+    user --> r
+    user --> arcgis
+    user --> qgis
+
     python --> proxy
     r --> proxy
     arcgis --> proxy
     qgis --> proxy
+
+    proxy -->|ensures backup| wayback
+    proxy -->|ensures backup| repo
 
     proxy --> source
     source -->|falls back to| rescue1
@@ -92,6 +107,8 @@ flowchart TD
     class python,r,arcgis,qgis sourceTool
     class proxy process
     class source,rescue1,rescue2 datastore
+
+    click repo href "https://github.com/investinopen/ptps-wildfire-demo/issues/11" _blank
 ```
 
 ### Usage
