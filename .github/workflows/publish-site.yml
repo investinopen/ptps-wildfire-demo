@@ -42,16 +42,14 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked
 
-      - name: Generate report
-        run: uv run python -m analysis.generate_report
-
       # https://quarto.org/docs/publishing/github-pages.html#github-action
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      # notebooks are rendered from their committed outputs, not re-executed
+      # generates the report (index.qmd); notebooks are rendered from their committed
+      # outputs, not re-executed
       - name: Render site
-        run: quarto render analysis
+        run: uv run quarto render analysis
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5

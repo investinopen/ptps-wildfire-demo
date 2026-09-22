@@ -1,0 +1,18 @@
+---
+title: Dataset rescue statuses
+toc: false
+---
+
+```{python}
+#| echo: false
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path.cwd().parent))
+
+from IPython.display import HTML
+
+from analysis.generate_report import render_report
+
+HTML(await render_report())
+```
