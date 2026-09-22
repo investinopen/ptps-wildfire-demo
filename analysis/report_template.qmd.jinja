@@ -1,0 +1,90 @@
+---
+title: Dataset rescue statuses
+toc: false
+---
+
+```{=html}
+<style>
+  .dataset {
+    margin-top: 2.5rem;
+  }
+
+  a {
+    word-break: break-all;
+  }
+
+  .empty {
+    font-style: italic;
+  }
+</style>
+
+<p class="lead">
+  Checks the rescue status of the
+  <a href="https://github.com/investinopen/ptps-wildfire-demo/blob/main/analysis/fire_datasets.csv"
+    target="_blank">example data sources</a>. Note that some sites may block our crawler, so it may show an error
+  status below when the URL is in fact retrievable in a browser.
+</p>
+<p class="text-body-secondary">
+  Generated
+  <time id="generated-at" datetime="{{ generated_at.isoformat() }}">{{ generated_at.strftime("%Y-%m-%d %H:%M UTC")
+    }}</time>.
+  Updates daily. Source:
+  <a href="https://github.com/investinopen/ptps-wildfire-demo" target="_blank">investinopen/ptps-wildfire-demo</a>.
+</p>
+<script>
+  (() => {
+    const el = document.getElementById("generated-at");
+    const generatedAt = new Date(el.getAttribute("datetime"));
+    const minutes = Math.round((Date.now() - generatedAt.getTime()) / 60000);
+
+    const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+    let relative;
+    if (minutes < 60) {
+      relative = rtf.format(-minutes, "minute");
+    } else if (minutes < 60 * 24) {
+      relative = rtf.format(-Math.round(minutes / 60), "hour");
+    } else {
+      relative = rtf.format(-Math.round(minutes / (60 * 24)), "day");
+    }
+
+    el.textContent = `${relative} (${el.textContent})`;
+  })();
+</script>
+
+{% for dataset in datasets %}
+<section class="dataset border-top pt-3">
+  <h2>{{ dataset.name }}</h2>
+  <p class="text-body-secondary">{{ dataset.description }}</p>
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Status</th>
+        <th>
+          In
+          <a href="https://web.archive.org/" target="_blank">Wayback Machine</a>?
+        </th>
+        <th>
+          In
+          <a href="https://portal.datarescueproject.org/" target="_blank">Data Rescue Project
+            Portal</a>?
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in dataset.rows %}
+      <tr>
+        <td>{{ row.url | link_label(row.type) }}</td>
+        <td>{{ row.status }}</td>
+        <td>{% if row.wayback_applicable %}{{ row.wayback_url | yes_no }}{% else %}<span class="empty text-body-secondary">N/A</span>{%
+          endif %}
+        </td>
+        <td>{% if row.drp_applicable %}{{ row.drp_url | yes_no }}{% else %}<span class="empty text-body-secondary">N/A</span>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endfor %}
+```

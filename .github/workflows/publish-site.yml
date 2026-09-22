@@ -45,17 +45,18 @@ jobs:
       - name: Generate report
         run: uv run python -m analysis.generate_report
 
-      - name: Prepare site
-        run: |
-          mkdir -p _site/firefighter-map
-          cp analysis/fire-datasets-report.html _site/index.html
-          cp analysis/firefighter-map/index.html _site/firefighter-map/index.html
-          cp analysis/firefighter-map/sw.js _site/firefighter-map/sw.js
+      # https://quarto.org/docs/publishing/github-pages.html#github-action
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      # notebooks are rendered from their committed outputs, not re-executed
+      - name: Render site
+        run: quarto render analysis
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: _site
+          path: analysis/_site
 
   deploy:
     needs: build

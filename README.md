@@ -8,7 +8,7 @@ PtPS is the Portfolio to Protect Science.
 
 - Analysis
   - [Dataset rescue statuses](https://investinopen.github.io/ptps-wildfire-demo/)
-  - [Risk calculation](https://nbviewer.org/github/investinopen/ptps-wildfire-demo/blob/main/analysis/risk.ipynb)
+  - [Risk calculation](https://investinopen.github.io/ptps-wildfire-demo/risk.html)
 - [Firefigher map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map/)
 - Tools
   - [HTTP proxy](#http-proxy)

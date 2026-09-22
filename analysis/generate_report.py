@@ -1,4 +1,4 @@
-"""Generates an HTML report checking the rescue status of the example wildfire datasets, with clickable links."""
+"""Generates a Quarto page (see _quarto.yml) checking the rescue status of the example wildfire datasets, with clickable links."""
 
 import asyncio
 import html
@@ -15,7 +15,8 @@ from analysis.helpers import get_statuses
 from ptps_wildfire_demo import Resolver
 
 ANALYSIS_DIR = Path(__file__).parent
-OUTPUT_PATH = ANALYSIS_DIR / "fire-datasets-report.html"
+# the site's home page
+OUTPUT_PATH = ANALYSIS_DIR / "index.qmd"
 
 
 def get_datasets_to_check(datasets: pd.DataFrame) -> pd.DataFrame:
@@ -185,13 +186,13 @@ async def main():
     env = Environment(loader=FileSystemLoader(ANALYSIS_DIR))
     env.filters["link_label"] = link_label
     env.filters["yes_no"] = yes_no
-    template = env.get_template("report_template.html.jinja")
-    html = template.render(
+    template = env.get_template("report_template.qmd.jinja")
+    page = template.render(
         datasets=consolidated_results,
         generated_at=datetime.now(UTC),
     )
 
-    OUTPUT_PATH.write_text(html)
+    OUTPUT_PATH.write_text(page)
     print(f"Wrote report to {OUTPUT_PATH}")
 
 

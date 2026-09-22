@@ -1,0 +1,30 @@
+# GitHub Pages site -- see ../.github/workflows/publish-site.yml
+# https://quarto.org/docs/websites/
+project:
+  type: website
+  # everything else in this directory is a working notebook/script, not a page
+  render:
+    - index.qmd
+    - risk.ipynb
+  # published as-is, with its own full-screen layout
+  resources:
+    - firefighter-map/
+
+website:
+  title: PtPS Wildfire Demo
+  repo-url: https://github.com/investinopen/ptps-wildfire-demo
+  navbar:
+    left:
+      - href: index.qmd
+        text: Dataset rescue statuses
+      - href: risk.ipynb
+        text: Risk calculation
+      - href: firefighter-map/index.html
+        text: Firefighter map
+
+format:
+  html:
+    theme:
+      light: cosmo
+      dark: darkly
+    toc: true
