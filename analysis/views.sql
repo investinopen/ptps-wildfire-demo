@@ -43,16 +43,32 @@ COMMENT ON VIEW fire_zones IS 'https://www.weather.gov/gis/FireZones';
 -- zone-level analysis needs, and red_flag_warnings below collapses it back to one row
 -- per alert.
 -- https://github.com/weather-gov/api/discussions/278
+--
+-- The properties are spelled out rather than inferred, because when there are no active
+-- warnings (common -- they're seasonal) there are no features to infer them from, and the
+-- view would fail to bind.
+--
+-- The feed changes minute to minute, and cache_httpfs (see setup.sql) caches by URL in
+-- fixed-size blocks, so a longer response can get stitched together from blocks of
+-- different versions of it and fail to parse. Always fetch it fresh instead.
+SELECT cache_httpfs_add_exclusion_regex('^https://api\.weather\.gov/alerts/');
+
 CREATE OR REPLACE VIEW red_flag_zones AS WITH warnings AS (
-        SELECT DISTINCT * EXCLUDE geom,
-            unnest(affectedZones) AS zone_url,
+        SELECT DISTINCT alert.*,
+            unnest(alert.affectedZones) AS zone_url,
             regexp_extract(
                 zone_url,
                 '^https://api.weather.gov/zones/fire/([A-Z]{2})Z(\d{3})$',
                 ['state', 'zone']
             ) AS zone_parsed
-        FROM ST_Read(
-                'https://api.weather.gov/alerts/active?event=Red%20Flag%20Warning&status=actual' -- , open_options = ['FLATTEN_NESTED_ATTRIBUTES=YES']
+        FROM (
+                SELECT unnest(features).properties AS alert
+                FROM read_json(
+                        'https://api.weather.gov/alerts/active?event=Red%20Flag%20Warning&status=actual',
+                        columns = {
+                            features: 'STRUCT(properties STRUCT(id VARCHAR, event VARCHAR, severity VARCHAR, expires TIMESTAMPTZ, headline VARCHAR, senderName VARCHAR, affectedZones VARCHAR[]))[]'
+                        }
+                    )
             )
     )
 SELECT warnings.* EXCLUDE (zone_url, zone_parsed),

@@ -98,11 +98,14 @@
         .maplibregl-ctrl-top-right .maplibregl-ctrl-zoom-out {
           display: none !important;
         }
-        /* geolocate is its own group (no "you are here" on a printed page); unlike zoom
-           it's the only button in its box, so hiding the whole group (not just the button)
-           avoids leaving an empty bordered square behind */
+        /* geolocate and full screen are each their own group (no "you are here" or full
+           screen on a printed page); unlike zoom each is the only button in its box, so
+           hiding the whole group (not just the button) avoids leaving an empty bordered
+           square behind */
         .maplibregl-ctrl-top-right
-          .maplibregl-ctrl-group:has(.maplibregl-ctrl-geolocate) {
+          .maplibregl-ctrl-group:has(.maplibregl-ctrl-geolocate),
+        .maplibregl-ctrl-top-right
+          .maplibregl-ctrl-group:has(.maplibregl-ctrl-fullscreen) {
           display: none !important;
         }
         /* the compass's arrow is a background-image, which browsers drop when "print
@@ -1010,6 +1013,13 @@
       map.addControl(
         new maplibregl.GeolocateControl({
           positionOptions: { enableHighAccuracy: true },
+        }),
+      );
+      // the container rather than the default (just the map canvas), so the legend/layer
+      // toggles come along
+      map.addControl(
+        new maplibregl.FullscreenControl({
+          container: document.getElementById("map-container"),
         }),
       );
       map.addControl(new maplibregl.AttributionControl({ compact: false }));
