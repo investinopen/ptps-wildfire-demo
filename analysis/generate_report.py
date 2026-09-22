@@ -1,4 +1,4 @@
-"""Generates an HTML report checking the rescue status of the example wildfire datasets, with clickable links."""
+"""Renders the report, for rescue-status.qmd, checking the rescue status of the example wildfire datasets, with clickable links."""
 
 import asyncio
 import html
@@ -15,7 +15,6 @@ from analysis.helpers import get_statuses
 from ptps_wildfire_demo import Resolver
 
 ANALYSIS_DIR = Path(__file__).parent
-OUTPUT_PATH = ANALYSIS_DIR / "fire-datasets-report.html"
 
 
 def get_datasets_to_check(datasets: pd.DataFrame) -> pd.DataFrame:
@@ -179,21 +178,14 @@ async def get_consolidated_results() -> list[dict]:
     return get_dataset_sections(webpage_results, example_data_url_results)
 
 
-async def main():
+async def render_report() -> str:
     consolidated_results = await get_consolidated_results()
 
     env = Environment(loader=FileSystemLoader(ANALYSIS_DIR))
     env.filters["link_label"] = link_label
     env.filters["yes_no"] = yes_no
     template = env.get_template("report_template.html.jinja")
-    html = template.render(
+    return template.render(
         datasets=consolidated_results,
         generated_at=datetime.now(UTC),
     )
-
-    OUTPUT_PATH.write_text(html)
-    print(f"Wrote report to {OUTPUT_PATH}")
-
-
-if __name__ == "__main__":
-    asyncio.run(main())

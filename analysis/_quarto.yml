@@ -1,0 +1,41 @@
+# GitHub Pages site -- see ../.github/workflows/publish-site.yml
+# https://quarto.org/docs/websites/
+project:
+  type: website
+  # everything else in this directory is a working notebook/script, not a page
+  render:
+    - index.qmd
+    - rescue-status.qmd
+    - risk.ipynb
+    - fire_overlap.ipynb
+  # published as-is, with its own full-screen layout
+  resources:
+    - firefighter-map/
+
+website:
+  title: PtPS Wildfire Demo
+  repo-url: https://github.com/investinopen/ptps-wildfire-demo
+  repo-branch: main
+  repo-subdir: analysis
+  navbar:
+    left:
+      - href: rescue-status.qmd
+        text: Dataset rescue statuses
+      - href: risk.ipynb
+        text: Risk calculation
+      - href: fire_overlap.ipynb
+        text: Wildfire overlap
+      - href: firefighter-map/index.html
+        text: Firefighter map
+
+filters:
+  - github-links.lua
+
+format:
+  html:
+    theme:
+      light: cosmo
+      dark: darkly
+    toc: true
+    # code cells start collapsed, with their outputs still shown
+    code-fold: true

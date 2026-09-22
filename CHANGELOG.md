@@ -26,7 +26,7 @@ After some initial scoping conversations, we landed on a technical goal of "maki
   - [Python package](README.md#python-package)
   - [Browser extension](README.md#browser-extension)
 - [Analysis/dashboards](analysis/)
-  - [Wildfire data](https://investinopen.github.io/ptps-wildfire-demo/)
+  - [Wildfire data](https://investinopen.github.io/ptps-wildfire-demo/rescue-status.html)
   - [Federal Data Terminations](analysis/federal_data_terminations.ipynb)
 
 The tools are all centered around the same problem: when a source URL (file, webpage, etc.) becomes unavailable, how do you find a backup? The tools leverage these mappings to answer that question:
