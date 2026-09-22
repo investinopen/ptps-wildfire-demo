@@ -42,7 +42,7 @@ Draws every mapped fire perimeter in a state since 1984 as a translucent polygon
 
 ## GitHub Pages site
 
-The dataset rescue status report, the [risk notebook](risk.ipynb) (from its committed outputs), and the [firefighter map](firefighter-map/) are published together as a [Quarto](https://quarto.org/) website, configured in [`_quarto.yml`](_quarto.yml). It's [published automatically](../.github/workflows/publish-site.yml). To preview locally, [install Quarto](https://quarto.org/docs/get-started/), then from the repository root run:
+The dataset rescue status report, the [risk](risk.ipynb) and [wildfire overlap](fire_overlap.ipynb) notebooks (from their committed outputs), and the [firefighter map](firefighter-map/) are published together as a [Quarto](https://quarto.org/) website, configured in [`_quarto.yml`](_quarto.yml). It's [published automatically](../.github/workflows/publish-site.yml). To preview locally, [install Quarto](https://quarto.org/docs/get-started/), then from the repository root run:
 
 ```sh
 uv run quarto preview analysis
