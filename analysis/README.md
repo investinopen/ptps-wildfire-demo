@@ -38,11 +38,11 @@ Draws every mapped fire perimeter in a state since 1984 as a translucent polygon
 
 ## Dataset rescue status report
 
-[`generate_report.py`](generate_report.py) checks the rescue status of the example data sources. It's run by [`index.qmd`](index.qmd), the home page of the site below, whenever the site is rendered.
+[`generate_report.py`](generate_report.py) checks the rescue status of the example data sources. It's run by [`rescue-status.qmd`](rescue-status.qmd), a page of the site below, whenever the site is rendered.
 
 ## GitHub Pages site
 
-The dataset rescue status report, the [risk](risk.ipynb) and [wildfire overlap](fire_overlap.ipynb) notebooks (from their committed outputs), and the [firefighter map](firefighter-map/) are published together as a [Quarto](https://quarto.org/) website, configured in [`_quarto.yml`](_quarto.yml). It's [published automatically](../.github/workflows/publish-site.yml). To preview locally, [install Quarto](https://quarto.org/docs/get-started/), then from the repository root run:
+A [homepage](index.qmd) introducing the project, the dataset rescue status report, the [risk](risk.ipynb) and [wildfire overlap](fire_overlap.ipynb) notebooks (from their committed outputs), and the [firefighter map](firefighter-map/) are published together as a [Quarto](https://quarto.org/) website, configured in [`_quarto.yml`](_quarto.yml). It's [published automatically](../.github/workflows/publish-site.yml). To preview locally, [install Quarto](https://quarto.org/docs/get-started/), then from the repository root run:
 
 ```sh
 uv run quarto preview analysis

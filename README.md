@@ -2,56 +2,19 @@
 
 A networked data infrastructure demo for the "Investing in Open Infra to Safeguard Critical Scientific Data" project. Essentially, we are **making it easier to work with rescued data**.
 
-PtPS is the Portfolio to Protect Science.
+PtPS is the Portfolio to Protect Science. See [the website](https://investinopen.github.io/ptps-wildfire-demo/) for background, what we're exploring, and our design decisions.
 
 ## Quick links
 
 - Analysis
-  - [Dataset rescue statuses](https://investinopen.github.io/ptps-wildfire-demo/)
+  - [Dataset rescue statuses](https://investinopen.github.io/ptps-wildfire-demo/rescue-status.html)
   - [Risk calculation](https://investinopen.github.io/ptps-wildfire-demo/risk.html)
   - [Wildfire overlap](https://investinopen.github.io/ptps-wildfire-demo/fire-overlap.html)
-- [Firefigher map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map/)
+- [Firefighter map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map/)
 - Tools
   - [HTTP proxy](#http-proxy)
   - [Python package](#python-package)
   - [Browser extension](#browser-extension)
-
-## Background
-
-We are losing critical scientific knowledge every day. Urgent and increasing threats from funding cuts and policy changes impact the core datasets relied on globally for climate forecasting, public health, research, and scientific discovery.
-
-To date, efforts to stop this loss have been primarily oriented toward rescue and preservation activities: saving bytes, archiving repositories, and migrating at-risk content to academic and non-profit storage environments and/or to commercial cloud providers. These crucial, often grassroots, efforts have been challenged by existing inefficiencies, fragmentation, and siloing across disconnected repositories and services. They may also inadvertently reinforce these problems by addressing immediate data loss, but not providing an alternate scenario for promoting long-term access continuity.
-
-What is almost entirely absent in the projects and initiatives we are tracking is investment in the technical infrastructure layer: the tools, pipelines, standards, systems, and people that make any of the other work durable.
-
-The project will design, build, and document a working end-to-end data infrastructure proof of concept organized around a specific use case: wildfire and disaster identification, prevention, and response. We have selected a fire and disaster relief scenario as our anchor case because it requires data across multiple disciplines including weather, GIS, health markers, environment and more, demonstrating the cross-domain assembly problem while connecting to urgent societal stakes that make visceral the "what happens if this goes dark" argument.
-
-## Output
-
-Data rescue/resilience has, for the most part, focused on a single aspect of the problem: Take data from a source location, make a copy elsewhere. There are various angles that are less explored:
-
-- If someone is looking for a dataset that's been disrupted, how do they find the (appropriate) backup?
-  - This is where the [fallbacks](#fallbacks) come in.
-    - [HTTP proxy](#http-proxy)
-    - [Python package](#python-package)
-    - [Browser extension](#browser-extension)
-- If someone's using backed-up data, how do they verify its integrity (relative to the source)?
-  - This is where [varve](https://github.com/tylere/varve) comes in.
-- What datasets have people not thought to back up yet? How do we avoid losing them?
-  - This is what the [data crawling / passive archiving](CHANGELOG.md#data-crawling) is about.
-- Instead of just making a copy of messy data, can we improve the quality/usability?
-  - Cleaning
-  - Merging
-  - This is what [Catalyst Cooperative](https://catalyst.coop/) is doing.
-- Most solutions assume a high-speed internet connection on a modern device. How can we make relevant data available to those who (urgently) need it but don't have internet or power?
-  - Disaster scenarios
-  - Remote areas
-  - This is what the [maps for firefighters](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map/) is about.
-- What data would be useful to operational folks but is too hard for them to access/use?
-  - Example: [Fire risk data](https://open-climate-risk.readthedocs.io/en/stable/access-data.html#download-options) requires using code / GIS software.
-  - This is also what the [maps for firefighters](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map/) is about.
-
-See also: [design decisions](#design-decisions), which differentiate this project from others.
 
 ## Fallbacks
 
@@ -81,19 +44,6 @@ We aim to support the following tools:
   - PostgreSQL/PostGIS
 
 Also paper! See [firefighter map](analysis/README.md#firefigher-map).
-
-## Design decisions
-
-- Focus on low-velocity/historical data rather than high-velocity/real-time
-- Focusing on mirrors (direct copies), rather than fabricating new datasets / creating alternatives
-- Focused on ensuring there are greater than zero copies of datasets
-  - Greater than one is a nice-to-have.
-  - In other words, we're focused on avoiding data disruption crises rather than long-term [preservation](https://en.wikipedia.org/wiki/Digital_preservation).
-- Presenting rescued/identical data as-is rather than doing any cleaning
-- Shouldn't be reliant on specific cloud providers
-- While this is being built as a compatibility layer (behind the scenes), we will surface source dataset status and fallbacks to make it easier for people to understand.
-
-We acknowledge that those other areas are valuable, they just aren't in scope for this (phase of the) project.
 
 ## [HTTP proxy](proxy/)
 

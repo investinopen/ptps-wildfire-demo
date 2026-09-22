@@ -5,6 +5,7 @@ project:
   # everything else in this directory is a working notebook/script, not a page
   render:
     - index.qmd
+    - rescue-status.qmd
     - risk.ipynb
     - fire_overlap.ipynb
   # published as-is, with its own full-screen layout
@@ -18,7 +19,7 @@ website:
   repo-subdir: analysis
   navbar:
     left:
-      - href: index.qmd
+      - href: rescue-status.qmd
         text: Dataset rescue statuses
       - href: risk.ipynb
         text: Risk calculation

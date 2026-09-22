@@ -46,7 +46,7 @@ jobs:
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      # generates the report (index.qmd); notebooks are rendered from their committed
+      # generates the report (rescue-status.qmd); notebooks are rendered from their committed
       # outputs, not re-executed
       - name: Render site
         run: uv run quarto render analysis
