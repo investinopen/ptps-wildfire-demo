@@ -10,7 +10,7 @@
     {
       "name": "site-preview",
       "runtimeExecutable": "uv",
-      "runtimeArgs": ["run", "python", "-m", "http.server", "8744", "--directory", "analysis/_site"],
+      "runtimeArgs": ["run", "quarto", "preview", "analysis", "--port", "8744", "--no-browser"],
       "port": 8744
     }
   ]
