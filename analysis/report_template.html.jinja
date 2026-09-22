@@ -1,17 +1,3 @@
-<style>
-  .dataset {
-    margin-top: 2.5rem;
-  }
-
-  a {
-    word-break: break-all;
-  }
-
-  .empty {
-    font-style: italic;
-  }
-</style>
-
 <p class="lead">
   Checks the rescue status of the
   <a href="https://github.com/investinopen/ptps-wildfire-demo/blob/main/analysis/fire_datasets.csv"
@@ -46,7 +32,7 @@
 </script>
 
 {% for dataset in datasets %}
-<section class="dataset border-top pt-3">
+<section class="mt-5">
   <h2>{{ dataset.name }}</h2>
   <p class="text-body-secondary">{{ dataset.description }}</p>
   <table class="table table-bordered table-striped">
@@ -70,10 +56,10 @@
       <tr>
         <td>{{ row.url | link_label(row.type) }}</td>
         <td>{{ row.status }}</td>
-        <td>{% if row.wayback_applicable %}{{ row.wayback_url | yes_no }}{% else %}<span class="empty text-body-secondary">N/A</span>{%
+        <td>{% if row.wayback_applicable %}{{ row.wayback_url | yes_no }}{% else %}<span class="fst-italic text-body-secondary">N/A</span>{%
           endif %}
         </td>
-        <td>{% if row.drp_applicable %}{{ row.drp_url | yes_no }}{% else %}<span class="empty text-body-secondary">N/A</span>{% endif %}
+        <td>{% if row.drp_applicable %}{{ row.drp_url | yes_no }}{% else %}<span class="fst-italic text-body-secondary">N/A</span>{% endif %}
         </td>
       </tr>
       {% endfor %}
