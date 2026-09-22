@@ -5,6 +5,7 @@ import time
 from json.decoder import JSONDecodeError
 
 import httpx
+from cachetools import TTLCache
 from dotenv import load_dotenv
 
 from ptps_wildfire_demo.constants import USER_AGENT
@@ -15,6 +16,10 @@ logger = logging.getLogger(__name__)
 
 # The Internet Archive rate-limits aggressively and asks clients to be gentle. Serialize our requests and keep a minimum gap between them.
 DEFAULT_REQUEST_INTERVAL = 1.0
+# Don't ask the Wayback Machine to re-capture the same URL more often than this.
+SAVE_INTERVAL = 24 * 60 * 60
+# Bounds memory in a long-running proxy; if exceeded, the oldest entries are evicted early.
+MAX_TRACKED_SAVES = 10_000
 
 
 class InternetArchiveClient:
@@ -27,6 +32,8 @@ class InternetArchiveClient:
     _throttle_lock: asyncio.Lock
     _last_request_at: float
 
+    _recent_saves: TTLCache[str, bool]
+
     def __init__(self, httpx_client: httpx.AsyncClient) -> None:
         self.httpx_client = httpx_client
 
@@ -35,6 +42,9 @@ class InternetArchiveClient:
 
         self._last_request_at = 0.0
         self._throttle_lock = asyncio.Lock()
+        self._recent_saves = TTLCache(
+            maxsize=MAX_TRACKED_SAVES, ttl=SAVE_INTERVAL, timer=time.monotonic
+        )
 
     async def _throttle(self) -> None:
         """Block until at least `request_interval` seconds have passed since the
@@ -87,8 +97,18 @@ class InternetArchiveClient:
 
         return results.get("closest", {}).get("url")
 
-    async def save(self, url: str):
-        """https://help.archive.org/help/save-pages-in-the-wayback-machine/"""
+    async def save(self, url: str) -> httpx.Response | None:
+        """https://help.archive.org/help/save-pages-in-the-wayback-machine/
+
+        Returns None without making a request if the URL was submitted recently."""
+
+        # checked before the request (rather than after) so concurrent calls for the same URL are deduplicated too
+        if url in self._recent_saves:
+            logger.info(
+                f"{url} was submitted to the Internet Archive recently — skipping"
+            )
+            return None
+        self._recent_saves[url] = True
 
         # this endpoint waits for the page to be archived, so use a longer timeout
         return await self.request(f"https://web.archive.org/save/{url}", timeout=20)
