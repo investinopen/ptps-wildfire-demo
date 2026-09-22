@@ -34,6 +34,12 @@ website:
         text: Wildfire overlap
       - href: firefighter-map/index.html
         text: Firefighter map
+  page-footer:
+    left: "© 2026 [Invest in Open Infrastructure](https://investinopen.org/) · [MIT License](https://github.com/investinopen/ptps-wildfire-demo/blob/main/LICENSE)"
+    right:
+      - icon: github
+        href: https://github.com/investinopen/ptps-wildfire-demo
+        aria-label: GitHub
 
 filters:
   - github-links.lua
