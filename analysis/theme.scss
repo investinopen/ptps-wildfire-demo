@@ -1,0 +1,28 @@
+// Nudges the Bootswatch themes (see _quarto.yml) toward https://investinopen.org/.
+// Its headings use BW Gradual, which isn't openly licensed, so Inter stands in for both.
+// https://quarto.org/docs/output-formats/html-themes.html#custom-themes
+
+/*-- scss:defaults --*/
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap");
+
+$font-family-sans-serif: Inter, sans-serif;
+$headings-font-weight: 800;
+
+$navbar-bg: #000000;
+$navbar-fg: #ffffff;
+$navbar-hl: #ffde17;
+
+/*-- scss:rules --*/
+// the logo is black paths with no fill of its own; flip it for the black navbar. It also has
+// no intrinsic size, so it needs an explicit height or it collapses.
+.navbar-logo {
+  filter: invert(1);
+  height: 36px;
+  max-height: none;
+}
+
+// links in the body text's own color, rather than the theme's blue
+:root {
+  --bs-link-color-rgb: var(--bs-body-color-rgb);
+  --bs-link-hover-color-rgb: var(--bs-body-color-rgb);
+}

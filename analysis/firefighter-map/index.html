@@ -26,23 +26,32 @@
         flex: none;
         display: flex;
         flex-wrap: wrap;
+        align-items: center;
         gap: 4px 16px;
-        background: #f8f9fa;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        background: #000000;
         padding: 8px 12px;
-        font: 15px/1.4 sans-serif;
+        font: 15px/1.4 Inter, sans-serif;
       }
       #site-nav a {
-        color: #545555;
+        color: rgba(255, 255, 255, 0.8);
         text-decoration: none;
       }
       #site-nav a:hover,
       #site-nav a[aria-current] {
-        color: #1f4eb6;
+        color: #ffde17;
       }
       #site-nav .site-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
         margin-right: 8px;
+        color: #ffffff;
         font-size: 17px;
+      }
+      /* same as theme.scss: the logo's paths are black with no fill of their own */
+      #site-nav .site-title img {
+        height: 36px;
+        filter: invert(1);
       }
       #disclaimer-banner {
         flex: none;
@@ -256,7 +265,10 @@
   </head>
   <body>
     <nav id="site-nav">
-      <a class="site-title" href="../">PtPS Wildfire Demo</a>
+      <a class="site-title" href="../"
+        ><img src="../img/ioi-logo-dark.svg" alt="Invest in Open Infrastructure" />PtPS
+        Wildfire Demo</a
+      >
       <a href="../rescue-status.html">Dataset rescue statuses</a>
       <a href="../risk.html">Risk calculation</a>
       <a href="../fire-overlap.html">Wildfire overlap</a>

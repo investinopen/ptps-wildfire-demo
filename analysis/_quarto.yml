@@ -8,16 +8,23 @@ project:
     - rescue-status.qmd
     - risk.ipynb
     - fire_overlap.ipynb
-  # published as-is, with its own full-screen layout
+  # published as-is
   resources:
+    # has its own full-screen layout
     - firefighter-map/
+    # the map links to the logo directly
+    - img/
 
 website:
   title: PtPS Wildfire Demo
+  # both from https://investinopen.org/
+  favicon: img/ioi-icon.png
   repo-url: https://github.com/investinopen/ptps-wildfire-demo
   repo-branch: main
   repo-subdir: analysis
   navbar:
+    logo: img/ioi-logo-dark.svg
+    logo-alt: Invest in Open Infrastructure
     left:
       - href: rescue-status.qmd
         text: Dataset rescue statuses
@@ -34,8 +41,8 @@ filters:
 format:
   html:
     theme:
-      light: cosmo
-      dark: darkly
+      light: [cosmo, theme.scss]
+      dark: [darkly, theme.scss]
     toc: true
     # code cells start collapsed, with their outputs still shown
     code-fold: true
