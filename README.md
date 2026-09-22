@@ -25,9 +25,36 @@ What is almost entirely absent in the projects and initiatives we are tracking i
 
 The project will design, build, and document a working end-to-end data infrastructure proof of concept organized around a specific use case: wildfire and disaster identification, prevention, and response. We have selected a fire and disaster relief scenario as our anchor case because it requires data across multiple disciplines including weather, GIS, health markers, environment and more, demonstrating the cross-domain assembly problem while connecting to urgent societal stakes that make visceral the "what happens if this goes dark" argument.
 
+## Output
+
+Data rescue/resilience has, for the most part, focused on a single aspect of the problem: Take data from a source location, make a copy elsewhere. There are various angles that are less explored:
+
+- If someone is looking for a dataset that's been disrupted, how do they find the (appropriate) backup?
+  - This is where the [fallbacks](#fallbacks) come in.
+    - [HTTP proxy](#http-proxy)
+    - [Python package](#python-package)
+    - [Browser extension](#browser-extension)
+- If someone's using backed-up data, how do they verify its integrity (relative to the source)?
+  - This is where [varve](https://github.com/tylere/varve) comes in.
+- What datasets have people not thought to back up yet? How do we avoid losing them?
+  - This is what the [data crawling / passive archiving](CHANGELOG.md#data-crawling) is about.
+- Instead of just making a copy of messy data, can we improve the quality/usability?
+  - Cleaning
+  - Merging
+  - This is what [Catalyst Cooperative](https://catalyst.coop/) is doing.
+- Most solutions assume a high-speed internet connection on a modern device. How can we make relevant data available to those who (urgently) need it but don't have internet or power?
+  - Disaster scenarios
+  - Remote areas
+  - This is what the [maps for firefighters](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map/) is about.
+- What data would be useful to operational folks but is too hard for them to access/use?
+  - Example: [Fire risk data](https://open-climate-risk.readthedocs.io/en/stable/access-data.html#download-options) requires using code / GIS software.
+  - This is also what the [maps for firefighters](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map/) is about.
+
+See also: [design decisions](#design-decisions), which differentiate this project from others.
+
 ## Fallbacks
 
-When source data (from a government, etc.) gets taken down, this can stop its users dead in their tracks. Sometimes the data has been rescued by a third party, but it's not always easy to find, use, or comprehend. This project aims to make that simpler, providing a “fallback” behavior when original data sources aren't available. Essentially, we want to save data users from digging through the [Data Rescue Project (DRP) Portal](https://portal.datarescueproject.org/datasets/), if they even know to look for it.
+When source data (from a government, etc.) gets taken down, this can stop its users dead in their tracks. Sometimes the data has been rescued by a third party, but it's not always easy to find, use, or comprehend. This project aims to make that simpler, providing a "fallback" behavior when original data sources aren't available. Essentially, we want to save data users from digging through the [Data Rescue Project (DRP) Portal](https://portal.datarescueproject.org/datasets/), if they even know to look for it.
 
 ## Use cases
 
