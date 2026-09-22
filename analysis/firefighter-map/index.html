@@ -203,6 +203,10 @@
           ),
           #ffffff;
       }
+      /* matches the low-to-high stops of the image service's own color ramp */
+      #layer-controls .swatch.burn-probability {
+        background: linear-gradient(135deg, #fff0cf, #fc8d59, #7f0000);
+      }
       #layer-controls .swatch.buildings {
         background: #3fb1ce;
         border-color: #1f7a8c;
@@ -251,6 +255,11 @@
             <input type="checkbox" id="fuel-model-toggle" checked />
             <span class="swatch hatch"></span>
             Moderate/high fuel load
+          </label>
+          <label>
+            <input type="checkbox" id="burn-probability-toggle" checked />
+            <span class="swatch burn-probability"></span>
+            Burn probability
           </label>
           <label>
             <input type="checkbox" id="buildings-toggle" checked />
@@ -419,6 +428,25 @@
       };
       const hatchTile = makeHatchTile();
 
+      // annual burn probability, from USFS Wildfire Risk to Communities (Rocky Mountain
+      // Research Station / Pyrologix, public domain):
+      // https://data-usfs.hub.arcgis.com/datasets/usfs::wildfire-risk-to-communities-burn-probability-image-service/about
+      const BURN_PROBABILITY_SERVICE_URL =
+        "https://imagery.geoplatform.gov/iipp/rest/services/Fire_Aviation/USFS_EDW_RMRS_WRC_BurnProbability/ImageServer";
+      // "BurnProbability2024" is the service's own named raster function template -- it's
+      // what the service already renders by default, but naming it explicitly means we keep
+      // getting USFS's classification+color ramp even if that default ever changes
+      const BURN_PROBABILITY_RENDERING_RULE = JSON.stringify({
+        rasterFunction: "BurnProbability2024",
+      });
+
+      const BURN_PROBABILITY_EXPORT_URL =
+        BURN_PROBABILITY_SERVICE_URL +
+        "/exportImage?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=256,256&format=png32" +
+        "&interpolation=RSP_NearestNeighbor&renderingRule=" +
+        encodeURIComponent(BURN_PROBABILITY_RENDERING_RULE) +
+        "&f=image";
+
       // a small right-pointing arrow, registered as a map image below -- line-placed symbols
       // orient a 0deg icon along the line's own direction, so "right" is the convention
       const makeArrowIcon = () => {
@@ -494,6 +522,17 @@
         // a hatch pattern already reads as sparse, unlike a solid fill, so this can sit
         // much closer to fully opaque
         paint: { "raster-opacity": 0.9 },
+      };
+
+      // on by default -- toggled via the layer control; this is USFS's own classification +
+      // color ramp, so unlike the fuel-model hatch above it's a solid fill and needs to stay
+      // translucent enough for roads/hillshade/labels underneath to stay legible
+      const BURN_PROBABILITY_LAYER = {
+        id: "burn-probability",
+        type: "raster",
+        source: "burnProbability",
+        layout: { visibility: "visible" },
+        paint: { "raster-opacity": 0.4 },
       };
 
       const WATER_LAYER = {
@@ -795,11 +834,21 @@
               attribution:
                 '<a href="https://landfire.gov" target="_blank">LANDFIRE</a>',
             },
+            // USFS Wildfire Risk to Communities (public domain); exportImage per-tile via
+            // the {bbox-epsg-3857} template maplibre substitutes for ArcGIS image services
+            burnProbability: {
+              type: "raster",
+              tiles: [BURN_PROBABILITY_EXPORT_URL],
+              tileSize: 256,
+              attribution:
+                '<a href="https://data-usfs.hub.arcgis.com/datasets/usfs::wildfire-risk-to-communities-burn-probability-image-service/about" target="_blank">USFS Wildfire Risk to Communities</a>',
+            },
           },
           glyphs: "https://fonts.undpgeohub.org/fonts/{fontstack}/{range}.pbf",
           // draw order, bottom to top -- reorder these to change what draws over what
           layers: [
             HILLSHADE_LAYER,
+            BURN_PROBABILITY_LAYER,
             FUEL_MODELS_LAYER,
             WATER_LAYER,
             WATERWAYS_LAYER,
@@ -970,6 +1019,7 @@
       };
       bindLayerToggle("hillshade-toggle", ["hillshade"]);
       bindLayerToggle("fuel-model-toggle", ["fuel-models"]);
+      bindLayerToggle("burn-probability-toggle", ["burn-probability"]);
       bindLayerToggle("buildings-toggle", [
         "buildings-fill",
         "buildings-outline",
