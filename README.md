@@ -4,6 +4,17 @@ A networked data infrastructure demo for the "Investing in Open Infra to Safegua
 
 PtPS is the Portfolio to Protect Science.
 
+## Quick links
+
+- Analysis
+  - [Dataset rescue statuses](https://investinopen.github.io/ptps-wildfire-demo/)
+  - [Risk calculation](https://nbviewer.org/github/investinopen/ptps-wildfire-demo/blob/main/analysis/risk.ipynb)
+- [Firefigher map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map/)
+- Tools
+  - [HTTP proxy](#http-proxy)
+  - [Python package](#python-package)
+  - [Browser extension](#browser-extension)
+
 ## Background
 
 We are losing critical scientific knowledge every day. Urgent and increasing threats from funding cuts and policy changes impact the core datasets relied on globally for climate forecasting, public health, research, and scientific discovery.
@@ -113,8 +124,6 @@ flowchart TD
 
 ### Usage
 
-✅ **Implemented**
-
 1. Install dependencies:
    - Python
    - [uv](https://docs.astral.sh/uv/getting-started/installation/)
@@ -158,13 +167,7 @@ flowchart TD
       1. Click **OK**, restart QGIS, and load a web dataset URL (WMS/WFS/WCS).
    1. Instructions for the others to come.
 
-## ~~DuckDB extension~~
-
-The proxy / Python package can be used instead.
-
 ## Python package
-
-✅ **Implemented**
 
 Install the package directly from GitHub using [uv](https://docs.astral.sh/uv/) (preferred):
 
@@ -191,14 +194,13 @@ async with httpx.AsyncClient() as client:
 
 ## [Browser extension](extension/)
 
-✅ **Implemented**
+![modal showing over the EPA EJScreener](img/extension_modal_2026-08-31.png)
 
 ### Usage
 
 It's recommended that you use this alongside the [official Internet Archive Wayback Machine extension](https://web.archive.org/).
 
-1. Install dependencies:
-   - [Node.js](https://nodejs.org/)
+1. Install [Node.js](https://nodejs.org/).
 1. Install npm dependencies:
 
    ```sh
