@@ -59,7 +59,9 @@
         <td>{% if row.wayback_applicable %}{{ row.wayback_url | yes_no }}{% else %}<span class="fst-italic text-body-secondary">N/A</span>{%
           endif %}
         </td>
-        <td>{% if row.drp_applicable %}{{ row.drp_url | yes_no }}{% else %}<span class="fst-italic text-body-secondary">N/A</span>{% endif %}
+        <td>{% if row.drp_applicable %}{{ row.drp_url | yes_no }}{% if row.drp_repositories %}, in
+          {% for repository in row.drp_repositories %}{{ repository.url | link_label(repository.name) }}{% if not
+          loop.last %}, {% endif %}{% endfor %}{% endif %}{% else %}<span class="fst-italic text-body-secondary">N/A</span>{% endif %}
         </td>
       </tr>
       {% endfor %}

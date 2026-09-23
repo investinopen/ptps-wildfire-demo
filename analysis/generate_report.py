@@ -5,6 +5,7 @@ import html
 import math
 from datetime import UTC, datetime
 from pathlib import Path
+from urllib.parse import urlparse
 
 import httpx
 import pandas as pd
@@ -38,6 +39,24 @@ def is_drp_applicable(webpage: pd.Series) -> pd.Series:
     return not_src_coop & not_dryad
 
 
+def get_drp_repositories(resolver: Resolver, drp_url: str | None) -> list[dict]:
+    """The repositories holding a Data Rescue Project dataset's rescued copies, named by
+    host (the Portal doesn't name them), each linked to its copy."""
+
+    if drp_url is None:
+        return []
+
+    matches = resolver.drp_rescues[resolver.drp_rescues["url"] == drp_url]
+    repositories: dict[str, str] = {}
+    for resources in matches["resources"]:
+        for resource in resources if resources is not None else []:
+            host = urlparse(resource["url"] or "").hostname
+            if host:
+                repositories.setdefault(host.removeprefix("www."), resource["url"])
+
+    return [{"name": name, "url": url} for name, url in repositories.items()]
+
+
 async def get_example_data_url_results(
     client: httpx.AsyncClient, resolver: Resolver, datasets_to_check: pd.DataFrame
 ) -> pd.DataFrame:
@@ -56,6 +75,9 @@ async def get_example_data_url_results(
         }
     )
     rescues_df.insert(1, "example_data_url_status", statuses)
+    rescues_df["example_data_url_drp_repositories"] = [
+        get_drp_repositories(resolver, rescue.drp_url) for rescue in rescues
+    ]
 
     results = pd.merge(
         datasets_to_check[["name", "access_type", "example_data_url"]],
@@ -84,6 +106,9 @@ async def get_webpage_results(
         }
     )
     page_rescues_df.insert(1, "webpage_status", page_statuses)
+    page_rescues_df["webpage_drp_repositories"] = [
+        get_drp_repositories(resolver, rescue.drp_url) for rescue in page_rescues
+    ]
 
     results = pd.merge(
         datasets[["name", "description", "webpage"]], page_rescues_df, on="webpage"
@@ -111,6 +136,7 @@ def get_dataset_sections(
                 "wayback_url": dataset["webpage_wayback_url"],
                 "wayback_applicable": True,
                 "drp_url": dataset["webpage_drp_url"],
+                "drp_repositories": dataset["webpage_drp_repositories"],
                 "drp_applicable": dataset["drp_applicable"],
             }
         ]
@@ -125,6 +151,7 @@ def get_dataset_sections(
                         "example_data_url_wayback_applicable"
                     ],
                     "drp_url": dataset["example_data_url_drp_url"],
+                    "drp_repositories": dataset["example_data_url_drp_repositories"],
                     "drp_applicable": dataset["drp_applicable"],
                 }
             )
