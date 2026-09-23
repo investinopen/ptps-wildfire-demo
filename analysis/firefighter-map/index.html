@@ -178,10 +178,43 @@
         }
       }
 
+      /* collapses/expands the sidebar -- styled like MapLibre's own buttons (e.g. zoom) in the opposite corner */
+      #sidebar-toggle {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 1;
+        width: 29px;
+        height: 29px;
+        padding: 0;
+        border: none;
+        border-radius: 4px;
+        background: #ffffff;
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+        font: bold 18px/29px sans-serif;
+        color: #333333;
+        cursor: pointer;
+      }
+      #sidebar-toggle:hover {
+        background: #f2f2f2;
+      }
+      #map-container.sidebar-collapsed #sidebar {
+        display: none;
+      }
+      /* a printout without its legend isn't much use, so it's always there on paper */
+      @media print {
+        #map-container.sidebar-collapsed #sidebar {
+          display: flex;
+        }
+        #sidebar-toggle {
+          display: none;
+        }
+      }
       #live-data-spinner {
         position: absolute;
         top: 12px;
-        left: 12px;
+        /* right of the sidebar toggle */
+        left: 48px;
         z-index: 1;
         width: 22px;
         height: 22px;
@@ -486,6 +519,13 @@
       </aside>
       <div id="map-area">
         <div id="map"></div>
+        <!-- labeled/iconed by sidebar.js -->
+        <button
+          type="button"
+          id="sidebar-toggle"
+          aria-controls="sidebar"
+          aria-expanded="true"
+        ></button>
         <div
           id="live-data-spinner"
           title="Loading water sources & road access…"

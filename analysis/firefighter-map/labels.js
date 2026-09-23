@@ -161,9 +161,10 @@ const coveredRects = (map, elements) => {
     }));
 };
 
-// the elements over the map that labels shouldn't go under -- just MapLibre's own controls in its corners, since the legend etc. are in the sidebar beside it
+// the elements over the map that labels shouldn't go under -- MapLibre's own controls in its corners, and the sidebar toggle (the legend etc. are in the sidebar beside the map)
 const overlayElements = (map) => [
   ...map.getContainer().querySelectorAll(".maplibregl-ctrl"),
+  document.getElementById("sidebar-toggle"),
 ];
 
 // MapLibre has no way to keep labels out of part of the map, and places them under the legend/controls or running off the edge, where they can't be read. So this puts invisible boxes over those spots as symbols of their own, placed ahead of every label (see LABEL_BLOCKERS_LAYER) -- they don't show, but other labels avoid them like they would any other label. Updated whenever what's on screen could have changed.

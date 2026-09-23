@@ -10,12 +10,15 @@ import {
   iconImageData,
 } from "./icons.js";
 import { buildLegendKeys, bindLayerToggles } from "./legend.js";
+import { bindSidebarToggle } from "./sidebar.js";
 import { bindOverpassData } from "./overpass.js";
 import { bindFallbackRoadLabels, bindLabelBlockers } from "./labels.js";
 import { ROAD_LABELS_LAYER } from "./layers.js";
 import { bindPlaceSearch } from "./search.js";
 
 buildLegendKeys();
+// before the map is created, so it starts out at the right width
+bindSidebarToggle();
 
 const CENTER = [-105.375925, 40.052187]; // [lon, lat]
 const ZOOM = 16.03;
