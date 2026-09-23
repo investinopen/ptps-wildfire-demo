@@ -229,17 +229,6 @@
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
       }
-      #layer-controls .swatch.hatch {
-        background:
-          repeating-linear-gradient(
-            135deg,
-            #d62828,
-            #d62828 0.6px,
-            transparent 0.6px,
-            transparent 6px
-          ),
-          #ffffff;
-      }
       /* matches the low-to-high stops of the image service's own color ramp */
       #layer-controls .swatch.burn-probability {
         background: linear-gradient(135deg, #fff0cf, #fc8d59, #7f0000);
@@ -392,11 +381,6 @@
             <input type="checkbox" id="hillshade-toggle" checked />
             <span class="swatch hillshade"></span>
             Topographic shading
-          </label>
-          <label>
-            <input type="checkbox" id="fuel-model-toggle" checked />
-            <span class="swatch hatch"></span>
-            Moderate/high fuel load
           </label>
           <label>
             <input type="checkbox" id="flame-length-toggle" checked />

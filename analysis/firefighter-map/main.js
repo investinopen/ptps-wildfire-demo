@@ -5,11 +5,9 @@ import { PMTILES_URL } from "./buildings.js";
 import {
   BURN_PROBABILITY_EXPORT_URL,
   FLAME_LENGTH_EXPORT_URL,
-  FUEL_MODEL_URL,
 } from "./rasters.js";
 import {
   HILLSHADE_LAYER,
-  FUEL_MODELS_LAYER,
   BURN_PROBABILITY_LAYER,
   FLAME_LENGTH_LAYER,
   WATER_LAYER,
@@ -108,15 +106,6 @@ const map = new maplibregl.Map({
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
       },
-      // LANDFIRE (USGS/USFS, public domain); exportImage per-tile via the
-      // {bbox-epsg-3857} template maplibre substitutes for ArcGIS image services
-      fuelModels: {
-        type: "raster",
-        tiles: [FUEL_MODEL_URL],
-        tileSize: 256,
-        attribution:
-          '<a href="https://landfire.gov" target="_blank">LANDFIRE</a>',
-      },
       // USFS Wildfire Risk to Communities (public domain); exportImage per-tile via
       // the {bbox-epsg-3857} template maplibre substitutes for ArcGIS image services
       burnProbability: {
@@ -142,7 +131,6 @@ const map = new maplibregl.Map({
       HILLSHADE_LAYER,
       BURN_PROBABILITY_LAYER,
       FLAME_LENGTH_LAYER,
-      FUEL_MODELS_LAYER,
       WATER_LAYER,
       WATERWAYS_LAYER,
       BUILDINGS_FILL_LAYER,

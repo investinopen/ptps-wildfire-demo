@@ -51,16 +51,15 @@ registerRoute(
   }),
 );
 
-// vector/raster tiles (roads/water/buildings/hillshade/fuel model/USFS burn probability +
-// flame length) -- lots of small,
-// URL-addressed requests; stale-while-revalidate means a previously-viewed area still
-// renders instantly offline while quietly refreshing in the background when online
+// vector/raster tiles (roads/water/buildings/hillshade/USFS burn probability + flame
+// length) -- lots of small, URL-addressed requests; stale-while-revalidate means a
+// previously-viewed area still renders instantly offline while quietly refreshing in the
+// background when online
 registerRoute(
   ({ url }) =>
     url.hostname === "tiles.openfreemap.org" ||
     url.hostname === "tiles.mapterhorn.com" ||
     url.hostname === "data.source.coop" ||
-    url.hostname === "edcintl.cr.usgs.gov" ||
     url.hostname === "imagery.geoplatform.gov" ||
     url.hostname === "fonts.undpgeohub.org",
   new StaleWhileRevalidate({

@@ -76,7 +76,6 @@ export const bindLayerToggles = (map) => {
     });
   };
   bindLayerToggle("hillshade-toggle", ["hillshade"]);
-  bindLayerToggle("fuel-model-toggle", ["fuel-models"]);
   bindLayerToggle("flame-length-toggle", ["flame-length"]);
   bindLayerToggle("burn-probability-toggle", ["burn-probability"]);
   bindLayerToggle("buildings-toggle", [

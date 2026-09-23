@@ -16,22 +16,10 @@ export const HILLSHADE_LAYER = {
   paint: { "hillshade-exaggeration": 0.3 },
 };
 
-// on by default -- toggled via the layer control
-export const FUEL_MODELS_LAYER = {
-  id: "fuel-models",
-  type: "raster",
-  source: "fuelModels",
-  layout: { visibility: "visible" },
-  // a hatch pattern already reads as sparse, unlike a solid fill, so this can sit
-  // much closer to fully opaque
-  paint: { "raster-opacity": 0.9 },
-};
-
 // off by default -- toggled via the layer control. It's a regional-scale measure, so in
 // fire-prone areas it's uniformly high across a whole neighborhood and just tints the
-// map red. This is USFS's own classification + color ramp, so unlike the fuel-model
-// hatch above it's a solid fill and needs to stay translucent enough for
-// roads/hillshade/labels underneath to stay legible
+// map red. This is USFS's own classification + color ramp, a solid fill that needs to
+// stay translucent enough for roads/hillshade/labels underneath to stay legible
 export const BURN_PROBABILITY_LAYER = {
   id: "burn-probability",
   type: "raster",
