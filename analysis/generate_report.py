@@ -135,9 +135,12 @@ async def get_consolidated_results() -> list[dict]:
         resolver = Resolver(client)
 
         datasets = pd.read_csv(ANALYSIS_DIR / "fire_datasets.csv")
+        # alphabetically, ignoring case
+        datasets = datasets.sort_values("name", key=lambda name: name.str.casefold())
         datasets_to_check = get_datasets_to_check(datasets)
 
-        # webpage rows first, so they come first within each dataset's section
+        # webpage rows first, so they come first within each dataset's section, and
+        # the sections stay in the datasets' order
         results = await asyncio.gather(
             get_url_results(client, resolver, datasets, "webpage"),
             get_url_results(client, resolver, datasets_to_check, "example_data_url"),
