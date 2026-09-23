@@ -244,9 +244,10 @@
       #layer-controls .swatch.burn-probability {
         background: linear-gradient(135deg, #fff0cf, #fc8d59, #7f0000);
       }
+      /* matches the low-to-high stops of RISK_BINS below */
       #layer-controls .swatch.buildings {
-        background: #3fb1ce;
-        border-color: #1f7a8c;
+        background: linear-gradient(135deg, #fee2d5, #fb7c5c, #67000d);
+        border-color: #4d4d4d;
       }
       #layer-controls .swatch.roads {
         background: #e58a1f;
@@ -311,7 +312,7 @@
           <label>
             <input type="checkbox" id="buildings-toggle" checked />
             <span class="swatch buildings"></span>
-            Buildings
+            Buildings, by wildfire risk
           </label>
           <label>
             <input type="checkbox" id="roads-toggle" checked />
@@ -338,13 +339,35 @@
       </div>
     </div>
     <script>
-      // Vector tile archive of merged Google V3 / Microsoft / OSM building footprints,
-      // from https://beta.source.coop/repositories/vida/google-microsoft-osm-open-buildings/
+      // Vector tile archive of Overture building footprints with CarbonPlan's per-building
+      // wildfire risk attached (ODbL), from https://source.coop/carbonplan/carbonplan-ocr
       // Same source + view as:
-      // https://pmtiles.io/#url=https://data.source.coop/vida/google-microsoft-osm-open-buildings/pmtiles/goog_msft_osm.pmtiles&map=16.03/40.052187/-105.375925
+      // https://pmtiles.io/#url=https://data.source.coop/carbonplan/carbonplan-ocr/output/fire-risk/vector/production/v1.1.0/pmtiles/buildings.pmtiles&map=16.03/40.052187/-105.375925
       const PMTILES_URL =
-        "https://data.source.coop/vida/google-microsoft-osm-open-buildings/pmtiles/goog_msft_osm.pmtiles";
-      const SOURCE_LAYER = "goog_msft_osm_building_footprints";
+        "https://data.source.coop/carbonplan/carbonplan-ocr/output/fire-risk/vector/production/v1.1.0/pmtiles/buildings.pmtiles";
+      const SOURCE_LAYER = "risk";
+      // the tiles' properties are numbered rather than named to save space -- "0" is
+      // rps_2011, annual risk to potential structures (%) under current (~2011) climate,
+      // the same score CarbonPlan's own map shows
+      // https://github.com/carbonplan/ocr/blob/main/ocr/pipeline/create_building_pmtiles.py
+      const RISK_PROPERTY = "0";
+      // CarbonPlan's own bins for that score (a lower bound + color each), so a building
+      // reads the same here as on their map -- zero is its own gray, anything above zero
+      // starts at the first bin: https://github.com/carbonplan/ocr-web/blob/main/lib/config.ts
+      // Colors are ColorBrewer's 9-class Reds, resampled to 10 steps.
+      const NO_RISK_COLOR = "#d9d9d9";
+      const RISK_BINS = [
+        [0, "#fff5f0"],
+        [0.01, "#fee2d5"],
+        [0.02, "#fcc3ac"],
+        [0.035, "#fca082"],
+        [0.06, "#fb7c5c"],
+        [0.1, "#f6553d"],
+        [0.2, "#e32f27"],
+        [0.5, "#c3161b"],
+        [1, "#9e0d14"],
+        [3, "#67000d"],
+      ];
       const CENTER = [-105.375925, 40.052187]; // [lon, lat]
       const ZOOM = 16.03;
       const BUILDING_MIN_ZOOM = 14.5;
@@ -750,7 +773,19 @@
         minzoom: BUILDING_MIN_ZOOM,
         layout: { visibility: "visible" },
         paint: {
-          "fill-color": "#3fb1ce",
+          // same shape as CarbonPlan's own expression; a building with no score at all
+          // gets the zero gray too, rather than looking like it's been rated low risk
+          "fill-color": [
+            "case",
+            ["==", ["to-number", ["get", RISK_PROPERTY], 0], 0],
+            NO_RISK_COLOR,
+            [
+              "step",
+              ["to-number", ["get", RISK_PROPERTY]],
+              NO_RISK_COLOR,
+              ...RISK_BINS.flat(),
+            ],
+          ],
         },
       };
 
@@ -762,7 +797,8 @@
         minzoom: BUILDING_MIN_ZOOM,
         layout: { visibility: "visible" },
         paint: {
-          "line-color": "#1f7a8c",
+          // dark enough to separate the palest risk bins from the white/hillshade behind them
+          "line-color": "#4d4d4d",
           "line-width": 1,
         },
       };
@@ -861,6 +897,9 @@
             buildings: {
               type: "vector",
               url: "pmtiles://" + PMTILES_URL,
+              // ODbL requires attributing both CarbonPlan and Overture's footprints
+              attribution:
+                '<a href="https://carbonplan.org/research/climate-risk" target="_blank">CarbonPlan Open Climate Risk</a> (<a href="https://opendatacommons.org/licenses/odbl/" target="_blank">ODbL</a>), <a href="https://overturemaps.org" target="_blank">Overture Maps</a>',
             },
             // fire hydrants aren't in OpenFreeMap's POI set -- fetched live from OSM below
             hydrants: {
