@@ -20,10 +20,6 @@ const buildRiskKey = () => {
   const key = document.getElementById("building-risk-key");
   keyRow(key, NO_RISK_COLOR, "None", "");
   for (const { color, label } of RISK_BINS) keyRow(key, color, label, "");
-  const caption = document.createElement("span");
-  caption.className = "caption";
-  caption.textContent = "Annual risk to structures";
-  key.append(caption);
 };
 
 // one row per class: its hatch, range, and what that flame length means for attack
