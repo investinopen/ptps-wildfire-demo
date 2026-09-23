@@ -161,7 +161,6 @@ export const TRAILS_LAYER = {
   paint: {
     "line-color": "#557a12",
     "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.5, 18, 2.5],
-    "line-dasharray": [2, 1.5],
   },
 };
 
