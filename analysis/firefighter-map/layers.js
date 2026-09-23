@@ -6,25 +6,6 @@ import {
   SOURCE_LAYER,
 } from "./buildings.js";
 
-// a small right-pointing arrow, registered as a map image in main.js -- line-placed symbols
-// orient a 0deg icon along the line's own direction, so "right" is the convention
-export const makeArrowIcon = () => {
-  const size = 14;
-  const canvas = new OffscreenCanvas(size, size);
-  const ctx = canvas.getContext("2d");
-  ctx.fillStyle = "#ffffff";
-  ctx.strokeStyle = "#2b2b2b";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(2, 2);
-  ctx.lineTo(size - 2, size / 2);
-  ctx.lineTo(2, size - 2);
-  ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
-  return ctx.getImageData(0, 0, size, size);
-};
-
 // one const per layer -- keeping these standalone makes the draw order (the `layers`
 // array in main.js) easy to see and rearrange without hunting through each definition
 export const HILLSHADE_LAYER = {
@@ -127,6 +108,7 @@ export const ONEWAY_ARROWS_LAYER = {
   minzoom: 15,
   layout: {
     visibility: "visible",
+    // see icons.js
     "icon-image": "oneway-arrow",
     "icon-size": 0.8,
     "symbol-placement": "line",
@@ -334,6 +316,60 @@ export const POOLS_LAYER = {
     "circle-color": "#6baed6",
     "circle-stroke-color": "#ffffff",
     "circle-stroke-width": 1,
+  },
+};
+
+// access hazards for an engine, fed by live Overpass data (see OVERPASS_GROUPS in
+// overpass.js) at the same street-level zoom as the one-way arrows. Symbols are drawn in
+// icons.js, and always shown even when they overlap -- a hidden gate is worse than a
+// crowded map.
+export const DEAD_ENDS_LAYER = {
+  id: "dead-ends",
+  type: "symbol",
+  source: "dead-ends",
+  minzoom: ONEWAY_ARROWS_LAYER.minzoom,
+  layout: {
+    visibility: "visible",
+    "icon-image": "dead-end",
+    "icon-allow-overlap": true,
+  },
+};
+
+export const GATES_LAYER = {
+  id: "gates",
+  type: "symbol",
+  source: "gates",
+  minzoom: ONEWAY_ARROWS_LAYER.minzoom,
+  layout: {
+    visibility: "visible",
+    "icon-image": "gate",
+    "icon-allow-overlap": true,
+  },
+};
+
+// the limit in a sign-like box at the middle of the bridge, kept upright rather than
+// following the road's angle so it reads like a sign
+export const WEIGHT_LIMITS_LAYER = {
+  id: "weight-limits",
+  type: "symbol",
+  source: "weight-limits",
+  minzoom: ONEWAY_ARROWS_LAYER.minzoom,
+  layout: {
+    visibility: "visible",
+    "symbol-placement": "line-center",
+    "text-field": ["get", "label"],
+    "text-font": ["Noto Sans Bold"],
+    "text-size": 11,
+    "text-rotation-alignment": "viewport",
+    "icon-image": "weight-limit-box",
+    "icon-text-fit": "both",
+    "icon-text-fit-padding": [1, 3, 1, 3],
+    "icon-rotation-alignment": "viewport",
+    "icon-allow-overlap": true,
+    "text-allow-overlap": true,
+  },
+  paint: {
+    "text-color": "#000000",
   },
 };
 

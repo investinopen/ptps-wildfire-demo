@@ -8,7 +8,6 @@ import {
   FUEL_MODEL_URL,
 } from "./rasters.js";
 import {
-  makeArrowIcon,
   HILLSHADE_LAYER,
   FUEL_MODELS_LAYER,
   BURN_PROBABILITY_LAYER,
@@ -28,8 +27,17 @@ import {
   HYDRANTS_LAYER,
   WATER_SOURCES_LAYER,
   POOLS_LAYER,
+  DEAD_ENDS_LAYER,
+  GATES_LAYER,
+  WEIGHT_LIMITS_LAYER,
   PLACE_LABELS_LAYER,
 } from "./layers.js";
+import {
+  ICONS,
+  ICON_PIXEL_RATIO,
+  WEIGHT_LIMIT_BOX_OPTIONS,
+  iconImageData,
+} from "./icons.js";
 import { buildLegendKeys, bindLayerToggles } from "./legend.js";
 import { bindOverpassData } from "./overpass.js";
 import { bindPlaceSearch } from "./search.js";
@@ -87,6 +95,19 @@ const map = new maplibregl.Map({
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
       },
+      // access hazards -- also from OSM in overpass.js, along with the oneway streets
+      gates: {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+      },
+      "dead-ends": {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+      },
+      "weight-limits": {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+      },
       // LANDFIRE (USGS/USFS, public domain); exportImage per-tile via the
       // {bbox-epsg-3857} template maplibre substitutes for ArcGIS image services
       fuelModels: {
@@ -137,6 +158,9 @@ const map = new maplibregl.Map({
       POOLS_LAYER,
       WATER_SOURCES_LAYER,
       HYDRANTS_LAYER,
+      DEAD_ENDS_LAYER,
+      GATES_LAYER,
+      WEIGHT_LIMITS_LAYER,
       PLACE_LABELS_LAYER,
     ],
   },
@@ -144,7 +168,15 @@ const map = new maplibregl.Map({
   zoom: ZOOM,
 });
 
-map.on("load", () => map.addImage("oneway-arrow", makeArrowIcon()));
+// the symbols drawn in icons.js
+map.on("load", () => {
+  for (const name of Object.keys(ICONS)) {
+    map.addImage(name, iconImageData(name), {
+      pixelRatio: ICON_PIXEL_RATIO,
+      ...(name === "weight-limit-box" ? WEIGHT_LIMIT_BOX_OPTIONS : {}),
+    });
+  }
+});
 bindOverpassData(map);
 
 // zoom + compass share the default top-right group; only the zoom buttons get

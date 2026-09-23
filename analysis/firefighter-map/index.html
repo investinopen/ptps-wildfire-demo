@@ -328,6 +328,21 @@
       #layer-controls .swatch.hillshade {
         background: linear-gradient(135deg, #ffffff, #6b6b6b);
       }
+      /* symbols drawn in icons.js -- see buildLegendKeys in legend.js */
+      #layer-controls .swatch.icon {
+        border: none;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+      /* stands in for the boxed limit shown on the bridge itself */
+      #layer-controls .swatch.weight-limit {
+        box-sizing: border-box;
+        background: #ffffff;
+        border-color: #000000;
+        font: bold 10px/14px sans-serif;
+        text-align: center;
+      }
       #layer-controls .swatch.hydrants {
         background: #e0342a;
         border-radius: 50%;
@@ -422,6 +437,21 @@
             Sidewalks, paths, & trails
           </label>
           <label>
+            <input type="checkbox" id="gates-toggle" checked />
+            <span class="swatch icon" data-icon="gate"></span>
+            Gates & barriers
+          </label>
+          <label>
+            <input type="checkbox" id="dead-ends-toggle" checked />
+            <span class="swatch icon" data-icon="dead-end"></span>
+            Dead ends, no turnaround mapped
+          </label>
+          <label>
+            <input type="checkbox" id="weight-limits-toggle" checked />
+            <span class="swatch weight-limit">t</span>
+            Bridge weight limits
+          </label>
+          <label>
             <input type="checkbox" id="hydrants-toggle" checked />
             <span class="swatch hydrants"></span>
             Fire hydrants
@@ -439,7 +469,7 @@
         </div>
         <div
           id="live-data-spinner"
-          title="Loading water sources & one-way streets…"
+          title="Loading water sources & road access…"
           hidden
         ></div>
       </div>

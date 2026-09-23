@@ -1,5 +1,6 @@
 import { NO_RISK_COLOR, RISK_BINS } from "./buildings.js";
 import { FLAME_LENGTH_CLASSES } from "./rasters.js";
+import { iconDataUrl } from "./icons.js";
 
 // the zero-risk gray is labeled "0" under its own cell; every other label sits on the
 // boundary where a bin starts (skipping the first bin's own lower bound of 0, since
@@ -57,6 +58,10 @@ const buildFlameLengthKey = () => {
 export const buildLegendKeys = () => {
   buildRiskKey();
   buildFlameLengthKey();
+  // swatches drawn from the same canvas code as their map symbols
+  for (const swatch of document.querySelectorAll(".swatch[data-icon]")) {
+    swatch.style.backgroundImage = `url(${iconDataUrl(swatch.dataset.icon)})`;
+  }
 };
 
 // wires each legend checkbox to show/hide its layers
@@ -85,4 +90,7 @@ export const bindLayerToggles = (map) => {
   bindLayerToggle("hydrants-toggle", ["hydrants"]);
   bindLayerToggle("water-sources-toggle", ["water-sources"]);
   bindLayerToggle("pools-toggle", ["pools"]);
+  bindLayerToggle("gates-toggle", ["gates"]);
+  bindLayerToggle("dead-ends-toggle", ["dead-ends"]);
+  bindLayerToggle("weight-limits-toggle", ["weight-limits"]);
 };
