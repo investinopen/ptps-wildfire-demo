@@ -2,6 +2,22 @@
 
 Only includes notable updates.
 
+## 2026-09-23
+
+- **[Firefighter map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map/):**
+  - Color buildings by [CarbonPlan's Open Climate Risk](https://carbonplan.org/) score, with a four-color key.
+  - Replace the fuel load and burn probability layers with a flame length hatch.
+  - Add water sources, swimming pools, gates, dead ends, and bridge weight limits (in US tons).
+  - Label every named road in view, and show route numbers as sign-style boxes that stay clear of buildings and house numbers.
+  - Make roads near-black, and driveways and trails thicker and easier to see; hide sidewalks.
+  - Move the legend, attribution, and scale into a collapsible sidebar, with the name of the town(s) in view and an overview map.
+  - Cache map data for offline use.
+  - Upgraded to MapLibre 6, and added tests.
+- [**Analysis:**](README.md#analysis)
+  - Show [what percentage of terminated federal datasets have been rescued](analysis/federal_data_terminations.ipynb).
+  - Added titles and legends to the maps that were missing them.
+- Documented [running the site locally](CONTRIBUTING.md).
+
 ## 2026-09-22
 
 - [**Analysis:**](README.md#analysis) The [risk](https://investinopen.github.io/ptps-wildfire-demo/risk.html) and [wildfire overlap](https://investinopen.github.io/ptps-wildfire-demo/fire-overlap.html) pages are now re-run daily, so the Red Flag Warnings and active fire detections stay current. Their input data is [stored in Git LFS](analysis/README.md#data).
