@@ -59,7 +59,7 @@ describe("building risk colors", () => {
   });
 
   test.each(RISK_BINS.slice(1))(
-    "a score of exactly $min starts the $label bin",
+    "a score of exactly $min starts its own bin",
     ({ min, color: binColor }) => {
       expect(colorFor({ 0: min })).toBe(color(binColor));
     },

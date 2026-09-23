@@ -1,8 +1,7 @@
-import { NO_RISK_COLOR, RISK_BINS } from "./buildings.js";
 import { FLAME_LENGTH_CLASSES, hatchCss } from "./rasters.js";
 import { iconDataUrl } from "./icons.js";
 
-// a row of the legend keys below: a color/pattern cell, a bold name, and a description
+// a row of the flame length key below: a pattern cell, a bold name, and a description
 const keyRow = (key, background, name, description) => {
   const cell = document.createElement("span");
   cell.className = "cell";
@@ -13,13 +12,6 @@ const keyRow = (key, background, name, description) => {
   const detail = document.createElement("span");
   detail.textContent = description;
   key.append(cell, term, detail);
-};
-
-// one row per risk bin, named in words -- plus the zero-risk gray. The bins' percentage ranges (see RISK_BINS) are intentionally left off: crews need to tell low from high at a glance, and exact annual-risk figures would suggest more precision than the underlying model has.
-const buildRiskKey = () => {
-  const key = document.getElementById("building-risk-key");
-  keyRow(key, NO_RISK_COLOR, "None", "");
-  for (const { color, label } of RISK_BINS) keyRow(key, color, label, "");
 };
 
 // one row per class: its hatch, range, and what that flame length means for attack
@@ -33,7 +25,6 @@ const buildFlameLengthKey = () => {
 // filled in by main.js right away rather than after the map, so the legend is complete
 // even if the map itself fails to start (e.g. no WebGL)
 export const buildLegendKeys = () => {
-  buildRiskKey();
   buildFlameLengthKey();
   // swatches drawn from the same canvas code as their map symbols
   for (const swatch of document.querySelectorAll(".swatch[data-icon]")) {

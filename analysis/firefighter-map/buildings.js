@@ -10,13 +10,13 @@ export const SOURCE_LAYER = "risk";
 // the same score CarbonPlan's own map shows
 // https://github.com/carbonplan/ocr/blob/main/ocr/pipeline/create_building_pmtiles.py
 export const RISK_PROPERTY = "0";
-// Bins for that score, each a lower bound (in % annual risk), color, and name for the legend -- zero is its own gray, anything above zero starts at the first bin. A coarser grouping of CarbonPlan's own 10 bins (every boundary here is one of theirs, so a building never lands in a lower bin here than on their map), since crews need to tell low from high at a glance rather than read fine gradations: https://github.com/carbonplan/ocr-web/blob/main/lib/config.ts
+// Bins for that score, each a lower bound (in % annual risk) and color -- zero is its own gray, anything above zero starts at the first bin. A coarser grouping of CarbonPlan's own 10 bins (every boundary here is one of theirs, so a building never lands in a lower bin here than on their map), since crews need to tell low from high at a glance rather than read fine gradations: https://github.com/carbonplan/ocr-web/blob/main/lib/config.ts
 // Colors are picked from ColorBrewer's Reds.
 export const NO_RISK_COLOR = "#d9d9d9";
 export const RISK_BINS = [
-  { min: 0, color: "#fcbba1", label: "Low" },
-  { min: 0.1, color: "#fb6a4a", label: "Moderate" },
-  { min: 0.5, color: "#cb181d", label: "High" },
-  { min: 1, color: "#67000d", label: "Very high" },
+  { min: 0, color: "#fcbba1" },
+  { min: 0.1, color: "#fb6a4a" },
+  { min: 0.5, color: "#cb181d" },
+  { min: 1, color: "#67000d" },
 ];
 export const BUILDING_MIN_ZOOM = 14.5;

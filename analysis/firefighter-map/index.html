@@ -306,7 +306,7 @@
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
       }
-      /* matches the low-to-high stops of RISK_BINS below */
+      /* matches the low-to-high colors of RISK_BINS in buildings.js -- the only key for them, deliberately without the individual levels */
       #layer-controls .swatch.buildings {
         background: linear-gradient(135deg, #fcbba1, #fb6a4a, #67000d);
         border-color: #4d4d4d;
@@ -328,7 +328,7 @@
           #ffffff;
       }
       /* one row per class: its color + what that flame length means for attack */
-      /* the flame length and building risk keys: one row per class, with its color/pattern, a bold name, and a description */
+      /* the flame length key: one row per class, with its pattern, a bold name, and a description */
       .table-key {
         margin: 0 0 4px 21px;
         font-size: 10px;
@@ -369,7 +369,7 @@
         background-repeat: no-repeat;
         background-position: center;
       }
-      /* stands in for the boxed labels on the map itself (weight limits, route numbers) */
+      /* stands in for the boxed weight limits on the map itself */
       #layer-controls .swatch.sign {
         box-sizing: border-box;
         background: #ffffff;
@@ -456,8 +456,6 @@
             <span class="swatch buildings"></span>
             Buildings, by wildfire risk
           </label>
-          <!-- filled in from RISK_BINS below -->
-          <div id="building-risk-key" class="layer-key table-key"></div>
           <label>
             <input type="checkbox" id="roads-toggle" checked />
             <span class="swatch roads"></span>
@@ -472,10 +470,6 @@
             <div class="sub-item">
               <span class="swatch trails"></span>
               Paths & trails
-            </div>
-            <div class="sub-item">
-              <span class="swatch sign route">36</span>
-              Route numbers
             </div>
           </div>
           <label>
