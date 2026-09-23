@@ -10,9 +10,9 @@ const buildRiskKey = () => {
   const cellWidth = parseFloat(
     getComputedStyle(key).getPropertyValue("--cell-width"),
   );
-  // the outer border, then (after the gray cell) its divider + gap -- see #building-risk-key's CSS in index.html
+  // the outer border, then (after the gray cell) its divider line -- see #building-risk-key's CSS in index.html
   const border = 1;
-  const grayOffset = border + cellWidth + 1 + 3;
+  const grayOffset = border + cellWidth + 1;
   const cells = key.querySelector(".cells");
   const ticks = key.querySelector(".ticks");
   const addTick = (text, left) => {
