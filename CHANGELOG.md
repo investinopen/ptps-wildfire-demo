@@ -13,14 +13,14 @@ Only includes notable updates.
   - Move the legend, attribution, and scale into a collapsible sidebar, with the name of the town(s) in view and an overview map.
   - Cache map data for offline use.
   - Upgraded to MapLibre 6, and added tests.
-- [**Analysis:**](README.md#analysis)
+- [**Analysis:**](analysis/)
   - Show [what percentage of terminated federal datasets have been rescued](analysis/federal_data_terminations.ipynb).
   - Added titles and legends to the maps that were missing them.
 - Documented [running the site locally](CONTRIBUTING.md).
 
 ## 2026-09-22
 
-- [**Analysis:**](README.md#analysis) The [risk](https://investinopen.github.io/ptps-wildfire-demo/risk.html) and [wildfire overlap](https://investinopen.github.io/ptps-wildfire-demo/fire-overlap.html) pages are now re-run daily, so the Red Flag Warnings and active fire detections stay current. Their input data is [stored in Git LFS](analysis/README.md#data).
+- [**Analysis:**](analysis/) The [risk](https://investinopen.github.io/ptps-wildfire-demo/risk.html) and [wildfire overlap](https://investinopen.github.io/ptps-wildfire-demo/fire-overlap.html) pages are now re-run daily, so the Red Flag Warnings and active fire detections stay current. Their input data is [stored in Git LFS](analysis/README.md#data).
 
 ## 2026-09-17
 
@@ -29,7 +29,7 @@ Only includes notable updates.
   - Add a "search for a place" box, and make the current view linkable.
   - Add a disclaimer that it's a proof of concept and hasn't been validated.
   - Tune it for printing (keep the legend fills, hide the layer toggles) and for mobile.
-- [**Analysis:**](README.md#analysis)
+- [**Analysis:**](analysis/)
   - [Rank a state's fire weather zones](analysis/risk.ipynb) by a composite of burn probability, burn history, active fire detections, and red flag warnings.
   - [Map every fire perimeter that's burned a state since 1984](analysis/fire_overlap.ipynb), using WUMI perimeters fetched from Dryad.
   - [Fuzzy-match terminated federal datasets](analysis/federal_data_terminations.ipynb) against Data Rescue Project rescues.
@@ -158,7 +158,7 @@ All that said, the best way to know what users want it is to talk to them 🙂 P
     - This pattern can be expanded to save data to other repositories, such as [Dryad](https://datadryad.org/) / [Source Cooperative](https://docs.source.coop/data-upload).
   - Improved URL matching.
   - Improved error handling.
-- [**Analysis:**](README.md#analysis) Expanded the [wildfire dataset status analysis](analysis/fire_datasets.ipynb).
+- [**Analysis:**](analysis/) Expanded the wildfire dataset status analysis.
   - Include [all datasets](analysis/fire_datasets.csv) that don't require authentication.
   - Display the source and rescue status of each data URL and webpage. This is meant to mimic the status dashboard from [**@jring-o**'s prototype](https://github.com/jring-o/scsd).
   - [Publish a report to GitHub Pages.](analysis/README.md#dataset-rescue-status-report)
@@ -166,8 +166,8 @@ All that said, the best way to know what users want it is to talk to them 🙂 P
 ## 2026-08-24
 
 - [**HTTP proxy:**](README.md#http-proxy) Find rescued data in the [Data Rescue Project](https://portal.datarescueproject.org/datasets/) and [Wayback Machine](https://web.archive.org/).
-- [**Analysis:**](README.md#analysis)
-  - [Show the rescue status of the wildfire datasets.](analysis/fire_datasets.ipynb)
+- [**Analysis:**](analysis/)
+  - Show the rescue status of the wildfire datasets.
   - [Show the statuses of the source URLs archived by the Data Rescue Project.](analysis/rescues.ipynb)
 
 ## 2026-08-20
@@ -176,7 +176,7 @@ All that said, the best way to know what users want it is to talk to them 🙂 P
 
 ## 2026-08-10
 
-- [**Analysis:**](README.md#analysis) Started [working with wildfire risk data](analysis/risk.ipynb).
+- [**Analysis:**](analysis/) Started [working with wildfire risk data](analysis/risk.ipynb).
   - Established a DuckDB- and notebook-based workflow for wildfire, burn-probability, active-fire, and climate-risk data.
   - Added nationwide risk and burn-probability visualizations, including state boundaries and red-flag alerts.
 
