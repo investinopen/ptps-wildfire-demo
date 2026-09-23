@@ -1,5 +1,5 @@
 import { NO_RISK_COLOR, RISK_BINS } from "./buildings.js";
-import { FLAME_LENGTH_CLASSES } from "./rasters.js";
+import { FLAME_LENGTH_CLASSES, hatchCss } from "./rasters.js";
 import { iconDataUrl } from "./icons.js";
 
 // the zero-risk gray is labeled "0" under its own cell; every other label sits on the
@@ -43,7 +43,7 @@ const buildFlameLengthKey = () => {
   for (const { color, range, meaning } of FLAME_LENGTH_CLASSES) {
     const cell = document.createElement("span");
     cell.className = "cell";
-    cell.style.background = `rgb(${color.join(",")})`;
+    cell.style.background = hatchCss(color);
     const rangeLabel = document.createElement("span");
     rangeLabel.className = "range";
     rangeLabel.textContent = range;

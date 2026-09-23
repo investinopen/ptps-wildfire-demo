@@ -35,7 +35,9 @@ export const FLAME_LENGTH_LAYER = {
   type: "raster",
   source: "flameLength",
   layout: { visibility: "visible" },
-  paint: { "raster-opacity": 0.5 },
+  // a hatch already reads as sparse, unlike a solid fill, so this can sit close to
+  // fully opaque
+  paint: { "raster-opacity": 0.9 },
 };
 
 export const WATER_LAYER = {

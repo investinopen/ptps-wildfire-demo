@@ -2,10 +2,7 @@
 // other modules, and wires up the controls. MapLibre and pmtiles are loaded as globals
 // by the <script> tags in index.html.
 import { PMTILES_URL } from "./buildings.js";
-import {
-  BURN_PROBABILITY_EXPORT_URL,
-  FLAME_LENGTH_EXPORT_URL,
-} from "./rasters.js";
+import { BURN_PROBABILITY_EXPORT_URL, FLAME_LENGTH_URL } from "./rasters.js";
 import {
   HILLSHADE_LAYER,
   BURN_PROBABILITY_LAYER,
@@ -119,7 +116,7 @@ const map = new maplibregl.Map({
       // identical attribution strings
       flameLength: {
         type: "raster",
-        tiles: [FLAME_LENGTH_EXPORT_URL],
+        tiles: [FLAME_LENGTH_URL],
         tileSize: 256,
         attribution:
           '<a href="https://data-usfs.hub.arcgis.com/datasets/usfs::wildfire-risk-to-communities-burn-probability-image-service/about" target="_blank">USFS Wildfire Risk to Communities</a>',

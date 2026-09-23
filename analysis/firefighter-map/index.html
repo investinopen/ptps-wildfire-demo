@@ -281,8 +281,20 @@
         color: #444444;
       }
       /* matches FLAME_LENGTH_CLASSES below */
+      /* the middle (orange) class's cross-hatch -- see hatchCss in rasters.js */
       #layer-controls .swatch.flame-length {
-        background: linear-gradient(135deg, #fee08b, #bf812d, #543005);
+        background:
+          repeating-linear-gradient(
+            45deg,
+            rgb(240, 120, 0) 0 1.5px,
+            transparent 1.5px 5.66px
+          ),
+          repeating-linear-gradient(
+            -45deg,
+            rgb(240, 120, 0) 0 1.5px,
+            transparent 1.5px 5.66px
+          ),
+          #ffffff;
       }
       /* one row per class: its color + what that flame length means for attack */
       #flame-length-key {
