@@ -342,8 +342,8 @@
         background-repeat: no-repeat;
         background-position: center;
       }
-      /* stands in for the boxed limit shown on the bridge itself */
-      #layer-controls .swatch.weight-limit {
+      /* stands in for the boxed labels on the map itself (weight limits, route numbers) */
+      #layer-controls .swatch.sign {
         box-sizing: border-box;
         background: #ffffff;
         border-color: #000000;
@@ -433,6 +433,10 @@
               <span class="swatch trails"></span>
               Paths & trails
             </div>
+            <div class="sub-item">
+              <span class="swatch sign route">36</span>
+              Route numbers
+            </div>
           </div>
           <label>
             <input type="checkbox" id="gates-toggle" checked />
@@ -446,7 +450,7 @@
           </label>
           <label>
             <input type="checkbox" id="weight-limits-toggle" checked />
-            <span class="swatch weight-limit">t</span>
+            <span class="swatch sign">t</span>
             Bridge weight limits
           </label>
           <label>

@@ -151,6 +151,60 @@ export const TRAILS_LAYER = {
   },
 };
 
+// route numbers as sign-style boxes along the road, e.g. "I-25", "US 36", "Hwy 119" -- also the only label for highway stretches with a number but no name. County roads' refs already read like "CR 52", so they're shown as-is.
+// https://openmaptiles.org/schema/#transportation_name
+export const ROUTE_SHIELDS_LAYER = {
+  id: "route-shields",
+  type: "symbol",
+  source: "roadsSource",
+  "source-layer": "transportation_name",
+  filter: [
+    "all",
+    ["has", "ref"],
+    ["in", ["get", "class"], ["literal", DRIVABLE_ROAD_CLASSES]],
+  ],
+  layout: {
+    visibility: "visible",
+    "symbol-placement": "line",
+    "symbol-spacing": 400,
+    "text-field": [
+      "match",
+      ["get", "network"],
+      "us-interstate",
+      ["concat", "I-", ["get", "ref"]],
+      "us-highway",
+      ["concat", "US ", ["get", "ref"]],
+      "us-state",
+      ["concat", "Hwy ", ["get", "ref"]],
+      ["get", "ref"],
+    ],
+    "text-font": ["Noto Sans Bold"],
+    "text-size": 11,
+    // upright like a sign, rather than following the road
+    "text-rotation-alignment": "viewport",
+    "icon-rotation-alignment": "viewport",
+    // see icons.js
+    "icon-image": [
+      "match",
+      ["get", "network"],
+      "us-interstate",
+      "interstate-box",
+      "sign-box",
+    ],
+    "icon-text-fit": "both",
+    "icon-text-fit-padding": [1, 3, 1, 3],
+  },
+  paint: {
+    "text-color": [
+      "match",
+      ["get", "network"],
+      "us-interstate",
+      "#ffffff",
+      "#000000",
+    ],
+  },
+};
+
 export const ROAD_LABELS_LAYER = {
   id: "road-labels",
   type: "symbol",
@@ -358,7 +412,7 @@ export const WEIGHT_LIMITS_LAYER = {
     "text-font": ["Noto Sans Bold"],
     "text-size": 11,
     "text-rotation-alignment": "viewport",
-    "icon-image": "weight-limit-box",
+    "icon-image": "sign-box",
     "icon-text-fit": "both",
     "icon-text-fit-padding": [1, 3, 1, 3],
     "icon-rotation-alignment": "viewport",

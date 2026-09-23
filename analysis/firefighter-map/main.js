@@ -6,7 +6,7 @@ import { STYLE } from "./style.js";
 import {
   ICONS,
   ICON_PIXEL_RATIO,
-  WEIGHT_LIMIT_BOX_OPTIONS,
+  SIGN_BOX_OPTIONS,
   iconImageData,
 } from "./icons.js";
 import { buildLegendKeys, bindLayerToggles } from "./legend.js";
@@ -40,7 +40,7 @@ map.on("load", () => {
   for (const name of Object.keys(ICONS)) {
     map.addImage(name, iconImageData(name), {
       pixelRatio: ICON_PIXEL_RATIO,
-      ...(name === "weight-limit-box" ? WEIGHT_LIMIT_BOX_OPTIONS : {}),
+      ...(ICONS[name].stretchable ? SIGN_BOX_OPTIONS : {}),
     });
   }
 });

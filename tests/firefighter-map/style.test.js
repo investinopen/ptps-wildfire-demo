@@ -12,6 +12,7 @@ import {
 } from "../../analysis/firefighter-map/buildings.js";
 import {
   BUILDINGS_FILL_LAYER,
+  ROUTE_SHIELDS_LAYER,
   TRAILS_LAYER,
 } from "../../analysis/firefighter-map/layers.js";
 import { STYLE } from "../../analysis/firefighter-map/style.js";
@@ -88,5 +89,42 @@ describe("paths and trails", () => {
 
   test("doesn't pick up roads", () => {
     expect(shown({ class: "minor" })).toBe(false);
+  });
+});
+
+describe("route numbers", () => {
+  const layout = (property) =>
+    expression.createPropertyExpression(
+      ROUTE_SHIELDS_LAYER.layout[property],
+      `route-shields.layout.${property}`,
+      latest.layout_symbol[property],
+    );
+  const label = layout("text-field");
+  const icon = layout("icon-image");
+  const evaluate = (expr, properties) =>
+    expr.value.evaluate({ zoom: 14 }, { properties }).toString();
+  const { filter } = featureFilter(
+    ROUTE_SHIELDS_LAYER.filter,
+    "route-shields.filter",
+  );
+
+  test.each([
+    ["us-interstate", "25", "I-25", "interstate-box"],
+    ["us-highway", "36", "US 36", "sign-box"],
+    ["us-state", "119", "Hwy 119", "sign-box"],
+    // county roads' refs already say what they are
+    ["road", "CR 52", "CR 52", "sign-box"],
+  ])("a %s route %j reads %j on a %s", (network, ref, text, iconName) => {
+    expect(evaluate(label, { network, ref })).toBe(text);
+    expect(evaluate(icon, { network, ref })).toBe(iconName);
+  });
+
+  test("only labels roads that have a number", () => {
+    const shown = (properties) => filter({ zoom: 14 }, { type: 2, properties });
+    expect(shown({ class: "trunk", ref: "119", network: "us-state" })).toBe(
+      true,
+    );
+    expect(shown({ class: "minor", name: "Gold Run Road" })).toBe(false);
+    expect(shown({ class: "path", ref: "123" })).toBe(false);
   });
 });

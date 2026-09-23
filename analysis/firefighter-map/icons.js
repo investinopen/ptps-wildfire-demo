@@ -56,12 +56,11 @@ const drawDeadEnd = (ctx, size) => {
   ctx.fillRect(size * 0.45, size * 0.3, size * 0.1, size * 0.38);
 };
 
-// a white box with a black border, stretched to fit a weight limit's text (like a
-// regulatory sign) -- see WEIGHT_LIMIT_BOX_OPTIONS
-const drawBox = (ctx, size) => {
-  ctx.fillStyle = "#ffffff";
+// a box with a border, stretched to fit a label (a weight limit or route number) like a road sign -- see SIGN_BOX_OPTIONS
+const drawBox = (fill, border) => (ctx, size) => {
+  ctx.fillStyle = fill;
   ctx.fillRect(0, 0, size, size);
-  ctx.strokeStyle = "#000000";
+  ctx.strokeStyle = border;
   ctx.lineWidth = ICON_PIXEL_RATIO;
   ctx.strokeRect(1, 1, size - 2, size - 2);
 };
@@ -71,14 +70,25 @@ export const ICONS = {
   "oneway-arrow": { draw: drawArrow, size: 14 },
   gate: { draw: drawGate, size: 14 },
   "dead-end": { draw: drawDeadEnd, size: 16 },
-  "weight-limit-box": { draw: drawBox, size: 16 },
+  // stretchable ones get SIGN_BOX_OPTIONS when registered (see main.js)
+  "sign-box": {
+    draw: drawBox("#ffffff", "#000000"),
+    size: 16,
+    stretchable: true,
+  },
+  // Interstate blue
+  "interstate-box": {
+    draw: drawBox("#1f4e9c", "#ffffff"),
+    size: 16,
+    stretchable: true,
+  },
 };
 
 // only stretch the box's interior, so its border stays 1px thick however wide the text is
 // https://maplibre.org/maplibre-style-spec/sprite/#stretchx
 const boxInset = 3 * ICON_PIXEL_RATIO;
-const boxSize = ICONS["weight-limit-box"].size * ICON_PIXEL_RATIO;
-export const WEIGHT_LIMIT_BOX_OPTIONS = {
+const boxSize = ICONS["sign-box"].size * ICON_PIXEL_RATIO;
+export const SIGN_BOX_OPTIONS = {
   stretchX: [[boxInset, boxSize - boxInset]],
   stretchY: [[boxInset, boxSize - boxInset]],
   content: [boxInset, boxInset, boxSize - boxInset, boxSize - boxInset],
