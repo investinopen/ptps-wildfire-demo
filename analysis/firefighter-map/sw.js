@@ -18,15 +18,19 @@ const { CacheableResponsePlugin } = workbox.cacheableResponse;
 // only cache real successes -- avoids poisoning a cache with an opaque/error response
 const cacheableResponse = new CacheableResponsePlugin({ statuses: [0, 200] });
 
-// the page itself: NetworkFirst so a fresh deploy is picked up whenever there's a
-// connection, but the last-successfully-loaded version still works offline
+// the page itself and its own scripts (main.js etc.): NetworkFirst so a fresh deploy is
+// picked up whenever there's a connection, but the last-successfully-loaded version still
+// works offline
 registerRoute(
-  ({ request }) => request.mode === "navigate",
+  ({ request, url }) =>
+    request.mode === "navigate" ||
+    (url.origin === self.location.origin && request.destination === "script"),
   new NetworkFirst({
     cacheName: "pages",
     plugins: [
       cacheableResponse,
-      new ExpirationPlugin({ maxEntries: 5, maxAgeSeconds: 60 * 60 * 24 }),
+      // room for the page plus each of its script files
+      new ExpirationPlugin({ maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 }),
     ],
   }),
 );
@@ -71,10 +75,10 @@ registerRoute(
   }),
 );
 
-// water sources/oneway (Overpass, or its fallback mirror) and place search (Nominatim) are live, safety-relevant data
-// -- always prefer the network, and only fall back to a short-lived cache entry if
-// there's genuinely no connection, so a stale hydrant or one-way status is never shown
-// in preference to a fresh one
+// water sources/oneway (Overpass, or its fallback mirror) and place search (Nominatim)
+// are live, safety-relevant data -- always prefer the network, and only fall back to a
+// short-lived cache entry if there's genuinely no connection, so a stale hydrant or
+// one-way status is never shown in preference to a fresh one
 registerRoute(
   ({ url }) =>
     url.hostname === "overpass-api.de" ||
