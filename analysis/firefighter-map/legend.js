@@ -82,9 +82,15 @@ export const bindLayerToggles = (map) => {
     "buildings-outline",
     "housenumbers",
   ]);
-  bindLayerToggle("roads-toggle", ["roads", "road-labels", "oneway-arrows"]);
-  bindLayerToggle("driveways-toggle", ["driveways"]);
-  bindLayerToggle("trails-toggle", ["trails", "trail-labels"]);
+  // driveways and paths are listed under roads, without toggles of their own
+  bindLayerToggle("roads-toggle", [
+    "roads",
+    "road-labels",
+    "oneway-arrows",
+    "driveways",
+    "trails",
+    "trail-labels",
+  ]);
   bindLayerToggle("hydrants-toggle", ["hydrants"]);
   bindLayerToggle("water-sources-toggle", ["water-sources"]);
   bindLayerToggle("pools-toggle", ["pools"]);

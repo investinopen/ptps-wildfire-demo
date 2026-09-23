@@ -212,11 +212,25 @@
         flex-direction: column;
         gap: 4px;
       }
-      #layer-controls label {
+      #layer-controls label,
+      #layer-controls .sub-item {
         display: flex;
         align-items: center;
         gap: 5px;
         white-space: nowrap;
+      }
+      /* indented to line up with the text of the row they belong to (past its checkbox and swatch) */
+      #layer-controls .sub-items {
+        margin-left: 48px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      /* on paper, minus the 25px the hidden checkbox (and its gap) took up, so they still line up with their row's text -- after the rule above, so it wins */
+      @media print {
+        #layer-controls .sub-items {
+          margin-left: 23px;
+        }
       }
       #layer-controls .swatch {
         width: 16px;
@@ -409,16 +423,17 @@
             <span class="swatch roads"></span>
             Roads
           </label>
-          <label>
-            <input type="checkbox" id="driveways-toggle" checked />
-            <span class="swatch driveways"></span>
-            Driveways & service roads
-          </label>
-          <label>
-            <input type="checkbox" id="trails-toggle" checked />
-            <span class="swatch trails"></span>
-            Paths & trails
-          </label>
+          <!-- shown/hidden along with roads, rather than toggled on their own -->
+          <div class="layer-key sub-items">
+            <div class="sub-item">
+              <span class="swatch driveways"></span>
+              Driveways & service roads
+            </div>
+            <div class="sub-item">
+              <span class="swatch trails"></span>
+              Paths & trails
+            </div>
+          </div>
           <label>
             <input type="checkbox" id="gates-toggle" checked />
             <span class="swatch icon" data-icon="gate"></span>
