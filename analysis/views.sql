@@ -13,7 +13,7 @@ ST_Transform(geom, source_crs, target_crs, always_xy := true);
 CREATE OR REPLACE VIEW burn_prob_1km AS
 SELECT *,
     ST_MakePoint(longitude, latitude) AS point
-FROM read_parquet('data/burn_prob_1km/*.parquet');
+FROM read_parquet('data/burn_prob_1km.parquet');
 
 COMMENT ON VIEW burn_prob_1km IS 'https://docs.carbonplan.org/ocr/en/latest/reference/data-schema.html#raster-tensor-datasets
 

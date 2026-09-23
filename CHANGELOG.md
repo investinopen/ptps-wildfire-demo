@@ -2,6 +2,10 @@
 
 Only includes notable updates.
 
+## 2026-09-22
+
+- [**Analysis:**](README.md#analysis) The [risk](https://investinopen.github.io/ptps-wildfire-demo/risk.html) and [wildfire overlap](https://investinopen.github.io/ptps-wildfire-demo/fire-overlap.html) pages are now re-run daily, so the Red Flag Warnings and active fire detections stay current. Their input data is [stored in Git LFS](analysis/README.md#data).
+
 ## 2026-09-17
 
 - **[Wildfire risk map:](analysis/README.md#firefigher-map)** [Published a printable map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map/) meant to be handed to small/rural fire departments, combining building footprints, fuel load, fire hydrants, roads, driveways, and trails for an area.

@@ -9,7 +9,9 @@
 .mypy_cache/
 .python-version
 __pycache__
-data/
+**/data/*
+!analysis/data/burn_prob_1km.parquet
+!analysis/data/wumi_perimeters/
 data_cache/
 
 .coverage

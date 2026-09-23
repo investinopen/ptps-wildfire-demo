@@ -28,6 +28,20 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v7
 
+      # the notebooks' input data is in Git LFS; cache it rather than downloading it every
+      # run, since downloads count against the LFS bandwidth quota
+      - name: List LFS objects
+        run: git lfs ls-files --long | cut -d' ' -f1 | sort > .lfs-assets-id
+
+      - name: Restore LFS cache
+        uses: actions/cache@v6
+        with:
+          path: .git/lfs
+          key: lfs-${{ hashFiles('.lfs-assets-id') }}
+
+      - name: Pull LFS objects
+        run: git lfs pull
+
       - name: Install uv
         uses: astral-sh/setup-uv@v10.0.1
         with:
@@ -46,10 +60,10 @@ jobs:
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      # generates the report (rescue-status.qmd); notebooks are rendered from their committed
-      # outputs, not re-executed
+      # generates the report (rescue-status.qmd) and re-executes the notebooks, so their live
+      # layers are current
       - name: Render site
-        run: uv run quarto render analysis
+        run: uv run quarto render analysis --execute
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5

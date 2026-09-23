@@ -1,5 +1,9 @@
 # Analysis
 
+## Data
+
+The notebooks' static inputs in [`data/`](data/) are stored with [Git LFS](https://git-lfs.com/). Install it (`brew install git-lfs && git lfs install`) before cloning, or run `git lfs pull` in an existing clone. The download notebooks linked below are only needed to refresh that data or to change `STATE`.
+
 ## [Wildfire risk](risk.ipynb)
 
 Brings four datasets of very different velocity together on one map, and ranks a state's
@@ -21,7 +25,7 @@ Requires [DuckDB](https://duckdb.org/).
 
 For Python dependencies managed with `uv`, use a regular CPython build (for example `3.14.6`), not a free-threaded build (for example `3.14.6t` / `3.14.6+freethreaded`). Some binary packages used by this project (such as `lonboard` -> `geoarrow-rust-core`) do not currently publish free-threaded wheels.
 
-1. [Download the burn probability data.](burn_prob.ipynb)
+1. [Download the burn probability data.](burn_prob.ipynb) Already in [`data/`](#data).
 1. [Run the analysis.](risk.ipynb)
 
 The first run binds every view, which means fetching from every endpoint and takes a few
@@ -33,7 +37,7 @@ earlier result, and nothing is written to disk -- capture anything you want to k
 
 Draws every mapped fire perimeter in a state since 1984 as a translucent polygon on one map, so places that have burned more than once show up darker where perimeters stack. Perimeters come from [WUMI](https://datadryad.org/dataset/doi:10.5061/dryad.63xsj3vd4), a merge of MTBS, CalFire, USGS, WFIGS, and IAFPH.
 
-1. [Download the fire perimeters.](wumi_perimeters.ipynb) Dryad's website sits behind bot detection, but its REST API doesn't -- this step needs a [Dryad API account](https://datadryad.org/api#?route=overview--api-accounts) (`DRYAD_CLIENT_ID`/`DRYAD_SECRET` in `.env`; see `.env.sample`) rather than a manual download.
+1. [Download the fire perimeters.](wumi_perimeters.ipynb) Already in [`data/`](#data) for Wyoming. Dryad's website sits behind bot detection, but its REST API doesn't -- this step needs a [Dryad API account](https://datadryad.org/api#?route=overview--api-accounts) (`DRYAD_CLIENT_ID`/`DRYAD_SECRET` in `.env`; see `.env.sample`) rather than a manual download.
 1. [Run the analysis.](fire_overlap.ipynb)
 
 ## Dataset rescue status report
@@ -42,7 +46,7 @@ Draws every mapped fire perimeter in a state since 1984 as a translucent polygon
 
 ## GitHub Pages site
 
-A [homepage](index.qmd) introducing the project, the dataset rescue status report, the [risk](risk.ipynb) and [wildfire overlap](fire_overlap.ipynb) notebooks (from their committed outputs), and the [firefighter map](firefighter-map/) are published together as a [Quarto](https://quarto.org/) website, configured in [`_quarto.yml`](_quarto.yml). It's [published automatically](../.github/workflows/publish-site.yml). To preview locally, [install Quarto](https://quarto.org/docs/get-started/), then from the repository root run:
+A [homepage](index.qmd) introducing the project, the dataset rescue status report, the [risk](risk.ipynb) and [wildfire overlap](fire_overlap.ipynb) notebooks, and the [firefighter map](firefighter-map/) are published together as a [Quarto](https://quarto.org/) website, configured in [`_quarto.yml`](_quarto.yml). It's [published automatically](../.github/workflows/publish-site.yml) when it changes and daily, re-executing the notebooks so their live layers stay current. To preview locally, [install Quarto](https://quarto.org/docs/get-started/), then from the repository root run:
 
 ```sh
 uv run quarto preview analysis
