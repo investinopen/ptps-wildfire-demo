@@ -103,6 +103,14 @@
       #map-scale {
         margin-top: auto;
       }
+      #map-places {
+        margin: 0;
+        font-size: 17px;
+        line-height: 1.25;
+      }
+      #map-places[hidden] {
+        display: none;
+      }
       #map-scale .maplibregl-ctrl-scale {
         margin: 0;
       }
@@ -421,6 +429,8 @@
     <div id="map-container">
       <!-- the legend, scale, and attribution, beside the map rather than over it -->
       <aside id="sidebar">
+        <!-- the town(s) in view, filled in by places.js -->
+        <h1 id="map-places" hidden></h1>
         <div id="layer-controls">
           <label>
             <input type="checkbox" id="hillshade-toggle" checked />
