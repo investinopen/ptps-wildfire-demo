@@ -19,7 +19,11 @@ const OVERPASS_URLS = [
   "https://overpass-api.de/api/interpreter",
   // VK Maps' public instance, which also allows cross-origin requests
   "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+  // Private.coffee's public instance -- no rate limits, per the wiki page above
+  "https://overpass.private.coffee/api/interpreter",
 ];
+// how long to wait on one server before moving on to the next, so one that's hanging (rather than failing outright) doesn't hold up the others. A bit longer than the queries' own [timeout:25].
+const OVERPASS_REQUEST_TIMEOUT_MS = 30 * 1000;
 // how long to skip a server after it rate-limits or fails, unless it says otherwise
 // via Retry-After
 const OVERPASS_COOLDOWN_MS = 60 * 1000;
@@ -53,7 +57,12 @@ const fetchOverpass = async (query, signal) => {
       // to keep the URL short.
       const response = await fetch(
         `${url}?data=${encodeURIComponent(query.replace(/\s+/g, " "))}`,
-        { signal },
+        {
+          signal: AbortSignal.any([
+            signal,
+            AbortSignal.timeout(OVERPASS_REQUEST_TIMEOUT_MS),
+          ]),
+        },
       );
       if (response.ok) return await response.json();
       const retryAfterSeconds = Number(response.headers.get("Retry-After"));
@@ -67,7 +76,7 @@ const fetchOverpass = async (query, signal) => {
       console.warn(`Overpass ${url} responded ${response.status}`);
     } catch (error) {
       if (signal.aborted) throw error;
-      // network failure, or a non-JSON (e.g. HTML error page) response
+      // network failure, timeout, or a non-JSON (e.g. HTML error page) response
       overpassCooldowns.set(url, Date.now() + OVERPASS_COOLDOWN_MS);
       console.warn(`Overpass ${url} failed:`, error);
     }

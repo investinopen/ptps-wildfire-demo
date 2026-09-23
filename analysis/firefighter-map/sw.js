@@ -51,9 +51,7 @@ registerRoute(
   }),
 );
 
-// vector/raster tiles (roads/water/buildings/hillshade/USFS flame length) -- lots of
-// small, URL-addressed requests; stale-while-revalidate means a previously-viewed area
-// still renders instantly offline while quietly refreshing in the background when online
+// vector/raster tiles (roads/water/buildings/hillshade/USFS flame length) -- lots of small, URL-addressed requests; stale-while-revalidate means a previously-viewed area still renders instantly offline while quietly refreshing in the background when online
 registerRoute(
   ({ url }) =>
     url.hostname === "tiles.openfreemap.org" ||
@@ -73,7 +71,7 @@ registerRoute(
   }),
 );
 
-// water sources/road access (Overpass, or its fallback mirror -- queried with GET so
+// water sources/road access (Overpass, or its fallback mirrors -- queried with GET so
 // they can be cached here, see overpass.js) and place search (Nominatim) are live,
 // safety-relevant data -- always prefer the network, and only fall back to a
 // short-lived cache entry if there's genuinely no connection, so a stale hydrant or
@@ -82,6 +80,7 @@ registerRoute(
   ({ url }) =>
     url.hostname === "overpass-api.de" ||
     url.hostname === "maps.mail.ru" ||
+    url.hostname === "overpass.private.coffee" ||
     url.hostname === "nominatim.openstreetmap.org",
   new NetworkFirst({
     cacheName: "live-data",
