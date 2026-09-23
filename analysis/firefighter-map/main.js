@@ -72,11 +72,12 @@ map.addControl(
     container: document.getElementById("map-container"),
   }),
 );
-map.addControl(
-  new maplibregl.ScaleControl({ maxWidth: 150, unit: "imperial" }),
-  "bottom-left",
-);
-// in the sidebar rather than a corner of the map, so it doesn't cover it -- onAdd() builds a control's element (and keeps it updated) without placing it anywhere
+// in the sidebar rather than corners of the map, so they don't cover it -- onAdd() builds a control's element (and keeps it updated) without placing it anywhere
+document
+  .getElementById("map-scale")
+  .append(
+    new maplibregl.ScaleControl({ maxWidth: 150, unit: "imperial" }).onAdd(map),
+  );
 document
   .getElementById("map-attribution")
   .append(new maplibregl.AttributionControl({ compact: false }).onAdd(map));
