@@ -320,8 +320,12 @@
       #layer-controls .swatch.driveways {
         background: #6a2fb8;
       }
+      /* a dashed line across the middle, like the paths on the map */
       #layer-controls .swatch.trails {
-        background: #557a12;
+        background:
+          repeating-linear-gradient(90deg, #557a12 0 5px, transparent 5px 8px)
+            center / 100% 3px no-repeat,
+          #ffffff;
       }
       #layer-controls .swatch.hillshade {
         background: linear-gradient(135deg, #ffffff, #6b6b6b);
