@@ -74,8 +74,9 @@ registerRoute(
   }),
 );
 
-// water sources/oneway (Overpass, or its fallback mirror) and place search (Nominatim)
-// are live, safety-relevant data -- always prefer the network, and only fall back to a
+// water sources/road access (Overpass, or its fallback mirror -- queried with GET so
+// they can be cached here, see overpass.js) and place search (Nominatim) are live,
+// safety-relevant data -- always prefer the network, and only fall back to a
 // short-lived cache entry if there's genuinely no connection, so a stale hydrant or
 // one-way status is never shown in preference to a fresh one
 registerRoute(

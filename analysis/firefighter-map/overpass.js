@@ -26,6 +26,19 @@ const OVERPASS_COOLDOWN_MS = 60 * 1000;
 // fraction of the view's width/height added on each side of what's fetched
 const OVERPASS_MARGIN = 0.5;
 
+// widens bounds out to a grid one map tile wide at the current zoom, so views that
+// are close to each other produce the exact same query -- which is what lets a cached
+// response be found again offline, since the cache is keyed on the full URL
+const snapToGrid = (bounds, zoom) => {
+  const step = 360 / 2 ** Math.floor(zoom);
+  const down = (n) => Math.floor(n / step) * step;
+  const up = (n) => Math.ceil(n / step) * step;
+  return new maplibregl.LngLatBounds(
+    [down(bounds.getWest()), down(bounds.getSouth())],
+    [up(bounds.getEast()), up(bounds.getNorth())],
+  );
+};
+
 // server URL -> timestamp before which it shouldn't be asked again
 const overpassCooldowns = new Map();
 
@@ -35,11 +48,13 @@ const fetchOverpass = async (query, signal) => {
   );
   for (const url of available) {
     try {
-      const response = await fetch(url, {
-        method: "POST",
-        body: "data=" + encodeURIComponent(query),
-        signal,
-      });
+      // GET rather than POST so the service worker can cache it for offline use (see
+      // sw.js) -- the Cache API can't store responses to POSTs. Whitespace is collapsed
+      // to keep the URL short.
+      const response = await fetch(
+        `${url}?data=${encodeURIComponent(query.replace(/\s+/g, " "))}`,
+        { signal },
+      );
       if (response.ok) return await response.json();
       const retryAfterSeconds = Number(response.headers.get("Retry-After"));
       overpassCooldowns.set(
@@ -265,9 +280,12 @@ export const bindOverpassData = (map) => {
 
     const latMargin = (view.getNorth() - view.getSouth()) * OVERPASS_MARGIN;
     const lngMargin = (view.getEast() - view.getWest()) * OVERPASS_MARGIN;
-    const bounds = new maplibregl.LngLatBounds(
-      [view.getWest() - lngMargin, view.getSouth() - latMargin],
-      [view.getEast() + lngMargin, view.getNorth() + latMargin],
+    const bounds = snapToGrid(
+      new maplibregl.LngLatBounds(
+        [view.getWest() - lngMargin, view.getSouth() - latMargin],
+        [view.getEast() + lngMargin, view.getNorth() + latMargin],
+      ),
+      zoom,
     );
     const bbox = `(${bounds.getSouth()},${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()})`;
     const query =
