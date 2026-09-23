@@ -304,7 +304,7 @@
             Moderate/high fuel load
           </label>
           <label>
-            <input type="checkbox" id="burn-probability-toggle" checked />
+            <input type="checkbox" id="burn-probability-toggle" />
             <span class="swatch burn-probability"></span>
             Burn probability
           </label>
@@ -571,14 +571,16 @@
         paint: { "raster-opacity": 0.9 },
       };
 
-      // on by default -- toggled via the layer control; this is USFS's own classification +
-      // color ramp, so unlike the fuel-model hatch above it's a solid fill and needs to stay
-      // translucent enough for roads/hillshade/labels underneath to stay legible
+      // off by default -- toggled via the layer control. It's a regional-scale measure, so in
+      // fire-prone areas it's uniformly high across a whole neighborhood and just tints the
+      // map red. This is USFS's own classification + color ramp, so unlike the fuel-model
+      // hatch above it's a solid fill and needs to stay translucent enough for
+      // roads/hillshade/labels underneath to stay legible
       const BURN_PROBABILITY_LAYER = {
         id: "burn-probability",
         type: "raster",
         source: "burnProbability",
-        layout: { visibility: "visible" },
+        layout: { visibility: "none" },
         paint: { "raster-opacity": 0.4 },
       };
 
