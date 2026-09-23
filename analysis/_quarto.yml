@@ -1,5 +1,11 @@
 # GitHub Pages site -- see ../.github/workflows/publish-site.yml
 # https://quarto.org/docs/websites/
+
+# Never execute code during a site render; pages use the results saved in _freeze/ (for .qmd files) or in the notebooks themselves (.ipynb). Those come from the "Refresh notebooks" workflow (../.github/workflows/refresh-notebooks.yml), which renders each page on its own -- a single-file render always executes. Locally, `quarto preview` of a single file still executes it.
+# https://quarto.org/docs/projects/code-execution.html#freeze
+execute:
+  freeze: true
+
 project:
   type: website
   # everything else in this directory is a working notebook/script, not a page

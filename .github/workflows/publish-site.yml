@@ -1,5 +1,7 @@
 name: Publish Pages site
 
+# Renders the site without executing any code: the pages that run against live data are executed by refresh-notebooks.yml, and their results are pulled in from its latest successful run. So publishing doesn't depend on any outside data source being up.
+
 on:
   push:
     branches:
@@ -8,14 +10,20 @@ on:
       - analysis/**
       - ptps_wildfire_demo/**
       - .github/workflows/publish-site.yml
-  schedule:
-    - cron: "0 0 * * *"
+  # picks up freshly executed pages
+  workflow_run:
+    workflows:
+      - Refresh notebooks
+    types:
+      - completed
   workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
+  # to download the refresh workflow's artifact
+  actions: read
 
 concurrency:
   group: pages
@@ -23,25 +31,32 @@ concurrency:
 
 jobs:
   build:
+    # a failed refresh leaves nothing new to publish
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
 
-      # the notebooks' input data is in Git LFS; cache it rather than downloading it every
-      # run, since downloads count against the LFS bandwidth quota
-      - name: List LFS objects
-        run: git lfs ls-files --long | cut -d' ' -f1 | sort > .lfs-assets-id
+      - name: Find the latest refreshed pages
+        id: refresh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run_id=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow refresh-notebooks.yml --branch main --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+          echo "run-id=$run_id" >> "$GITHUB_OUTPUT"
 
-      - name: Restore LFS cache
-        uses: actions/cache@v6
+      # Overwrites the checked-out notebooks with their executed versions, and adds _freeze/ for the .qmd. A notebook edited since that refresh shows its old version until the refresh that the edit triggers finishes (which then republishes).
+      - name: Download refreshed pages
+        if: steps.refresh.outputs.run-id != ''
+        uses: actions/download-artifact@v8
         with:
-          path: .git/lfs
-          key: lfs-${{ hashFiles('.lfs-assets-id') }}
+          name: executed-pages
+          path: analysis
+          run-id: ${{ steps.refresh.outputs.run-id }}
+          github-token: ${{ github.token }}
 
-      - name: Pull LFS objects
-        run: git lfs pull
-
+      # Python is only needed if there's no refreshed copy of a .qmd page (e.g. its artifact expired), in which case the render executes it after all
       - name: Install uv
         uses: astral-sh/setup-uv@v10.0.1
         with:
@@ -60,10 +75,9 @@ jobs:
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      # generates the report (rescue-status.qmd) and re-executes the notebooks, so their live
-      # layers are current
+      # no --execute: with `freeze: true` (see analysis/_quarto.yml), pages use their saved results
       - name: Render site
-        run: uv run quarto render analysis --execute
+        run: uv run quarto render analysis
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5

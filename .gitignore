@@ -20,6 +20,8 @@ data_cache/
 
 # Quarto site (analysis/_quarto.yml)
 analysis/_site/
+# executed notebook results -- made by the "Refresh notebooks" workflow and passed to publishing as an artifact, rather than committed
+analysis/_freeze/
 # intermediate files, moved into _site/ once rendering finishes
 analysis/site_libs/
 analysis/*_files/

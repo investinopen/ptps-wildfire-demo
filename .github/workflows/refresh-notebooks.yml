@@ -1,0 +1,112 @@
+name: Refresh notebooks
+
+# Executes the site's pages that run code against live data, and passes the results to publish-site.yml as an artifact. Kept separate from publishing so an outage at one of the data sources only means slightly staler pages, rather than blocking the whole site (including the firefighter map) from deploying.
+
+on:
+  push:
+    branches:
+      - main
+    # anything that changes what the pages compute
+    paths:
+      - analysis/*.ipynb
+      - analysis/*.qmd
+      - analysis/*.sql
+      - analysis/*.py
+      - analysis/data/**
+      - ptps_wildfire_demo/**
+      - pyproject.toml
+      - uv.lock
+      - .github/workflows/refresh-notebooks.yml
+  # daily, for the live layers (Red Flag Warnings, active fires, rescue statuses)
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# a newer refresh makes an in-progress one moot
+concurrency:
+  group: refresh-notebooks
+  cancel-in-progress: true
+
+env:
+  # where DuckDB's cache_httpfs extension (see analysis/setup.sql) keeps downloaded data by default
+  DUCKDB_CACHE_DIR: /tmp/duckdb_cache_httpfs_cache
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      # the notebooks' input data is in Git LFS; cache it rather than downloading it every run, since downloads count against the LFS bandwidth quota
+      - name: List LFS objects
+        run: git lfs ls-files --long | cut -d' ' -f1 | sort > .lfs-assets-id
+
+      - name: Restore LFS cache
+        uses: actions/cache@v6
+        with:
+          path: .git/lfs
+          key: lfs-${{ hashFiles('.lfs-assets-id') }}
+
+      - name: Pull LFS objects
+        run: git lfs pull
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.0.1
+        with:
+          version: latest
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      # https://quarto.org/docs/publishing/github-pages.html#github-action
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      # Remote data DuckDB has already downloaded, so the static sources (fire zones, MTBS perimeters, CarbonPlan) are only fetched once. The live feeds are excluded from this cache in views.sql. Each run saves a new entry, and restores the most recent one.
+      - name: Restore DuckDB download cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ env.DUCKDB_CACHE_DIR }}
+          key: duckdb-httpfs-${{ github.run_id }}
+          restore-keys: duckdb-httpfs-
+
+      # so there's always something to save, even if a run fails before DuckDB creates it
+      - name: Create DuckDB download cache directory
+        run: mkdir -p "$DUCKDB_CACHE_DIR"
+
+      # A single-file render always executes, even with `freeze: true` (see analysis/_quarto.yml). This saves the .qmd's results to analysis/_freeze/ and writes the .ipynb's outputs back into the notebook.
+      - name: Execute pages
+        run: |
+          for page in rescue-status.qmd risk.ipynb fire_overlap.ipynb; do
+            uv run quarto render "analysis/$page" --execute
+          done
+
+      # even after a failure, so whatever did download doesn't have to be again
+      - name: Save DuckDB download cache
+        if: ${{ !cancelled() }}
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ env.DUCKDB_CACHE_DIR }}
+          key: duckdb-httpfs-${{ github.run_id }}
+
+      - name: Upload executed pages
+        uses: actions/upload-artifact@v7
+        with:
+          name: executed-pages
+          # stored relative to analysis/, where publish-site.yml puts them back
+          path: |
+            analysis/_freeze/
+            analysis/risk.ipynb
+            analysis/fire_overlap.ipynb
+          if-no-files-found: error
+          retention-days: 30
