@@ -111,6 +111,11 @@
       #map-places[hidden] {
         display: none;
       }
+      #overview-map {
+        flex: none;
+        height: 160px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+      }
       #map-scale .maplibregl-ctrl-scale {
         margin: 0;
       }
@@ -431,6 +436,8 @@
       <aside id="sidebar">
         <!-- the town(s) in view, filled in by places.js -->
         <h1 id="map-places" hidden></h1>
+        <!-- see overview.js -->
+        <div id="overview-map"></div>
         <div id="layer-controls">
           <label>
             <input type="checkbox" id="hillshade-toggle" checked />

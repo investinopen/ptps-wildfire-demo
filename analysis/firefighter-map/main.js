@@ -12,6 +12,7 @@ import {
 import { buildLegendKeys, bindLayerToggles } from "./legend.js";
 import { bindSidebarToggle } from "./sidebar.js";
 import { bindPlaceHeading } from "./places.js";
+import { bindOverviewMap } from "./overview.js";
 import { bindOverpassData } from "./overpass.js";
 import { bindFallbackRoadLabels, bindLabelBlockers } from "./labels.js";
 import { ROAD_LABELS_LAYER } from "./layers.js";
@@ -52,6 +53,7 @@ map.on("load", () => {
 });
 bindOverpassData(map);
 bindPlaceHeading(map);
+bindOverviewMap(map);
 bindLabelBlockers(map, { sourceId: "label-blockers" });
 bindFallbackRoadLabels(map, {
   sourceId: "road-label-fallbacks",
