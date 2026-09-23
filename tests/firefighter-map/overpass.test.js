@@ -292,10 +292,18 @@ test("lineLengthMeters", () => {
 });
 
 test.each([
-  ["10", "10 t"],
-  [" 5.5 ", "5.5 t"],
-  ["10 st", "10 st"],
-  ["20000 lbs", "20000 lbs"],
+  // short tons, as US bridges are usually tagged
+  ["15 st", "15 tons"],
+  ["3.5 st", "3.5 tons"],
+  ["5 tons", "5 tons"],
+  // metric tonnes (the default with no unit), rounded down
+  ["10", "11 tons"],
+  [" 5.5 ", "6 tons"],
+  ["5t", "5.5 tons"],
+  ["20000 lbs", "10 tons"],
+  ["7000 lbs", "3.5 tons"],
+  // left as tagged
+  ["unknown", "unknown"],
 ])("formatWeight(%j) is %j", (input, expected) => {
   expect(formatWeight(input)).toBe(expected);
 });
@@ -338,7 +346,7 @@ describe("toSources", () => {
     expect(sources.oneway.map((f) => f.properties.oneway)).toEqual([1, -1]);
     expect(sources.gates).toHaveLength(1);
     expect(sources["weight-limits"].map((f) => f.properties.label)).toEqual([
-      "10 t",
+      "11 tons",
     ]);
   });
 

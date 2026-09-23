@@ -216,11 +216,29 @@ export const findDeadEnds = (roads, turnaroundIds, bounds) => {
   return deadEnds;
 };
 
-// OSM's maxweight defaults to metric tonnes when there's no unit; US bridges are more
-// often tagged in short tons ("st") or pounds ("lbs"), which are kept as-is
+// OSM's maxweight comes in several units -- metric tonnes when there's none, short tons ("st"), pounds ("lbs"), etc. -- so it's converted to US tons (2,000 lb), the unit on US bridge signs and engine specs. Rounded down to a tenth, so the limit shown is never above the real one. Anything unrecognized is shown as tagged.
 // https://wiki.openstreetmap.org/wiki/Key:maxweight
-export const formatWeight = (maxweight) =>
-  /^[\d.]+$/.test(maxweight.trim()) ? `${maxweight.trim()} t` : maxweight;
+const POUNDS_PER_UNIT = {
+  "": 2204.62,
+  t: 2204.62,
+  st: 2000,
+  ton: 2000,
+  tons: 2000,
+  lt: 2240,
+  lb: 1,
+  lbs: 1,
+  kg: 2.20462,
+};
+export const formatWeight = (maxweight) => {
+  const match = maxweight
+    .trim()
+    .toLowerCase()
+    .match(/^([\d.]+)\s*([a-z]*)$/);
+  const pounds = match && POUNDS_PER_UNIT[match[2]];
+  if (!pounds) return maxweight;
+  const tons = Math.floor((Number(match[1]) * pounds) / 200) / 10;
+  return `${tons} tons`;
+};
 
 // one entry per part of the combined query, each only included at or above its minzoom
 // (matching its layers'). Each group's query leaves its results in the default set to
