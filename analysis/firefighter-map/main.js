@@ -101,3 +101,6 @@ if ("serviceWorker" in navigator) {
       console.error("Service worker registration failed:", error),
     );
 }
+
+// handy for poking at the map from the browser console
+window.firefighterMap = map;
