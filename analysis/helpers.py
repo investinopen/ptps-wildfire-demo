@@ -4,8 +4,6 @@ from pathlib import Path
 
 import geopandas as gpd
 import httpx
-import matplotlib
-import matplotlib.colors as mcolors
 import pandas as pd
 from duckdb import DuckDBPyConnection
 from IPython.display import HTML
@@ -18,20 +16,6 @@ def run_script_in_db(conn: DuckDBPyConnection, path: Path | str):
         sql = f.read()
 
     conn.execute(sql)
-
-
-def to_hex_color_map(values: pd.Series, cmap: str) -> pd.Series:
-    """Scale `values` into `cmap`, returned as hex strings for use in a Folium
-    `style_function`. cmap options:
-    https://matplotlib.org/stable/gallery/color/colormap_reference.html"""
-
-    vmin = values.min()
-    vmax = values.max()
-    span = vmax - vmin
-    scaled = (values - vmin) / span if span else pd.Series(0.0, index=values.index)
-
-    cmap_obj = matplotlib.colormaps[cmap]
-    return scaled.apply(lambda v: mcolors.to_hex(cmap_obj(v)))
 
 
 def read_geo(
