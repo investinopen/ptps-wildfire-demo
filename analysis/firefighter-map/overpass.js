@@ -15,7 +15,7 @@ import { HYDRANTS_LAYER, ONEWAY_ARROWS_LAYER } from "./layers.js";
 // - a server that's rate-limiting (429) or failing is left alone for a while, and the
 //   next one in OVERPASS_URLS is used instead
 // https://wiki.openstreetmap.org/wiki/Overpass_API#Public_Overpass_API_instances
-const OVERPASS_URLS = [
+export const OVERPASS_URLS = [
   "https://overpass-api.de/api/interpreter",
   // VK Maps' public instance, which also allows cross-origin requests
   "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
@@ -30,25 +30,53 @@ const OVERPASS_COOLDOWN_MS = 60 * 1000;
 // fraction of the view's width/height added on each side of what's fetched
 const OVERPASS_MARGIN = 0.5;
 
-// widens bounds out to a grid one map tile wide at the current zoom, so views that
-// are close to each other produce the exact same query -- which is what lets a cached
-// response be found again offline, since the cache is keyed on the full URL
-const snapToGrid = (bounds, zoom) => {
+// bounds here are plain { west, south, east, north } objects (in degrees), rather than MapLibre's LngLatBounds, so this module doesn't depend on MapLibre being loaded
+export const boundsContains = (outer, { west, south, east, north }) =>
+  west >= outer.west &&
+  south >= outer.south &&
+  east <= outer.east &&
+  north <= outer.north;
+
+// the view plus `margin` (a fraction of its width/height) on each side
+export const padBounds = ({ west, south, east, north }, margin) => {
+  const lngMargin = (east - west) * margin;
+  const latMargin = (north - south) * margin;
+  return {
+    west: west - lngMargin,
+    south: south - latMargin,
+    east: east + lngMargin,
+    north: north + latMargin,
+  };
+};
+
+// widens bounds out to a grid one map tile wide at the current zoom, so views that are close to each other produce the exact same query -- which is what lets a cached response be found again offline, since the cache is keyed on the full URL
+export const snapToGrid = ({ west, south, east, north }, zoom) => {
   const step = 360 / 2 ** Math.floor(zoom);
   const down = (n) => Math.floor(n / step) * step;
   const up = (n) => Math.ceil(n / step) * step;
-  return new maplibregl.LngLatBounds(
-    [down(bounds.getWest()), down(bounds.getSouth())],
-    [up(bounds.getEast()), up(bounds.getNorth())],
-  );
+  return {
+    west: down(west),
+    south: down(south),
+    east: up(east),
+    north: up(north),
+  };
 };
 
 // server URL -> timestamp before which it shouldn't be asked again
 const overpassCooldowns = new Map();
 
-const fetchOverpass = async (query, signal) => {
-  const available = OVERPASS_URLS.filter(
-    (url) => (overpassCooldowns.get(url) ?? 0) <= Date.now(),
+// the options are for tests; the page always uses the defaults
+export const fetchOverpass = async (
+  query,
+  signal,
+  {
+    urls = OVERPASS_URLS,
+    timeoutMs = OVERPASS_REQUEST_TIMEOUT_MS,
+    cooldowns = overpassCooldowns,
+  } = {},
+) => {
+  const available = urls.filter(
+    (url) => (cooldowns.get(url) ?? 0) <= Date.now(),
   );
   for (const url of available) {
     try {
@@ -58,15 +86,12 @@ const fetchOverpass = async (query, signal) => {
       const response = await fetch(
         `${url}?data=${encodeURIComponent(query.replace(/\s+/g, " "))}`,
         {
-          signal: AbortSignal.any([
-            signal,
-            AbortSignal.timeout(OVERPASS_REQUEST_TIMEOUT_MS),
-          ]),
+          signal: AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]),
         },
       );
       if (response.ok) return await response.json();
       const retryAfterSeconds = Number(response.headers.get("Retry-After"));
-      overpassCooldowns.set(
+      cooldowns.set(
         url,
         Date.now() +
           (retryAfterSeconds > 0
@@ -77,7 +102,7 @@ const fetchOverpass = async (query, signal) => {
     } catch (error) {
       if (signal.aborted) throw error;
       // network failure, timeout, or a non-JSON (e.g. HTML error page) response
-      overpassCooldowns.set(url, Date.now() + OVERPASS_COOLDOWN_MS);
+      cooldowns.set(url, Date.now() + OVERPASS_COOLDOWN_MS);
       console.warn(`Overpass ${url} failed:`, error);
     }
   }
@@ -114,7 +139,7 @@ const NON_ROUTE_SERVICE = ["parking_aisle", "parking", "drive-through"];
 // real hazard for an engine
 const MIN_DEAD_END_DRIVEWAY_METERS = 150;
 
-const lineLengthMeters = (geometry) => {
+export const lineLengthMeters = (geometry) => {
   const toRadians = (degrees) => (degrees * Math.PI) / 180;
   let total = 0;
   for (let i = 1; i < geometry.length; i++) {
@@ -160,7 +185,7 @@ const line = (geometry, properties = {}) => ({
 // the end of a road that no other road touches, with no turning circle/loop mapped
 // there. Only ends inside `bounds` (what was fetched) count -- anything a road connects
 // to at a point inside it was fetched too, but past the edge it might not have been.
-const findDeadEnds = (roads, turnaroundIds, bounds) => {
+export const findDeadEnds = (roads, turnaroundIds, bounds) => {
   const nodeUses = new Map();
   for (const road of roads) {
     for (const id of road.nodes) nodeUses.set(id, (nodeUses.get(id) ?? 0) + 1);
@@ -177,7 +202,12 @@ const findDeadEnds = (roads, turnaroundIds, bounds) => {
       if (
         nodeUses.get(id) === 1 &&
         !turnaroundIds.has(id) &&
-        bounds.contains([pt.lon, pt.lat])
+        boundsContains(bounds, {
+          west: pt.lon,
+          south: pt.lat,
+          east: pt.lon,
+          north: pt.lat,
+        })
       ) {
         deadEnds.push(point(pt));
       }
@@ -189,14 +219,14 @@ const findDeadEnds = (roads, turnaroundIds, bounds) => {
 // OSM's maxweight defaults to metric tonnes when there's no unit; US bridges are more
 // often tagged in short tons ("st") or pounds ("lbs"), which are kept as-is
 // https://wiki.openstreetmap.org/wiki/Key:maxweight
-const formatWeight = (maxweight) =>
+export const formatWeight = (maxweight) =>
   /^[\d.]+$/.test(maxweight.trim()) ? `${maxweight.trim()} t` : maxweight;
 
 // one entry per part of the combined query, each only included at or above its minzoom
 // (matching its layers'). Each group's query leaves its results in the default set to
 // be output (as points, or with full line geometry), then picks its own elements back
 // out of the combined response to fill one or more GeoJSON sources.
-const OVERPASS_GROUPS = [
+export const OVERPASS_GROUPS = [
   {
     minzoom: HYDRANTS_LAYER.minzoom,
     // tanks/ponds/pools are often mapped as areas, so `out center` reduces those to
@@ -266,6 +296,22 @@ const OVERPASS_GROUPS = [
   },
 ];
 
+// the combined query for these groups, over `bounds`
+export const buildQuery = (groups, { west, south, east, north }) => {
+  const bbox = `(${south},${west},${north},${east})`;
+  return (
+    "[out:json][timeout:25];" +
+    groups.map((g) => `${g.query(bbox)}out ${g.output};`).join("")
+  );
+};
+
+// splits a combined response back into features for each group's GeoJSON sources, as { sourceId: features }
+export const toSources = (groups, elements, bounds) =>
+  Object.assign(
+    {},
+    ...groups.map((g) => g.toSources(elements.filter(g.matches), bounds)),
+  );
+
 // keeps the Overpass-fed sources up to date as the map moves
 export const bindOverpassData = (map) => {
   const liveDataSpinner = document.getElementById("live-data-spinner");
@@ -279,27 +325,21 @@ export const bindOverpassData = (map) => {
     const groups = OVERPASS_GROUPS.filter((g) => zoom >= g.minzoom);
     // below every group's minzoom, nothing's drawn anyway -- keep what's loaded
     if (groups.length === 0) return;
-    const view = map.getBounds();
+    const mapBounds = map.getBounds();
+    const view = {
+      west: mapBounds.getWest(),
+      south: mapBounds.getSouth(),
+      east: mapBounds.getEast(),
+      north: mapBounds.getNorth(),
+    };
     const alreadyLoaded =
       loadedBounds &&
-      loadedBounds.contains(view.getSouthWest()) &&
-      loadedBounds.contains(view.getNorthEast()) &&
+      boundsContains(loadedBounds, view) &&
       groups.every((g) => loadedGroups.includes(g));
     if (alreadyLoaded) return;
 
-    const latMargin = (view.getNorth() - view.getSouth()) * OVERPASS_MARGIN;
-    const lngMargin = (view.getEast() - view.getWest()) * OVERPASS_MARGIN;
-    const bounds = snapToGrid(
-      new maplibregl.LngLatBounds(
-        [view.getWest() - lngMargin, view.getSouth() - latMargin],
-        [view.getEast() + lngMargin, view.getNorth() + latMargin],
-      ),
-      zoom,
-    );
-    const bbox = `(${bounds.getSouth()},${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()})`;
-    const query =
-      "[out:json][timeout:25];" +
-      groups.map((g) => `${g.query(bbox)}out ${g.output};`).join("");
+    const bounds = snapToGrid(padBounds(view, OVERPASS_MARGIN), zoom);
+    const query = buildQuery(groups, bounds);
 
     inFlight?.abort();
     const controller = new AbortController();
@@ -307,13 +347,11 @@ export const bindOverpassData = (map) => {
     liveDataSpinner.hidden = false;
     try {
       const { elements } = await fetchOverpass(query, controller.signal);
-      for (const g of groups) {
-        const sources = g.toSources(elements.filter(g.matches), bounds);
-        for (const [sourceId, features] of Object.entries(sources)) {
-          map
-            .getSource(sourceId)
-            .setData({ type: "FeatureCollection", features });
-        }
+      const sources = toSources(groups, elements, bounds);
+      for (const [sourceId, features] of Object.entries(sources)) {
+        map
+          .getSource(sourceId)
+          .setData({ type: "FeatureCollection", features });
       }
       loadedBounds = bounds;
       loadedGroups = groups;

@@ -36,7 +36,7 @@ export const FLAME_LENGTH_CLASSES = [
 ];
 // reclassify the raw feet into one value per class (anything unmatched, i.e. under
 // 4 ft or non-burnable, becomes transparent), then color those classes
-const FLAME_LENGTH_RENDERING_RULE = JSON.stringify({
+export const FLAME_LENGTH_RENDERING_RULE = JSON.stringify({
   rasterFunction: "Colormap",
   rasterFunctionArguments: {
     colormap: FLAME_LENGTH_CLASSES.map(({ color }, i) => [i + 1, ...color]),
@@ -59,7 +59,7 @@ const FLAME_LENGTH_EXPORT_URL =
   "&f=image";
 
 // a hatch tile: a single diagonal ("/"), repeated to fill each class's area
-const HATCH_SIZE = 14;
+export const HATCH_SIZE = 14;
 const HATCH_LINE_WIDTH = 1.5;
 const makeHatchTile = () => {
   const canvas = new OffscreenCanvas(HATCH_SIZE, HATCH_SIZE);
@@ -76,7 +76,8 @@ const makeHatchTile = () => {
   }
   return canvas;
 };
-const hatchTile = makeHatchTile();
+// made on first use rather than at import, so this module can be loaded without a canvas (e.g. in tests)
+let hatchTile;
 
 // the same hatch as CSS, for the legend swatches -- a -45deg gradient runs toward the
 // top left, so its stripes run "/" like the tile's
@@ -86,11 +87,21 @@ export const hatchCss = ([r, g, b]) => {
   return `repeating-linear-gradient(-45deg, ${line}), #ffffff`;
 };
 
-// wraps the flame length tile fetch: the service already colors each class (see
-// FLAME_LENGTH_RENDERING_RULE), so this just keeps those colors where the hatch
-// lines are and clears everything else -- registered as a protocol the same way
-// pmtiles:// is in main.js
-maplibregl.addProtocol("flamehatch", async (params, abortController) => {
+// where the hatch pattern should start within a tile, in pixels. Each tile draws the hatch starting from its own local (0,0), so without this the lines jump out of phase at every tile edge -- this shifts the pattern by the tile's real-world position (from the exportImage URL's EPSG:3857 bbox, mod the pattern size) so it reads as one continuous hatch.
+export const hatchOffset = (url, tileWidth) => {
+  const [, xmin, , xmax, ymax] = url
+    .match(/bbox=(-?[\d.]+),(-?[\d.]+),(-?[\d.]+),(-?[\d.]+)/)
+    .map(Number);
+  const metersPerPixel = (xmax - xmin) / tileWidth;
+  const mod = (n, m) => ((n % m) + m) % m;
+  return [
+    mod(-xmin / metersPerPixel, HATCH_SIZE),
+    mod(ymax / metersPerPixel, HATCH_SIZE),
+  ];
+};
+
+// handles flamehatch:// tile URLs, wrapping the flame length tile fetch: the service already colors each class (see FLAME_LENGTH_RENDERING_RULE), so this just keeps those colors where the hatch lines are and clears everything else. Registered with MapLibre in main.js, the same way as pmtiles://.
+export const flameHatchProtocol = async (params, abortController) => {
   const url = params.url.replace("flamehatch://", "");
   const response = await fetch(url, { signal: abortController.signal });
   const bitmap = await createImageBitmap(await response.blob());
@@ -98,20 +109,10 @@ maplibregl.addProtocol("flamehatch", async (params, abortController) => {
   const ctx = canvas.getContext("2d");
   ctx.drawImage(bitmap, 0, 0);
 
-  // each tile draws the hatch starting from its own local (0,0), so without this the
-  // lines jump out of phase at every tile edge -- shift the pattern by this tile's
-  // real-world position (mod the tile size) so it reads as one continuous hatch
-  const [, xmin, , xmax, ymax] = url
-    .match(/bbox=(-?[\d.]+),(-?[\d.]+),(-?[\d.]+),(-?[\d.]+)/)
-    .map(Number);
-  const metersPerPixel = (xmax - xmin) / bitmap.width;
-  const mod = (n, m) => ((n % m) + m) % m;
+  hatchTile ??= makeHatchTile();
   const pattern = ctx.createPattern(hatchTile, "repeat");
   pattern.setTransform(
-    new DOMMatrix().translate(
-      mod(-xmin / metersPerPixel, HATCH_SIZE),
-      mod(ymax / metersPerPixel, HATCH_SIZE),
-    ),
+    new DOMMatrix().translate(...hatchOffset(url, bitmap.width)),
   );
 
   ctx.globalCompositeOperation = "destination-in";
@@ -119,6 +120,6 @@ maplibregl.addProtocol("flamehatch", async (params, abortController) => {
   ctx.fillRect(0, 0, bitmap.width, bitmap.height);
   const blob = await canvas.convertToBlob({ type: "image/png" });
   return { data: await blob.arrayBuffer() };
-});
+};
 
 export const FLAME_LENGTH_URL = "flamehatch://" + FLAME_LENGTH_EXPORT_URL;
