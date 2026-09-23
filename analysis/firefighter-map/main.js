@@ -2,10 +2,9 @@
 // other modules, and wires up the controls. MapLibre and pmtiles are loaded as globals
 // by the <script> tags in index.html.
 import { PMTILES_URL } from "./buildings.js";
-import { BURN_PROBABILITY_EXPORT_URL, FLAME_LENGTH_URL } from "./rasters.js";
+import { FLAME_LENGTH_URL } from "./rasters.js";
 import {
   HILLSHADE_LAYER,
-  BURN_PROBABILITY_LAYER,
   FLAME_LENGTH_LAYER,
   WATER_LAYER,
   WATERWAYS_LAYER,
@@ -105,28 +104,18 @@ const map = new maplibregl.Map({
       },
       // USFS Wildfire Risk to Communities (public domain); exportImage per-tile via
       // the {bbox-epsg-3857} template maplibre substitutes for ArcGIS image services
-      burnProbability: {
-        type: "raster",
-        tiles: [BURN_PROBABILITY_EXPORT_URL],
-        tileSize: 256,
-        attribution:
-          '<a href="https://data-usfs.hub.arcgis.com/datasets/usfs::wildfire-risk-to-communities-burn-probability-image-service/about" target="_blank">USFS Wildfire Risk to Communities</a>',
-      },
-      // same service family + attribution as burnProbability -- maplibre dedupes
-      // identical attribution strings
       flameLength: {
         type: "raster",
         tiles: [FLAME_LENGTH_URL],
         tileSize: 256,
         attribution:
-          '<a href="https://data-usfs.hub.arcgis.com/datasets/usfs::wildfire-risk-to-communities-burn-probability-image-service/about" target="_blank">USFS Wildfire Risk to Communities</a>',
+          '<a href="https://data-usfs.hub.arcgis.com/datasets/usfs::wildfire-risk-to-communities-conditional-flame-length-image-service/about" target="_blank">USFS Wildfire Risk to Communities</a>',
       },
     },
     glyphs: "https://fonts.undpgeohub.org/fonts/{fontstack}/{range}.pbf",
     // draw order, bottom to top -- reorder these to change what draws over what
     layers: [
       HILLSHADE_LAYER,
-      BURN_PROBABILITY_LAYER,
       FLAME_LENGTH_LAYER,
       WATER_LAYER,
       WATERWAYS_LAYER,

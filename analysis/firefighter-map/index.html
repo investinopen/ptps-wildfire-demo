@@ -229,10 +229,6 @@
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
       }
-      /* matches the low-to-high stops of the image service's own color ramp */
-      #layer-controls .swatch.burn-probability {
-        background: linear-gradient(135deg, #fff0cf, #fc8d59, #7f0000);
-      }
       /* matches the low-to-high stops of RISK_BINS below */
       #layer-controls .swatch.buildings {
         background: linear-gradient(135deg, #fee2d5, #fb7c5c, #67000d);
@@ -398,11 +394,6 @@
           </label>
           <!-- filled in from FLAME_LENGTH_CLASSES below -->
           <div id="flame-length-key" class="layer-key"></div>
-          <label>
-            <input type="checkbox" id="burn-probability-toggle" />
-            <span class="swatch burn-probability"></span>
-            Burn probability
-          </label>
           <label>
             <input type="checkbox" id="buildings-toggle" checked />
             <span class="swatch buildings"></span>

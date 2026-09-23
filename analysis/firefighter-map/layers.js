@@ -16,20 +16,7 @@ export const HILLSHADE_LAYER = {
   paint: { "hillshade-exaggeration": 0.3 },
 };
 
-// off by default -- toggled via the layer control. It's a regional-scale measure, so in
-// fire-prone areas it's uniformly high across a whole neighborhood and just tints the
-// map red. This is USFS's own classification + color ramp, a solid fill that needs to
-// stay translucent enough for roads/hillshade/labels underneath to stay legible
-export const BURN_PROBABILITY_LAYER = {
-  id: "burn-probability",
-  type: "raster",
-  source: "burnProbability",
-  layout: { visibility: "none" },
-  paint: { "raster-opacity": 0.4 },
-};
-
-// on by default -- toggled via the layer control; translucent for the same reason as
-// burn probability above
+// on by default -- toggled via the layer control
 export const FLAME_LENGTH_LAYER = {
   id: "flame-length",
   type: "raster",

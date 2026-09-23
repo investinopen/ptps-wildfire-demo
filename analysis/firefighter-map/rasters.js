@@ -1,22 +1,3 @@
-// annual burn probability, from USFS Wildfire Risk to Communities (Rocky Mountain
-// Research Station / Pyrologix, public domain):
-// https://data-usfs.hub.arcgis.com/datasets/usfs::wildfire-risk-to-communities-burn-probability-image-service/about
-const BURN_PROBABILITY_SERVICE_URL =
-  "https://imagery.geoplatform.gov/iipp/rest/services/Fire_Aviation/USFS_EDW_RMRS_WRC_BurnProbability/ImageServer";
-// "BurnProbability2024" is the service's own named raster function template -- it's
-// what the service already renders by default, but naming it explicitly means we keep
-// getting USFS's classification+color ramp even if that default ever changes
-const BURN_PROBABILITY_RENDERING_RULE = JSON.stringify({
-  rasterFunction: "BurnProbability2024",
-});
-
-export const BURN_PROBABILITY_EXPORT_URL =
-  BURN_PROBABILITY_SERVICE_URL +
-  "/exportImage?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=256,256&format=png32" +
-  "&interpolation=RSP_NearestNeighbor&renderingRule=" +
-  encodeURIComponent(BURN_PROBABILITY_RENDERING_RULE) +
-  "&f=image";
-
 // mean headfire flame length (feet) if a fire occurs, from USFS Wildfire Risk to
 // Communities (Rocky Mountain Research Station / Pyrologix, public domain):
 // https://data-usfs.hub.arcgis.com/datasets/usfs::wildfire-risk-to-communities-conditional-flame-length-image-service/about
