@@ -11,6 +11,8 @@ import {
 } from "./icons.js";
 import { buildLegendKeys, bindLayerToggles } from "./legend.js";
 import { bindOverpassData } from "./overpass.js";
+import { bindFallbackRoadLabels, bindLabelBlockers } from "./labels.js";
+import { ROAD_LABELS_LAYER } from "./layers.js";
 import { bindPlaceSearch } from "./search.js";
 
 buildLegendKeys();
@@ -45,6 +47,12 @@ map.on("load", () => {
   }
 });
 bindOverpassData(map);
+bindLabelBlockers(map, { sourceId: "label-blockers" });
+bindFallbackRoadLabels(map, {
+  sourceId: "road-label-fallbacks",
+  labelLayerId: ROAD_LABELS_LAYER.id,
+  roadsFilter: ROAD_LABELS_LAYER.filter,
+});
 
 // zoom + compass share the default top-right group; only the zoom buttons get
 // hidden on paper (see print styles in index.html), the compass survives printing since it

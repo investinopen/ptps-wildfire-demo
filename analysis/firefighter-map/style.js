@@ -12,6 +12,8 @@ import {
   TRAILS_LAYER,
   ROAD_LABELS_LAYER,
   ROUTE_SHIELDS_LAYER,
+  ROAD_LABEL_FALLBACKS_LAYER,
+  LABEL_BLOCKERS_LAYER,
   TRAIL_LABELS_LAYER,
   WATER_LABELS_LAYER,
   BUILDINGS_FILL_LAYER,
@@ -29,6 +31,15 @@ import {
 export const STYLE = {
   version: 8,
   sources: {
+    // filled in by labels.js
+    "road-label-fallbacks": {
+      type: "geojson",
+      data: { type: "FeatureCollection", features: [] },
+    },
+    "label-blockers": {
+      type: "geojson",
+      data: { type: "FeatureCollection", features: [] },
+    },
     // hillshade example: https://mapterhorn.com/examples/hillshade/
     hillshadeSource: {
       type: "raster-dem",
@@ -87,7 +98,7 @@ export const STYLE = {
     },
   },
   glyphs: "https://fonts.undpgeohub.org/fonts/{fontstack}/{range}.pbf",
-  // draw order, bottom to top -- reorder these to change what draws over what
+  // draw order, bottom to top -- reorder these to change what draws over what. Labels/symbols are also placed in reverse of this order, so the ones nearer the end win when they'd collide.
   layers: [
     HILLSHADE_LAYER,
     FLAME_LENGTH_LAYER,
@@ -100,8 +111,6 @@ export const STYLE = {
     ONEWAY_ARROWS_LAYER,
     WATER_LABELS_LAYER,
     BUILDINGS_OUTLINE_LAYER,
-    ROAD_LABELS_LAYER,
-    ROUTE_SHIELDS_LAYER,
     TRAIL_LABELS_LAYER,
     HOUSENUMBERS_LAYER,
     POOLS_LAYER,
@@ -110,6 +119,13 @@ export const STYLE = {
     DEAD_ENDS_LAYER,
     GATES_LAYER,
     WEIGHT_LIMITS_LAYER,
+    // road names first, then the fallbacks for roads they couldn't fit on, then route numbers, over everything else below (see ROAD_LABELS_LAYER)
+    ROUTE_SHIELDS_LAYER,
+    ROAD_LABEL_FALLBACKS_LAYER,
+    ROAD_LABELS_LAYER,
+    // town names, only shown zoomed out
     PLACE_LABELS_LAYER,
+    // placed ahead of everything, to keep labels out from under the legend/controls and off the edges
+    LABEL_BLOCKERS_LAYER,
   ],
 };

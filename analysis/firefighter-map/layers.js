@@ -205,18 +205,66 @@ export const ROUTE_SHIELDS_LAYER = {
   },
 };
 
+// Every named road on screen should get a readable name, so these are placed before any other labels/symbols (see the layer order in style.js) and tried more often along each road than the default 250px, which gives short town blocks more chances to fit. Named service roads are included, since rural private roads are often tagged that way -- unnamed driveways just get no label.
 export const ROAD_LABELS_LAYER = {
   id: "road-labels",
   type: "symbol",
   source: "roadsSource",
   "source-layer": "transportation_name",
-  filter: ["in", ["get", "class"], ["literal", DRIVABLE_ROAD_CLASSES]],
+  filter: [
+    "in",
+    ["get", "class"],
+    ["literal", [...DRIVABLE_ROAD_CLASSES, "service"]],
+  ],
   layout: {
     visibility: "visible",
     "text-field": ["get", "name"],
     "text-font": ["Noto Sans Bold"],
     "text-size": 12,
     "symbol-placement": "line",
+    "symbol-spacing": 150,
+  },
+  paint: {
+    "text-color": "#000000",
+    "text-halo-color": "#ffffff",
+    "text-halo-width": 1.5,
+  },
+};
+
+// invisible boxes over the legend/controls and along the map's edges, which other labels avoid -- see bindLabelBlockers in labels.js. Always placed (allow-overlap), but still counted in collisions (no ignore-placement).
+export const LABEL_BLOCKERS_LAYER = {
+  id: "label-blockers",
+  type: "symbol",
+  source: "label-blockers",
+  layout: {
+    "icon-image": ["get", "image"],
+    "icon-allow-overlap": true,
+    "icon-rotation-alignment": "viewport",
+    "icon-pitch-alignment": "viewport",
+  },
+};
+
+// horizontal names for the roads ROAD_LABELS_LAYER couldn't label along the line -- placed by labels.js. Still avoids overlapping anything, but can shift off-center to find room.
+export const ROAD_LABEL_FALLBACKS_LAYER = {
+  id: "road-label-fallbacks",
+  type: "symbol",
+  source: "road-label-fallbacks",
+  layout: {
+    visibility: "visible",
+    "text-field": ["get", "name"],
+    "text-font": ["Noto Sans Bold"],
+    "text-size": 12,
+    "text-variable-anchor": [
+      "center",
+      "top",
+      "bottom",
+      "left",
+      "right",
+      "top-left",
+      "top-right",
+      "bottom-left",
+      "bottom-right",
+    ],
   },
   paint: {
     "text-color": "#000000",

@@ -86,6 +86,7 @@ export const bindLayerToggles = (map) => {
   bindLayerToggle("roads-toggle", [
     "roads",
     "road-labels",
+    "road-label-fallbacks",
     "oneway-arrows",
     "route-shields",
     "driveways",
