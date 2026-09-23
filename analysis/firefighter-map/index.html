@@ -65,10 +65,50 @@
         position: relative;
         flex: 1;
         min-height: 0;
+        display: flex;
+      }
+      /* the legend, scale, and attribution, as a column beside the map so none of them cover it */
+      #sidebar {
+        flex: none;
+        overflow-y: auto;
+        padding: 8px 10px;
+        border-right: 1px solid rgba(0, 0, 0, 0.15);
+        background: #ffffff;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        font: 13px/1.4 sans-serif;
+      }
+      #map-area {
+        position: relative;
+        flex: 1;
+        min-width: 0;
       }
       #map {
         width: 100%;
         height: 100%;
+      }
+      /* on a phone, a column beside the map would leave it too narrow -- stack the sidebar above it instead, scrolling if it's long */
+      @media screen and (max-width: 700px) {
+        #map-container {
+          flex-direction: column;
+        }
+        #sidebar {
+          max-height: 35vh;
+          border-right: none;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+        }
+      }
+      /* the scale and attribution are MapLibre controls, just rendered here rather than in a corner of the map (see main.js) -- undo the styles they have for sitting on top of it */
+      #map-scale .maplibregl-ctrl-scale {
+        margin: 0;
+      }
+      #map-attribution .maplibregl-ctrl-attrib {
+        margin: 0;
+        padding: 0;
+        background: none;
+        font-size: 11px;
+        max-width: 240px;
       }
 
       @media print {
@@ -138,21 +178,11 @@
         }
       }
 
-      /* wraps the spinner + legend so their left-to-right order can be changed in markup
-         without hand-tuning offsets -- the legend's width isn't fixed, so positioning the
-         spinner after it with a hardcoded `left` would break whenever the legend's content
-         (and so its rendered width) changes */
-      #top-left-controls {
+      #live-data-spinner {
         position: absolute;
         top: 12px;
         left: 12px;
         z-index: 1;
-        display: flex;
-        align-items: flex-start;
-        gap: 10px;
-      }
-      #live-data-spinner {
-        flex: none;
         width: 22px;
         height: 22px;
         border: 3px solid #ffffff;
@@ -188,26 +218,7 @@
         font: 13px sans-serif;
       }
 
-      /* the non-compact attribution list has no width of its own -- it only avoids the
-         scale bar in the opposite corner because there's normally enough window width for
-         it to lay out on one line. Once it wraps (a narrow window, or a print page cut down
-         to fit), it grows to fill the entire bottom edge and swallows the scale bar. Capping
-         it forces the wrap to happen before it reaches that corner, and the leftover z-index
-         keeps the corner above the attribution's own translucent background as a fallback */
-      .maplibregl-ctrl-bottom-right {
-        max-width: calc(100% - 160px);
-      }
-      .maplibregl-ctrl-bottom-left {
-        z-index: 3;
-      }
-
       #layer-controls {
-        flex: none;
-        background: #ffffff;
-        border-radius: 4px;
-        box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
-        padding: 6px 10px;
-        font: 13px/1.4 sans-serif;
         display: flex;
         flex-direction: column;
         gap: 4px;
@@ -392,8 +403,8 @@
       />
     </form>
     <div id="map-container">
-      <div id="map"></div>
-      <div id="top-left-controls">
+      <!-- the legend, scale, and attribution, beside the map rather than over it -->
+      <aside id="sidebar">
         <div id="layer-controls">
           <label>
             <input type="checkbox" id="hillshade-toggle" checked />
@@ -469,6 +480,12 @@
             Swimming pools
           </label>
         </div>
+        <!-- filled in by main.js -->
+        <div id="map-scale"></div>
+        <div id="map-attribution"></div>
+      </aside>
+      <div id="map-area">
+        <div id="map"></div>
         <div
           id="live-data-spinner"
           title="Loading water sources & road access…"
