@@ -25,7 +25,7 @@ const FLAME_LENGTH_SERVICE_URL =
 // classed at the NWCG "hauling chart" thresholds, since those are what decide how a
 // fire can be attacked -- rather than the service's own 7 classes, which don't break
 // at 11 ft. Under 4 ft (hand crews can work the head) is left unshaded to keep the
-// map clear. Drawn as a cross-hatch in the usual fire yellow/orange/red (see the
+// map clear. Drawn as a diagonal hatch in the usual fire yellow/orange/red (see the
 // flamehatch:// protocol below), so the buildings' solid red fills still stand apart.
 // The yellow is darker than a typical ramp's so thin lines still show on white.
 // https://www.nwcg.gov/publications/pms437/surface-fire/interpreting-expected-surface-fire-behavior
@@ -77,7 +77,7 @@ const FLAME_LENGTH_EXPORT_URL =
   encodeURIComponent(FLAME_LENGTH_RENDERING_RULE) +
   "&f=image";
 
-// a cross-hatch tile: lines both ways at 45 degrees, repeated to fill each class's area
+// a hatch tile: a single diagonal ("/"), repeated to fill each class's area
 const HATCH_SIZE = 14;
 const HATCH_LINE_WIDTH = 1.5;
 const makeHatchTile = () => {
@@ -85,29 +85,28 @@ const makeHatchTile = () => {
   const ctx = canvas.getContext("2d");
   ctx.strokeStyle = "#000000";
   ctx.lineWidth = HATCH_LINE_WIDTH;
-  // each diagonal is drawn three times, offset by a tile, so the ends of the lines
-  // meet up across tile edges instead of leaving gaps at the corners
+  // drawn three times, offset by a tile, so the ends of the line meet up across tile
+  // edges instead of leaving gaps at the corners
   for (const offset of [-HATCH_SIZE, 0, HATCH_SIZE]) {
     ctx.beginPath();
     ctx.moveTo(offset, HATCH_SIZE);
     ctx.lineTo(offset + HATCH_SIZE, 0);
-    ctx.moveTo(offset, 0);
-    ctx.lineTo(offset + HATCH_SIZE, HATCH_SIZE);
     ctx.stroke();
   }
   return canvas;
 };
 const hatchTile = makeHatchTile();
 
-// the same cross-hatch as CSS, for the legend swatches
+// the same hatch as CSS, for the legend swatches -- a -45deg gradient runs toward the
+// top left, so its stripes run "/" like the tile's
 export const hatchCss = ([r, g, b]) => {
   const color = `rgb(${r},${g},${b})`;
   const line = `${color} 0 ${HATCH_LINE_WIDTH}px, transparent ${HATCH_LINE_WIDTH}px ${HATCH_SIZE / Math.SQRT2}px`;
-  return `repeating-linear-gradient(45deg, ${line}), repeating-linear-gradient(-45deg, ${line}), #ffffff`;
+  return `repeating-linear-gradient(-45deg, ${line}), #ffffff`;
 };
 
 // wraps the flame length tile fetch: the service already colors each class (see
-// FLAME_LENGTH_RENDERING_RULE), so this just keeps those colors where the cross-hatch
+// FLAME_LENGTH_RENDERING_RULE), so this just keeps those colors where the hatch
 // lines are and clears everything else -- registered as a protocol the same way
 // pmtiles:// is in main.js
 maplibregl.addProtocol("flamehatch", async (params, abortController) => {
