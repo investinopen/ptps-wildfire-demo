@@ -1,3 +1,5 @@
+import { ROAD } from "./colors";
+
 // map symbols drawn on a canvas, so the same drawing can be registered as a map image
 // (see main.js) and shown as its legend swatch (see legend.js). All black/white/yellow,
 // so they stay readable when printed in grayscale.
@@ -9,8 +11,7 @@ export const ICON_PIXEL_RATIO = 2;
 // a small right-pointing arrow -- line-placed symbols orient a 0deg icon along the
 // line's own direction, so "right" is the convention
 const drawArrow = (ctx, size) => {
-  ctx.fillStyle = "#ffffff";
-  ctx.strokeStyle = "#2b2b2b";
+  ctx.fillStyle = ROAD;
   ctx.lineWidth = size / 14;
   ctx.beginPath();
   ctx.moveTo(size / 7, size / 7);

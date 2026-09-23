@@ -5,6 +5,7 @@ import {
   RISK_PROPERTY,
   SOURCE_LAYER,
 } from "./buildings.js";
+import { ROAD } from "./colors";
 
 // one const per layer -- keeping these standalone makes the draw order (the `layers`
 // array in main.js) easy to see and rearrange without hunting through each definition
@@ -69,9 +70,7 @@ export const ROADS_LAYER = {
   filter: ["in", ["get", "class"], ["literal", DRIVABLE_ROAD_CLASSES]],
   layout: { visibility: "visible" },
   paint: {
-    // near-black, like a topo map -- every brighter hue is already taken by a
-    // hazard/risk layer, and it stays legible when printed in grayscale
-    "line-color": "#2b2b2b",
+    "line-color": ROAD,
     "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.5, 18, 4],
   },
 };
