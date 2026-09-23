@@ -33,7 +33,7 @@ export const FLAME_LENGTH_CLASSES = [
   {
     min: 4,
     max: 8,
-    color: [230, 184, 0],
+    color: [200, 150, 0],
     range: "4–8 ft",
     meaning: "too hot for hand tools at the head",
   },
