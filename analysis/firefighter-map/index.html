@@ -317,7 +317,7 @@
         white-space: nowrap;
       }
       #layer-controls .swatch.roads {
-        background: #e58a1f;
+        background: #2b2b2b;
       }
       #layer-controls .swatch.driveways {
         background: #8855c8;
@@ -645,7 +645,7 @@
       // fire can be attacked -- rather than the service's own 7 classes, which don't break
       // at 11 ft. Under 4 ft (hand crews can work the head) is left unshaded to keep the
       // map clear. Browns rather than the usual fire reds/oranges, which the buildings,
-      // fuel hatch, hydrants, and roads already use.
+      // fuel hatch, and hydrants already use.
       // https://www.nwcg.gov/publications/pms437/surface-fire/interpreting-expected-surface-fire-behavior
       const FLAME_LENGTH_CLASSES = [
         {
@@ -716,7 +716,7 @@
         const canvas = new OffscreenCanvas(size, size);
         const ctx = canvas.getContext("2d");
         ctx.fillStyle = "#ffffff";
-        ctx.strokeStyle = "#5c3a00";
+        ctx.strokeStyle = "#2b2b2b";
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(2, 2);
@@ -851,7 +851,9 @@
         filter: ["in", ["get", "class"], ["literal", DRIVABLE_ROAD_CLASSES]],
         layout: { visibility: "visible" },
         paint: {
-          "line-color": "#e58a1f",
+          // near-black, like a topo map -- every brighter hue is already taken by a
+          // hazard/risk layer, and it stays legible when printed in grayscale
+          "line-color": "#2b2b2b",
           "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.5, 18, 4],
         },
       };
