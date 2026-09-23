@@ -11,6 +11,7 @@
 __pycache__
 **/data/*
 !analysis/data/burn_prob_1km.parquet
+!analysis/data/cb_2018_us_state_20m.zip
 !analysis/data/wumi_perimeters/
 data_cache/
 

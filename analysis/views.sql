@@ -93,6 +93,9 @@ GROUP BY ALL;
 COMMENT ON VIEW red_flag_warnings IS 'https://www.weather.gov/documentation/services-web-api#/default/alerts_active, enriched with the combined geometries';
 
 
+-- A rolling "last 24 hours" file at a fixed URL, and cache_httpfs doesn't expire what it caches, so a cached copy would never update (and would be stitched together from different versions, like the alerts feed above). Always fetch it fresh.
+SELECT cache_httpfs_add_exclusion_regex('^https://firms\.modaps\.eosdis\.nasa\.gov/');
+
 CREATE OR REPLACE VIEW active_fires AS
 SELECT *
 FROM 'https://firms.modaps.eosdis.nasa.gov/data/active_fire/modis-c6.1/csv/MODIS_C6_1_USA_contiguous_and_Hawaii_24h.csv';
@@ -103,12 +106,11 @@ COMMENT ON VIEW active_fires IS '"Each MODIS active fire/thermal hotspot locatio
 - https://firms.modaps.eosdis.nasa.gov/active_fire/#firms-txt';
 
 
--- www2.census.gov answers DuckDB's own zip://https:// scheme with a WAF "Request Rejected"
--- page rather than the zip, but GDAL's /vsizip/vsicurl/ request pattern gets through fine.
+-- A copy of https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_state_20m.zip, kept in the repo (Git LFS) since it's a fixed 2018 release -- and www2.census.gov's firewall rejects requests from GitHub Actions, which broke publishing.
 CREATE OR REPLACE VIEW state_boundaries AS
 SELECT *
 FROM ST_Read(
-        '/vsizip/vsicurl/https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_state_20m.zip/cb_2018_us_state_20m.shp'
+        '/vsizip/data/cb_2018_us_state_20m.zip/cb_2018_us_state_20m.shp'
     );
 
 COMMENT ON VIEW state_boundaries IS 'https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html';
