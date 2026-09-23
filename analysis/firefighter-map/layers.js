@@ -111,8 +111,9 @@ export const ONEWAY_ARROWS_LAYER = {
   },
 };
 
-// private roads/driveways (class "service") -- styled thinner + a different hue to
-// read as minor, same as OSM data allows
+// private roads/driveways (class "service") -- styled thinner than roads + a different
+// hue to read as minor, same as OSM data allows, but still thick/dark enough to follow
+// over the flame length hatch, since a driveway is how an engine reaches a house
 // https://wiki.openstreetmap.org/wiki/Key:highway#Highway
 export const DRIVEWAYS_LAYER = {
   id: "driveways",
@@ -122,8 +123,8 @@ export const DRIVEWAYS_LAYER = {
   filter: ["==", ["get", "class"], "service"],
   layout: { visibility: "visible" },
   paint: {
-    "line-color": "#8855c8",
-    "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.3, 18, 1.5],
+    "line-color": "#6a2fb8",
+    "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.5, 18, 2.5],
   },
 };
 
