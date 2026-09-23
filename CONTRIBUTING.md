@@ -1,3 +1,12 @@
+## Running the site
+
+1. [Install Quarto.](https://quarto.org/docs/get-started/)
+1. Start the server.
+
+   ```sh
+   quarto preview analysis
+   ```
+
 ## Testing
 
 ```sh
