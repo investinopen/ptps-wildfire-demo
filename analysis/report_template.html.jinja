@@ -32,8 +32,10 @@
 </script>
 
 {% for dataset in datasets %}
-<section class="mt-5">
-  <h2>{{ dataset.name }}</h2>
+{# a Markdown heading rather than an <h2>, so Quarto includes it in the table of contents #}
+## {{ dataset.name }}
+
+<section>
   <p class="text-body-secondary">{{ dataset.description }}</p>
   <table class="table table-bordered table-striped">
     <thead>
