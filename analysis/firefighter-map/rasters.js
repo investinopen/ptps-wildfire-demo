@@ -78,7 +78,7 @@ const FLAME_LENGTH_EXPORT_URL =
   "&f=image";
 
 // a cross-hatch tile: lines both ways at 45 degrees, repeated to fill each class's area
-const HATCH_SIZE = 8;
+const HATCH_SIZE = 14;
 const HATCH_LINE_WIDTH = 1.5;
 const makeHatchTile = () => {
   const canvas = new OffscreenCanvas(HATCH_SIZE, HATCH_SIZE);

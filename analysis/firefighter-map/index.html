@@ -281,18 +281,19 @@
         color: #444444;
       }
       /* matches FLAME_LENGTH_CLASSES below */
-      /* the middle (orange) class's cross-hatch -- see hatchCss in rasters.js */
+      /* the middle (orange) class's cross-hatch -- see hatchCss in rasters.js (9.9px is
+         HATCH_SIZE / sqrt(2)) */
       #layer-controls .swatch.flame-length {
         background:
           repeating-linear-gradient(
             45deg,
             rgb(240, 120, 0) 0 1.5px,
-            transparent 1.5px 5.66px
+            transparent 1.5px 9.9px
           ),
           repeating-linear-gradient(
             -45deg,
             rgb(240, 120, 0) 0 1.5px,
-            transparent 1.5px 5.66px
+            transparent 1.5px 9.9px
           ),
           #ffffff;
       }
