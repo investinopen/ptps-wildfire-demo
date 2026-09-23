@@ -2,19 +2,7 @@
 
 A networked data infrastructure demo for the "Investing in Open Infra to Safeguard Critical Scientific Data" project. Essentially, we are **making it easier to work with rescued data**.
 
-PtPS is the Portfolio to Protect Science. See [the website](https://investinopen.github.io/ptps-wildfire-demo/) for background, what we're exploring, and our design decisions.
-
-## Quick links
-
-- Analysis
-  - [Dataset rescue statuses](https://investinopen.github.io/ptps-wildfire-demo/rescue-status.html)
-  - [Risk calculation](https://investinopen.github.io/ptps-wildfire-demo/risk.html)
-  - [Wildfire overlap](https://investinopen.github.io/ptps-wildfire-demo/fire-overlap.html)
-- [Firefighter map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map/)
-- Tools
-  - [HTTP proxy](#http-proxy)
-  - [Python package](#python-package)
-  - [Browser extension](#browser-extension)
+PtPS is the Portfolio to Protect Science. **See [the website](https://investinopen.github.io/ptps-wildfire-demo/) for background, what we're exploring, and our design decisions.**
 
 ## Fallbacks
 
@@ -201,12 +189,3 @@ It's recommended that you use this alongside the [official Internet Archive Wayb
 - `npm run watch` — rebuild on file changes
 - `npm run typecheck` — type-check without emitting
 - `npm test` — run the test suite (hits live network endpoints, mirroring the [proxy](proxy/)'s Python tests)
-
-## [Analysis](analysis/)
-
-## See also
-
-- [The Data Resilience Funding Landscape: A Preliminary Analysis](https://investinopen.org/blog/data-resilience-funding-landscape/)
-- [Protype app from **@jring-o**](https://github.com/jring-o/scsd)
-- [varve](https://github.com/tylere/varve) "dataset archiving service"
-- [Binoc:](https://harvard-lil.github.io/binoc/) "The missing changelog for datasets."

@@ -65,3 +65,11 @@ Data rescue/resilience has, for the most part, focused on a single aspect of the
 - While this is being built as a compatibility layer (behind the scenes), we will surface source dataset status and fallbacks to make it easier for people to understand.
 
 We acknowledge that those other areas are valuable, they just aren't in scope for this (phase of the) project.
+
+## See also
+
+- [On building for the long run, not just the crisis](https://www.linkedin.com/pulse/building-long-run-just-crisis-kaitlin-thaney-txdhc/)
+- [The Data Resilience Funding Landscape: A Preliminary Analysis](https://investinopen.org/blog/data-resilience-funding-landscape/)
+- [Protype app from **@jring-o**](https://github.com/jring-o/scsd)
+- [varve](https://github.com/tylere/varve) "dataset archiving service"
+- [Binoc:](https://harvard-lil.github.io/binoc/) "The missing changelog for datasets."
