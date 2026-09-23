@@ -1,4 +1,4 @@
-// the button that collapses/expands the sidebar (the legend, scale, and attribution), so the map can take the whole width. Remembered per browser; the sidebar always shows in print regardless (see index.html).
+// the button that collapses/expands the sidebar (the legend and attribution), so the map can take the whole width. Remembered per browser; the sidebar always shows in print regardless (see index.html).
 const STORAGE_KEY = "firefighter-map:sidebar-collapsed";
 
 // localStorage can be unavailable (e.g. blocked in a private window), in which case it just isn't remembered

@@ -67,7 +67,7 @@
         min-height: 0;
         display: flex;
       }
-      /* the legend, scale, and attribution, as a column beside the map so none of them cover it */
+      /* the legend and attribution, as a column beside the map so neither covers it */
       #sidebar {
         flex: none;
         overflow-y: auto;
@@ -99,10 +99,7 @@
           border-bottom: 1px solid rgba(0, 0, 0, 0.15);
         }
       }
-      /* the scale and attribution are MapLibre controls, just rendered here rather than in a corner of the map (see main.js) -- undo the styles they have for sitting on top of it */
-      #map-scale .maplibregl-ctrl-scale {
-        margin: 0;
-      }
+      /* the attribution is a MapLibre control, just rendered here rather than in a corner of the map (see main.js) -- undo the styles it has for sitting on top of it */
       #map-attribution .maplibregl-ctrl-attrib {
         margin: 0;
         padding: 0;
@@ -436,7 +433,7 @@
       />
     </form>
     <div id="map-container">
-      <!-- the legend, scale, and attribution, beside the map rather than over it -->
+      <!-- the legend and attribution, beside the map rather than over it -->
       <aside id="sidebar">
         <div id="layer-controls">
           <label>
@@ -514,7 +511,6 @@
           </label>
         </div>
         <!-- filled in by main.js -->
-        <div id="map-scale"></div>
         <div id="map-attribution"></div>
       </aside>
       <div id="map-area">
