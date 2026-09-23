@@ -4,7 +4,7 @@ import { iconDataUrl } from "./icons.js";
 
 // the zero-risk gray is labeled "0" under its own cell; every other label sits on the
 // boundary where a bin starts (skipping the first bin's own lower bound of 0, since
-// it really means "above zero"), with the last bin reading as "3+"
+// it really means "above zero"), with the last bin reading as e.g. "1+"
 const buildRiskKey = () => {
   const key = document.getElementById("building-risk-key");
   const cellWidth = parseFloat(

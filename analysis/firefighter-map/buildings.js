@@ -10,21 +10,13 @@ export const SOURCE_LAYER = "risk";
 // the same score CarbonPlan's own map shows
 // https://github.com/carbonplan/ocr/blob/main/ocr/pipeline/create_building_pmtiles.py
 export const RISK_PROPERTY = "0";
-// CarbonPlan's own bins for that score (a lower bound + color each), so a building
-// reads the same here as on their map -- zero is its own gray, anything above zero
-// starts at the first bin: https://github.com/carbonplan/ocr-web/blob/main/lib/config.ts
-// Colors are ColorBrewer's 9-class Reds, resampled to 10 steps.
+// Bins for that score (a lower bound + color each) -- zero is its own gray, anything above zero starts at the first bin. A coarser grouping of CarbonPlan's own 10 bins (every boundary here is one of theirs, so a building never lands in a lower bin here than on their map), since crews need to tell low from high at a glance rather than read fine gradations: https://github.com/carbonplan/ocr-web/blob/main/lib/config.ts
+// Colors are picked from ColorBrewer's Reds.
 export const NO_RISK_COLOR = "#d9d9d9";
 export const RISK_BINS = [
-  [0, "#fff5f0"],
-  [0.01, "#fee2d5"],
-  [0.02, "#fcc3ac"],
-  [0.035, "#fca082"],
-  [0.06, "#fb7c5c"],
-  [0.1, "#f6553d"],
-  [0.2, "#e32f27"],
-  [0.5, "#c3161b"],
-  [1, "#9e0d14"],
-  [3, "#67000d"],
+  [0, "#fcbba1"],
+  [0.1, "#fb6a4a"],
+  [0.5, "#cb181d"],
+  [1, "#67000d"],
 ];
 export const BUILDING_MIN_ZOOM = 14.5;
