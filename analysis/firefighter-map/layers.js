@@ -128,7 +128,8 @@ export const DRIVEWAYS_LAYER = {
   },
 };
 
-// unpaved tracks and foot/bike/horse paths (class "track", "path") --
+// unpaved tracks and foot/bike/horse paths (class "track", "path") -- the same width as
+// driveways so they're as easy to follow over the flame length hatch --
 // https://wiki.openstreetmap.org/wiki/Tag:highway%3Dtrack
 // https://wiki.openstreetmap.org/wiki/Tag:highway%3Dpath
 export const TRAILS_LAYER = {
@@ -139,8 +140,8 @@ export const TRAILS_LAYER = {
   filter: ["in", ["get", "class"], ["literal", ["track", "path"]]],
   layout: { visibility: "visible" },
   paint: {
-    "line-color": "#6b8e23",
-    "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.3, 18, 1.5],
+    "line-color": "#557a12",
+    "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.5, 18, 2.5],
     "line-dasharray": [2, 1.5],
   },
 };
