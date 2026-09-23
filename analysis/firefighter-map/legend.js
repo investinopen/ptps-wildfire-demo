@@ -2,54 +2,44 @@ import { NO_RISK_COLOR, RISK_BINS } from "./buildings.js";
 import { FLAME_LENGTH_CLASSES, hatchCss } from "./rasters.js";
 import { iconDataUrl } from "./icons.js";
 
-// the zero-risk gray is labeled "0" under its own cell; every other label sits on the
-// boundary where a bin starts (skipping the first bin's own lower bound of 0, since
-// it really means "above zero"), with the last bin reading as e.g. "1+"
-const buildRiskKey = () => {
-  const key = document.getElementById("building-risk-key");
-  const cellWidth = parseFloat(
-    getComputedStyle(key).getPropertyValue("--cell-width"),
-  );
-  // the outer border, then (after the gray cell) its divider line -- see #building-risk-key's CSS in index.html
-  const border = 1;
-  const grayOffset = border + cellWidth + 1;
-  const cells = key.querySelector(".cells");
-  const ticks = key.querySelector(".ticks");
-  const addTick = (text, left) => {
-    const tick = document.createElement("span");
-    tick.textContent = text;
-    tick.style.left = left + "px";
-    ticks.append(tick);
-  };
-  for (const color of [NO_RISK_COLOR, ...RISK_BINS.map(([, c]) => c)]) {
-    const cell = document.createElement("span");
-    cell.style.background = color;
-    cells.append(cell);
-  }
-  addTick("0", border + cellWidth / 2);
-  RISK_BINS.slice(1).forEach(([lowerBound], i) => {
-    const isLast = i === RISK_BINS.length - 2;
-    addTick(
-      // drops the leading zero to keep labels narrow enough for their cells
-      String(lowerBound).replace(/^0\./, ".") + (isLast ? "+" : ""),
-      grayOffset + (i + 1) * cellWidth,
-    );
-  });
+// a row of the legend keys below: a color/pattern cell, a bold name, and a description
+const keyRow = (key, background, name, description) => {
+  const cell = document.createElement("span");
+  cell.className = "cell";
+  cell.style.background = background;
+  const term = document.createElement("span");
+  term.className = "term";
+  term.textContent = name;
+  const detail = document.createElement("span");
+  detail.textContent = description;
+  key.append(cell, term, detail);
 };
 
-// one row per class: its color, range, and what that flame length means for attack
+// one row per risk bin, named in words with its range of annual risk -- plus the zero-risk gray
+const buildRiskKey = () => {
+  const key = document.getElementById("building-risk-key");
+  keyRow(key, NO_RISK_COLOR, "None", "");
+  RISK_BINS.forEach(({ min, color, label }, i) => {
+    const next = RISK_BINS[i + 1]?.min;
+    const range =
+      next === undefined
+        ? `${min}%+`
+        : i === 0
+          ? `under ${next}%`
+          : `${min}–${next}%`;
+    keyRow(key, color, label, range);
+  });
+  const caption = document.createElement("span");
+  caption.className = "caption";
+  caption.textContent = "Annual risk to structures";
+  key.append(caption);
+};
+
+// one row per class: its hatch, range, and what that flame length means for attack
 const buildFlameLengthKey = () => {
-  const flameLengthKey = document.getElementById("flame-length-key");
+  const key = document.getElementById("flame-length-key");
   for (const { color, range, meaning } of FLAME_LENGTH_CLASSES) {
-    const cell = document.createElement("span");
-    cell.className = "cell";
-    cell.style.background = hatchCss(color);
-    const rangeLabel = document.createElement("span");
-    rangeLabel.className = "range";
-    rangeLabel.textContent = range;
-    const meaningLabel = document.createElement("span");
-    meaningLabel.textContent = meaning;
-    flameLengthKey.append(cell, rangeLabel, meaningLabel);
+    keyRow(key, hatchCss(color), range, meaning);
   }
 };
 

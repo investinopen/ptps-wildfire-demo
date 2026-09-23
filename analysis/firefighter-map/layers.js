@@ -328,7 +328,7 @@ export const BUILDINGS_FILL_LAYER = {
         "step",
         ["to-number", ["get", RISK_PROPERTY]],
         NO_RISK_COLOR,
-        ...RISK_BINS.flat(),
+        ...RISK_BINS.flatMap(({ min, color }) => [min, color]),
       ],
     ],
   },

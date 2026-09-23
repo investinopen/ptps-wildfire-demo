@@ -288,46 +288,9 @@
         background: linear-gradient(135deg, #fcbba1, #fb6a4a, #67000d);
         border-color: #4d4d4d;
       }
-      /* a small colorbar under the buildings row: the zero-risk gray on its own, then one
-         cell per risk bin, labeled at the boundaries between them. Laid out on a fixed
-         cell width so the tick labels (absolutely positioned) line up with the edges */
-      #building-risk-key {
-        --cell-width: 28px;
-        margin: 0 0 4px 21px;
-        font-size: 10px;
-        line-height: 1.2;
-        /* same reason as the swatches -- the cells are nothing but background colors */
-        print-color-adjust: exact;
-        -webkit-print-color-adjust: exact;
-      }
       /* no key for a layer that isn't shown, on screen or on paper */
       #layer-controls label:has(input:not(:checked)) + .layer-key {
         display: none;
-      }
-      #building-risk-key .cells {
-        display: flex;
-        border: 1px solid #4d4d4d;
-        width: max-content;
-      }
-      #building-risk-key .cells span {
-        width: var(--cell-width);
-        height: 10px;
-      }
-      /* a line between the zero-risk gray and the scale itself */
-      #building-risk-key .cells span:first-child {
-        border-right: 1px solid #4d4d4d;
-      }
-      #building-risk-key .ticks {
-        position: relative;
-        height: 12px;
-      }
-      #building-risk-key .ticks span {
-        position: absolute;
-        transform: translateX(-50%);
-        white-space: nowrap;
-      }
-      #building-risk-key .caption {
-        color: #444444;
       }
       /* matches FLAME_LENGTH_CLASSES below */
       /* the middle (orange) class's hatch -- see hatchCss in rasters.js (9.9px is
@@ -342,7 +305,8 @@
           #ffffff;
       }
       /* one row per class: its color + what that flame length means for attack */
-      #flame-length-key {
+      /* the flame length and building risk keys: one row per class, with its color/pattern, a bold name, and a description */
+      .table-key {
         margin: 0 0 4px 21px;
         font-size: 10px;
         line-height: 1.2;
@@ -353,15 +317,19 @@
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
       }
-      /* big enough to show a few repeats of the hatch, so it reads as a pattern */
-      #flame-length-key .cell {
+      /* big enough to show a few repeats of the flame length hatch, so it reads as a pattern */
+      .table-key .cell {
         width: 32px;
         height: 16px;
         border: 1px solid #4d4d4d;
       }
-      #flame-length-key .range {
+      .table-key .term {
         font-weight: bold;
         white-space: nowrap;
+      }
+      .table-key .caption {
+        grid-column: 1 / -1;
+        color: #444444;
       }
       #layer-controls .swatch.roads {
         background: #2b2b2b;
@@ -446,18 +414,14 @@
             Flame length, if a fire starts
           </label>
           <!-- filled in from FLAME_LENGTH_CLASSES below -->
-          <div id="flame-length-key" class="layer-key"></div>
+          <div id="flame-length-key" class="layer-key table-key"></div>
           <label>
             <input type="checkbox" id="buildings-toggle" checked />
             <span class="swatch buildings"></span>
             Buildings, by wildfire risk
           </label>
           <!-- filled in from RISK_BINS below -->
-          <div id="building-risk-key" class="layer-key">
-            <div class="cells"></div>
-            <div class="ticks"></div>
-            <div class="caption">Annual risk to structures (%)</div>
-          </div>
+          <div id="building-risk-key" class="layer-key table-key"></div>
           <label>
             <input type="checkbox" id="roads-toggle" checked />
             <span class="swatch roads"></span>

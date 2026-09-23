@@ -55,18 +55,18 @@ describe("building risk colors", () => {
   });
 
   test("anything above zero starts at the first bin", () => {
-    expect(colorFor({ 0: 0.001 })).toBe(color(RISK_BINS[0][1]));
+    expect(colorFor({ 0: 0.001 })).toBe(color(RISK_BINS[0].color));
   });
 
   test.each(RISK_BINS.slice(1))(
-    "a score of exactly %s starts its own bin",
-    (lowerBound, binColor) => {
-      expect(colorFor({ 0: lowerBound })).toBe(color(binColor));
+    "a score of exactly $min starts the $label bin",
+    ({ min, color: binColor }) => {
+      expect(colorFor({ 0: min })).toBe(color(binColor));
     },
   );
 
   test("scores above the last bound get the last color", () => {
-    expect(colorFor({ 0: 50 })).toBe(color(RISK_BINS.at(-1)[1]));
+    expect(colorFor({ 0: 50 })).toBe(color(RISK_BINS.at(-1).color));
   });
 });
 
