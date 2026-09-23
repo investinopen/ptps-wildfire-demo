@@ -119,7 +119,6 @@ export const STYLE = {
     HYDRANTS_LAYER,
     DEAD_ENDS_LAYER,
     GATES_LAYER,
-    WEIGHT_LIMITS_LAYER,
     // Road names first, then the fallbacks for roads they couldn't fit on, then house numbers, then the invisible building/driveway obstacles, then route numbers -- so route numbers avoid all of those -- over everything else below (see ROAD_LABELS_LAYER).
     ROUTE_SHIELDS_LAYER,
     DRIVEWAY_OBSTACLES_LAYER,
@@ -127,6 +126,8 @@ export const STYLE = {
     HOUSENUMBERS_LAYER,
     ROAD_LABEL_FALLBACKS_LAYER,
     ROAD_LABELS_LAYER,
+    // bridge weight limits over the road names, which steer around them -- a limit an engine exceeds matters more than the road's name
+    WEIGHT_LIMITS_LAYER,
     // town names, only shown zoomed out
     PLACE_LABELS_LAYER,
     // placed ahead of everything, to keep labels out from under the legend/controls and off the edges

@@ -379,6 +379,11 @@
         font: bold 10px/14px sans-serif;
         text-align: center;
       }
+      /* yellow, like the weight limit boxes themselves (see icons.js) */
+      #layer-controls .swatch.sign.weight-limit {
+        background: #ffd200;
+        border-radius: 3px;
+      }
       #layer-controls .swatch.hydrants {
         background: #e0342a;
         border-radius: 50%;
@@ -486,7 +491,7 @@
           </label>
           <label>
             <input type="checkbox" id="weight-limits-toggle" checked />
-            <span class="swatch sign">t</span>
+            <span class="swatch sign weight-limit">t</span>
             Bridge weight limits
           </label>
           <label>

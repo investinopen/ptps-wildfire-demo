@@ -493,7 +493,8 @@ export const WEIGHT_LIMITS_LAYER = {
     "text-font": ["Noto Sans Bold"],
     "text-size": 11,
     "text-rotation-alignment": "viewport",
-    "icon-image": "sign-box",
+    // see icons.js
+    "icon-image": "weight-limit-box",
     "icon-text-fit": "both",
     "icon-text-fit-padding": [1, 3, 1, 3],
     "icon-rotation-alignment": "viewport",

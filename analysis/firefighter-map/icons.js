@@ -57,13 +57,18 @@ const drawDeadEnd = (ctx, size) => {
 };
 
 // a box with a border, stretched to fit a label (a weight limit or route number) like a road sign -- see SIGN_BOX_OPTIONS
-const drawBox = (fill, border) => (ctx, size) => {
-  ctx.fillStyle = fill;
-  ctx.fillRect(0, 0, size, size);
-  ctx.strokeStyle = border;
-  ctx.lineWidth = ICON_PIXEL_RATIO;
-  ctx.strokeRect(1, 1, size - 2, size - 2);
-};
+// A corner radius (in CSS pixels) has to stay within the unstretched edges -- see boxInset.
+const drawBox =
+  (fill, border, radius = 0) =>
+  (ctx, size) => {
+    ctx.fillStyle = fill;
+    ctx.strokeStyle = border;
+    ctx.lineWidth = ICON_PIXEL_RATIO;
+    ctx.beginPath();
+    ctx.roundRect(1, 1, size - 2, size - 2, radius * ICON_PIXEL_RATIO);
+    ctx.fill();
+    ctx.stroke();
+  };
 
 // size is in CSS pixels
 export const ICONS = {
@@ -78,6 +83,12 @@ export const ICONS = {
   },
   // draws nothing -- only takes up space, so other labels avoid it (see the *_OBSTACLES_LAYERs in layers.js)
   obstacle: { draw: () => {}, size: 10 },
+  // yellow like the dead-end sign, so a weight limit reads as a hazard rather than another route number
+  "weight-limit-box": {
+    draw: drawBox("#ffd200", "#000000", 3),
+    size: 16,
+    stretchable: true,
+  },
   // Interstate blue
   "interstate-box": {
     draw: drawBox("#1f4e9c", "#ffffff"),
