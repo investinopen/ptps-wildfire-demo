@@ -198,7 +198,8 @@ export const ROUTE_SHIELDS_LAYER = {
   layout: {
     visibility: "visible",
     "symbol-placement": "line",
-    "symbol-spacing": 400,
+    // tried often along each road, since the obstacles above rule out many spots near houses
+    "symbol-spacing": 150,
     "text-field": [
       "match",
       ["get", "network"],
