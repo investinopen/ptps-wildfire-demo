@@ -15,20 +15,11 @@ const keyRow = (key, background, name, description) => {
   key.append(cell, term, detail);
 };
 
-// one row per risk bin, named in words with its range of annual risk -- plus the zero-risk gray
+// one row per risk bin, named in words -- plus the zero-risk gray. The bins' percentage ranges (see RISK_BINS) are intentionally left off: crews need to tell low from high at a glance, and exact annual-risk figures would suggest more precision than the underlying model has.
 const buildRiskKey = () => {
   const key = document.getElementById("building-risk-key");
   keyRow(key, NO_RISK_COLOR, "None", "");
-  RISK_BINS.forEach(({ min, color, label }, i) => {
-    const next = RISK_BINS[i + 1]?.min;
-    const range =
-      next === undefined
-        ? `${min}%+`
-        : i === 0
-          ? `under ${next}%`
-          : `${min}–${next}%`;
-    keyRow(key, color, label, range);
-  });
+  for (const { color, label } of RISK_BINS) keyRow(key, color, label, "");
   const caption = document.createElement("span");
   caption.className = "caption";
   caption.textContent = "Annual risk to structures";
