@@ -262,7 +262,7 @@
         -webkit-print-color-adjust: exact;
       }
       /* no key for a layer that isn't shown, on screen or on paper */
-      #layer-controls label:has(#buildings-toggle:not(:checked)) + #building-risk-key {
+      #layer-controls label:has(input:not(:checked)) + .layer-key {
         display: none;
       }
       #building-risk-key .cells {
@@ -290,6 +290,31 @@
       }
       #building-risk-key .caption {
         color: #444444;
+      }
+      /* matches FLAME_LENGTH_CLASSES below */
+      #layer-controls .swatch.flame-length {
+        background: linear-gradient(135deg, #fee08b, #bf812d, #543005);
+      }
+      /* one row per class: its color + what that flame length means for attack */
+      #flame-length-key {
+        margin: 0 0 4px 21px;
+        font-size: 10px;
+        line-height: 1.2;
+        display: grid;
+        grid-template-columns: auto auto 1fr;
+        gap: 2px 5px;
+        align-items: center;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+      #flame-length-key .cell {
+        width: 20px;
+        height: 10px;
+        border: 1px solid #4d4d4d;
+      }
+      #flame-length-key .range {
+        font-weight: bold;
+        white-space: nowrap;
       }
       #layer-controls .swatch.roads {
         background: #e58a1f;
@@ -347,6 +372,13 @@
             Moderate/high fuel load
           </label>
           <label>
+            <input type="checkbox" id="flame-length-toggle" checked />
+            <span class="swatch flame-length"></span>
+            Flame length, if a fire starts
+          </label>
+          <!-- filled in from FLAME_LENGTH_CLASSES below -->
+          <div id="flame-length-key" class="layer-key"></div>
+          <label>
             <input type="checkbox" id="burn-probability-toggle" />
             <span class="swatch burn-probability"></span>
             Burn probability
@@ -357,7 +389,7 @@
             Buildings, by wildfire risk
           </label>
           <!-- filled in from RISK_BINS below -->
-          <div id="building-risk-key">
+          <div id="building-risk-key" class="layer-key">
             <div class="cells"></div>
             <div class="ticks"></div>
             <div class="caption">Annual risk to structures (%)</div>
@@ -604,6 +636,79 @@
         encodeURIComponent(BURN_PROBABILITY_RENDERING_RULE) +
         "&f=image";
 
+      // mean headfire flame length (feet) if a fire occurs, from USFS Wildfire Risk to
+      // Communities (Rocky Mountain Research Station / Pyrologix, public domain):
+      // https://data-usfs.hub.arcgis.com/datasets/usfs::wildfire-risk-to-communities-conditional-flame-length-image-service/about
+      const FLAME_LENGTH_SERVICE_URL =
+        "https://imagery.geoplatform.gov/iipp/rest/services/Fire_Aviation/USFS_EDW_RMRS_WRC_ConditionalFlameLength/ImageServer";
+      // classed at the NWCG "hauling chart" thresholds, since those are what decide how a
+      // fire can be attacked -- rather than the service's own 7 classes, which don't break
+      // at 11 ft. Under 4 ft (hand crews can work the head) is left unshaded to keep the
+      // map clear. Browns rather than the usual fire reds/oranges, which the buildings,
+      // fuel hatch, hydrants, and roads already use.
+      // https://www.nwcg.gov/publications/pms437/surface-fire/interpreting-expected-surface-fire-behavior
+      const FLAME_LENGTH_CLASSES = [
+        {
+          min: 4,
+          max: 8,
+          color: [254, 224, 139],
+          range: "4–8 ft",
+          meaning: "too hot for hand tools at the head",
+        },
+        {
+          min: 8,
+          max: 11,
+          color: [191, 129, 45],
+          range: "8–11 ft",
+          meaning: "torching/spotting; head attack likely fails",
+        },
+        {
+          // the raster is 16-bit, so this covers everything above 11 ft
+          min: 11,
+          max: 65536,
+          color: [84, 48, 5],
+          range: "11+ ft",
+          meaning: "crowning & major runs; no head attack",
+        },
+      ];
+      // reclassify the raw feet into one value per class (anything unmatched, i.e. under
+      // 4 ft or non-burnable, becomes transparent), then color those classes
+      const FLAME_LENGTH_RENDERING_RULE = JSON.stringify({
+        rasterFunction: "Colormap",
+        rasterFunctionArguments: {
+          colormap: FLAME_LENGTH_CLASSES.map(({ color }, i) => [i + 1, ...color]),
+          Raster: {
+            rasterFunction: "Remap",
+            rasterFunctionArguments: {
+              InputRanges: FLAME_LENGTH_CLASSES.flatMap(({ min, max }) => [min, max]),
+              OutputValues: FLAME_LENGTH_CLASSES.map((_, i) => i + 1),
+              AllowUnmatched: false,
+            },
+          },
+        },
+      });
+
+      const FLAME_LENGTH_EXPORT_URL =
+        FLAME_LENGTH_SERVICE_URL +
+        "/exportImage?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=256,256&format=png32" +
+        "&interpolation=RSP_NearestNeighbor&renderingRule=" +
+        encodeURIComponent(FLAME_LENGTH_RENDERING_RULE) +
+        "&f=image";
+
+      // built right away, same as the building risk key
+      const flameLengthKey = document.getElementById("flame-length-key");
+      for (const { color, range, meaning } of FLAME_LENGTH_CLASSES) {
+        const cell = document.createElement("span");
+        cell.className = "cell";
+        cell.style.background = `rgb(${color.join(",")})`;
+        const rangeLabel = document.createElement("span");
+        rangeLabel.className = "range";
+        rangeLabel.textContent = range;
+        const meaningLabel = document.createElement("span");
+        meaningLabel.textContent = meaning;
+        flameLengthKey.append(cell, rangeLabel, meaningLabel);
+      }
+
       // a small right-pointing arrow, registered as a map image below -- line-placed symbols
       // orient a 0deg icon along the line's own direction, so "right" is the convention
       const makeArrowIcon = () => {
@@ -692,6 +797,16 @@
         source: "burnProbability",
         layout: { visibility: "none" },
         paint: { "raster-opacity": 0.4 },
+      };
+
+      // on by default -- toggled via the layer control; translucent for the same reason as
+      // burn probability above
+      const FLAME_LENGTH_LAYER = {
+        id: "flame-length",
+        type: "raster",
+        source: "flameLength",
+        layout: { visibility: "visible" },
+        paint: { "raster-opacity": 0.5 },
       };
 
       const WATER_LAYER = {
@@ -1018,12 +1133,22 @@
               attribution:
                 '<a href="https://data-usfs.hub.arcgis.com/datasets/usfs::wildfire-risk-to-communities-burn-probability-image-service/about" target="_blank">USFS Wildfire Risk to Communities</a>',
             },
+            // same service family + attribution as burnProbability -- maplibre dedupes
+            // identical attribution strings
+            flameLength: {
+              type: "raster",
+              tiles: [FLAME_LENGTH_EXPORT_URL],
+              tileSize: 256,
+              attribution:
+                '<a href="https://data-usfs.hub.arcgis.com/datasets/usfs::wildfire-risk-to-communities-burn-probability-image-service/about" target="_blank">USFS Wildfire Risk to Communities</a>',
+            },
           },
           glyphs: "https://fonts.undpgeohub.org/fonts/{fontstack}/{range}.pbf",
           // draw order, bottom to top -- reorder these to change what draws over what
           layers: [
             HILLSHADE_LAYER,
             BURN_PROBABILITY_LAYER,
+            FLAME_LENGTH_LAYER,
             FUEL_MODELS_LAYER,
             WATER_LAYER,
             WATERWAYS_LAYER,
@@ -1201,6 +1326,7 @@
       };
       bindLayerToggle("hillshade-toggle", ["hillshade"]);
       bindLayerToggle("fuel-model-toggle", ["fuel-models"]);
+      bindLayerToggle("flame-length-toggle", ["flame-length"]);
       bindLayerToggle("burn-probability-toggle", ["burn-probability"]);
       bindLayerToggle("buildings-toggle", [
         "buildings-fill",
