@@ -1,6 +1,6 @@
-// entry point: builds the legend, creates the map from the layers/sources defined in the
-// other modules, and wires up the controls. MapLibre and pmtiles are loaded as globals
-// by the <script> tags in index.html.
+// entry point: builds the legend, creates the map from the layers/sources defined in the other modules, and wires up the controls. pmtiles is loaded as a global by its <script> tag in index.html.
+// MapLibre only ships as an ES module since v6, and loads its own web worker from the same CDN.
+import * as maplibregl from "https://cdn.jsdelivr.net/npm/maplibre-gl@6/dist/maplibre-gl.mjs";
 import { flameHatchProtocol } from "./rasters.js";
 import { STYLE } from "./style.js";
 import {

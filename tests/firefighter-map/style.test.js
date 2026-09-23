@@ -16,7 +16,7 @@ import {
 } from "../../analysis/firefighter-map/layers.js";
 import { STYLE } from "../../analysis/firefighter-map/style.js";
 
-// MapLibre's own validator, against the style spec version the page's maplibre-gl@5 uses
+// MapLibre's own validator, against the style spec version the page's maplibre-gl@6 uses
 test("the style is valid", () => {
   expect(validateStyleMin(STYLE)).toEqual([]);
 });
@@ -33,8 +33,10 @@ test("layer IDs are unique", () => {
 });
 
 describe("building risk colors", () => {
+  // the second argument only labels where an error came from, in error messages
   const fillColor = expression.createPropertyExpression(
     BUILDINGS_FILL_LAYER.paint["fill-color"],
+    "buildings-fill.paint.fill-color",
     latest.paint_fill["fill-color"],
   );
   // the tiles' risk score is property "0" (see RISK_PROPERTY)
@@ -68,7 +70,7 @@ describe("building risk colors", () => {
 });
 
 describe("paths and trails", () => {
-  const { filter } = featureFilter(TRAILS_LAYER.filter);
+  const { filter } = featureFilter(TRAILS_LAYER.filter, "trails.filter");
   const shown = (properties) => filter({ zoom: 16 }, { type: 2, properties });
 
   test.each(["path", "cycleway", "bridleway"])("keeps path/%s", (subclass) => {
