@@ -3,6 +3,7 @@ from typing import cast
 import httpx
 import pandas as pd
 
+from ptps_wildfire_demo.constants import USER_AGENT
 from ptps_wildfire_demo.helpers import str_or_none
 from ptps_wildfire_demo.internet_archive_client import InternetArchiveClient
 from ptps_wildfire_demo.rescue import Rescue
@@ -14,6 +15,8 @@ def get_drp_rescues():
     df = pd.read_json(
         "https://portal.datarescueproject.org/datasets-full.json",
         dtype_backend="pyarrow",
+        # sent as request headers for URLs
+        storage_options={"User-Agent": USER_AGENT},
     )
     # make full URLs
     df["url"] = "https://portal.datarescueproject.org" + df["url"]
@@ -39,7 +42,10 @@ class Resolver:
 
         try:
             response = await self.httpx_client.head(
-                url, timeout=20, follow_redirects=True
+                url,
+                headers={"User-Agent": USER_AGENT},
+                timeout=20,
+                follow_redirects=True,
             )
             return str(response.url)
         except httpx.HTTPError:
