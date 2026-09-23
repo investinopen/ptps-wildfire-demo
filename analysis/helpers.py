@@ -1,7 +1,9 @@
 import asyncio
 from collections.abc import Iterable
+from html import escape
 from pathlib import Path
 
+import folium
 import geopandas as gpd
 import httpx
 import pandas as pd
@@ -16,6 +18,37 @@ def run_script_in_db(conn: DuckDBPyConnection, path: Path | str):
         sql = f.read()
 
     conn.execute(sql)
+
+
+def add_map_caption(
+    m: folium.Map,
+    title: str,
+    subtitle: str | None = None,
+    legend: dict[str, str] | None = None,
+):
+    """Add a title box, with an optional legend, to the bottom left of a Folium map --
+    bottom left since branca always puts colormap legends in the top right. `legend`
+    maps each label to the CSS for its swatch, e.g. `{"warned": "background: red"}`."""
+
+    lines = [f"<strong style='font-size: 14px;'>{escape(title)}</strong>"]
+    if subtitle:
+        lines.append(escape(subtitle))
+    for label, swatch_css in (legend or {}).items():
+        lines.append(
+            "<span style='display: inline-block; width: 12px; height: 12px; "
+            f"margin-right: 4px; vertical-align: middle; {swatch_css}'></span>"
+            f"{escape(label)}"
+        )
+
+    m.get_root().html.add_child(
+        folium.Element(
+            '<div style="position: absolute; bottom: 24px; left: 10px; z-index: 1000; '
+            "padding: 4px 10px; background: rgba(255, 255, 255, 0.85); "
+            'border-radius: 4px; font: 12px sans-serif;">'
+            + "<br>".join(lines)
+            + "</div>"
+        )
+    )
 
 
 def read_geo(
