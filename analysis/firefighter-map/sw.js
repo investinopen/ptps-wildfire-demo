@@ -71,13 +71,14 @@ registerRoute(
   }),
 );
 
-// hydrants/oneway (Overpass) and place search (Nominatim) are live, safety-relevant data
+// water sources/oneway (Overpass, or its fallback mirror) and place search (Nominatim) are live, safety-relevant data
 // -- always prefer the network, and only fall back to a short-lived cache entry if
 // there's genuinely no connection, so a stale hydrant or one-way status is never shown
 // in preference to a fresh one
 registerRoute(
   ({ url }) =>
     url.hostname === "overpass-api.de" ||
+    url.hostname === "maps.mail.ru" ||
     url.hostname === "nominatim.openstreetmap.org",
   new NetworkFirst({
     cacheName: "live-data",
