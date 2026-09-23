@@ -57,114 +57,54 @@ def get_drp_repositories(resolver: Resolver, drp_url: str | None) -> list[dict]:
     return [{"name": name, "url": url} for name, url in repositories.items()]
 
 
-async def get_example_data_url_results(
-    client: httpx.AsyncClient, resolver: Resolver, datasets_to_check: pd.DataFrame
+URL_TYPES = {"webpage": "Webpage", "example_data_url": "Example data URL"}
+
+
+async def get_url_results(
+    client: httpx.AsyncClient,
+    resolver: Resolver,
+    datasets: pd.DataFrame,
+    url_column: str,
 ) -> pd.DataFrame:
+    """Checks the status and rescues of each dataset's URL in the given column, one row per dataset."""
+
+    urls = datasets[url_column]
     statuses, rescues = await asyncio.gather(
-        get_statuses(client, datasets_to_check["example_data_url"]),
-        asyncio.gather(
-            *(resolver.get_rescue(url) for url in datasets_to_check["example_data_url"])
-        ),
+        get_statuses(client, urls),
+        asyncio.gather(*(resolver.get_rescue(url) for url in urls)),
     )
 
-    rescues_df = pd.DataFrame(rescues).rename(
-        columns={
-            "original_url": "example_data_url",
-            "wayback_newest_url": "example_data_url_wayback_url",
-            "drp_url": "example_data_url_drp_url",
-        }
+    results = datasets[["name", "description"]].copy()
+    results["type"] = URL_TYPES[url_column]
+    results["url"] = urls
+    results["status"] = statuses
+    results["wayback_url"] = [rescue.wayback_newest_url for rescue in rescues]
+    results["wayback_applicable"] = (
+        is_wayback_applicable(datasets["access_type"])
+        if url_column == "example_data_url"
+        else True
     )
-    rescues_df.insert(1, "example_data_url_status", statuses)
-    rescues_df["example_data_url_drp_repositories"] = [
+    results["drp_url"] = [rescue.drp_url for rescue in rescues]
+    results["drp_repositories"] = [
         get_drp_repositories(resolver, rescue.drp_url) for rescue in rescues
     ]
-
-    results = pd.merge(
-        datasets_to_check[["name", "access_type", "example_data_url"]],
-        rescues_df,
-        on="example_data_url",
-    )
-    results["example_data_url_wayback_applicable"] = is_wayback_applicable(
-        results["access_type"]
-    )
-    return results.drop(columns=["access_type", "resolved_url"])
+    results["drp_applicable"] = is_drp_applicable(datasets["webpage"])
+    return results
 
 
-async def get_webpage_results(
-    client: httpx.AsyncClient, resolver: Resolver, datasets: pd.DataFrame
-) -> pd.DataFrame:
-    page_statuses, page_rescues = await asyncio.gather(
-        get_statuses(client, datasets["webpage"]),
-        asyncio.gather(*(resolver.get_rescue(url) for url in datasets["webpage"])),
-    )
+def get_dataset_sections(results: pd.DataFrame) -> list[dict]:
+    """Builds one section per dataset, each with a row per URL, in the order they appear in the results."""
 
-    page_rescues_df = pd.DataFrame(page_rescues).rename(
-        columns={
-            "original_url": "webpage",
-            "wayback_newest_url": "webpage_wayback_url",
-            "drp_url": "webpage_drp_url",
+    return [
+        {
+            "name": name,
+            "description": rows["description"].iloc[0],
+            "rows": rows.drop(columns=["name", "description"]).to_dict(
+                orient="records"
+            ),
         }
-    )
-    page_rescues_df.insert(1, "webpage_status", page_statuses)
-    page_rescues_df["webpage_drp_repositories"] = [
-        get_drp_repositories(resolver, rescue.drp_url) for rescue in page_rescues
+        for name, rows in results.groupby("name", sort=False)
     ]
-
-    results = pd.merge(
-        datasets[["name", "description", "webpage"]], page_rescues_df, on="webpage"
-    )
-    results["drp_applicable"] = is_drp_applicable(results["webpage"])
-    return results.drop(columns="resolved_url")
-
-
-def get_dataset_sections(
-    webpage_results: pd.DataFrame, example_data_url_results: pd.DataFrame
-) -> list[dict]:
-    """Builds one section per dataset, each with a row for its webpage and (if checked) example data URL."""
-
-    consolidated = pd.merge(
-        webpage_results, example_data_url_results, on="name", how="left"
-    )
-
-    sections = []
-    for dataset in consolidated.to_dict(orient="records"):
-        rows = [
-            {
-                "type": "Webpage",
-                "url": dataset["webpage"],
-                "status": dataset["webpage_status"],
-                "wayback_url": dataset["webpage_wayback_url"],
-                "wayback_applicable": True,
-                "drp_url": dataset["webpage_drp_url"],
-                "drp_repositories": dataset["webpage_drp_repositories"],
-                "drp_applicable": dataset["drp_applicable"],
-            }
-        ]
-        if pd.notna(dataset["example_data_url"]):
-            rows.append(
-                {
-                    "type": "Example data URL",
-                    "url": dataset["example_data_url"],
-                    "status": dataset["example_data_url_status"],
-                    "wayback_url": dataset["example_data_url_wayback_url"],
-                    "wayback_applicable": dataset[
-                        "example_data_url_wayback_applicable"
-                    ],
-                    "drp_url": dataset["example_data_url_drp_url"],
-                    "drp_repositories": dataset["example_data_url_drp_repositories"],
-                    "drp_applicable": dataset["drp_applicable"],
-                }
-            )
-
-        sections.append(
-            {
-                "name": dataset["name"],
-                "description": dataset["description"],
-                "rows": rows,
-            }
-        )
-
-    return sections
 
 
 def link_label(url: object, label: str) -> Markup:
@@ -197,12 +137,13 @@ async def get_consolidated_results() -> list[dict]:
         datasets = pd.read_csv(ANALYSIS_DIR / "fire_datasets.csv")
         datasets_to_check = get_datasets_to_check(datasets)
 
-        webpage_results, example_data_url_results = await asyncio.gather(
-            get_webpage_results(client, resolver, datasets),
-            get_example_data_url_results(client, resolver, datasets_to_check),
+        # webpage rows first, so they come first within each dataset's section
+        results = await asyncio.gather(
+            get_url_results(client, resolver, datasets, "webpage"),
+            get_url_results(client, resolver, datasets_to_check, "example_data_url"),
         )
 
-    return get_dataset_sections(webpage_results, example_data_url_results)
+    return get_dataset_sections(pd.concat(results))
 
 
 async def render_report() -> str:
