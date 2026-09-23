@@ -370,6 +370,19 @@
         height: 10px;
         margin: 3px;
       }
+      /* On paper the map is what matters, so the sidebar is a fixed width narrower than on screen (where it's as wide as its longest line), with longer lines wrapping to fit. At the end of the stylesheet, so it wins over the screen styles above. */
+      @media print {
+        #sidebar {
+          width: 224px;
+        }
+        #layer-controls label,
+        #layer-controls .sub-item {
+          white-space: normal;
+        }
+        #map-attribution .maplibregl-ctrl-attrib {
+          max-width: none;
+        }
+      }
     </style>
   </head>
   <body>
