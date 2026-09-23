@@ -49,6 +49,7 @@ export const bindLayerToggles = (map) => {
     "buildings-fill",
     "buildings-outline",
     "housenumbers",
+    "building-obstacles",
   ]);
   // driveways and paths are listed under roads, without toggles of their own
   bindLayerToggle("roads-toggle", [
@@ -58,6 +59,7 @@ export const bindLayerToggles = (map) => {
     "oneway-arrows",
     "route-shields",
     "driveways",
+    "driveway-obstacles",
     "trails",
     "trail-labels",
   ]);

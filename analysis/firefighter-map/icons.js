@@ -76,6 +76,8 @@ export const ICONS = {
     size: 16,
     stretchable: true,
   },
+  // draws nothing -- only takes up space, so other labels avoid it (see the *_OBSTACLES_LAYERs in layers.js)
+  obstacle: { draw: () => {}, size: 10 },
   // Interstate blue
   "interstate-box": {
     draw: drawBox("#1f4e9c", "#ffffff"),

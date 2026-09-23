@@ -151,6 +151,38 @@ export const TRAILS_LAYER = {
   },
 };
 
+// Invisible obstacles so route number signs (and any other label placed after these -- see the layer order in style.js) don't land on top of buildings or driveways. MapLibre only keeps labels from overlapping other labels/symbols, not lines or shapes, so these put an invisible symbol on each building and every few pixels along each driveway. Always placed (allow-overlap), but still counted in collisions. Road names and house numbers are placed before these, so they're unaffected.
+export const BUILDING_OBSTACLES_LAYER = {
+  id: "building-obstacles",
+  type: "symbol",
+  source: "buildings",
+  "source-layer": SOURCE_LAYER,
+  minzoom: BUILDING_MIN_ZOOM,
+  layout: {
+    visibility: "visible",
+    "icon-image": "obstacle",
+    // roughly a house's size on screen, growing with it
+    "icon-size": ["interpolate", ["exponential", 2], ["zoom"], 15, 1, 18, 4],
+    "icon-allow-overlap": true,
+  },
+};
+
+export const DRIVEWAY_OBSTACLES_LAYER = {
+  id: "driveway-obstacles",
+  type: "symbol",
+  source: "roadsSource",
+  "source-layer": "transportation",
+  filter: ["==", ["get", "class"], "service"],
+  layout: {
+    visibility: "visible",
+    "icon-image": "obstacle",
+    "symbol-placement": "line",
+    // closer together than a sign is wide, so a sign can't fit between two of them
+    "symbol-spacing": 10,
+    "icon-allow-overlap": true,
+  },
+};
+
 // route numbers as sign-style boxes along the road, e.g. "I-25", "US 36", "Hwy 119" -- also the only label for highway stretches with a number but no name. County roads' refs already read like "CR 52", so they're shown as-is.
 // https://openmaptiles.org/schema/#transportation_name
 export const ROUTE_SHIELDS_LAYER = {

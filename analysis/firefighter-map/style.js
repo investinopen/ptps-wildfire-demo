@@ -12,6 +12,8 @@ import {
   TRAILS_LAYER,
   ROAD_LABELS_LAYER,
   ROUTE_SHIELDS_LAYER,
+  BUILDING_OBSTACLES_LAYER,
+  DRIVEWAY_OBSTACLES_LAYER,
   ROAD_LABEL_FALLBACKS_LAYER,
   LABEL_BLOCKERS_LAYER,
   TRAIL_LABELS_LAYER,
@@ -112,15 +114,17 @@ export const STYLE = {
     WATER_LABELS_LAYER,
     BUILDINGS_OUTLINE_LAYER,
     TRAIL_LABELS_LAYER,
-    HOUSENUMBERS_LAYER,
     POOLS_LAYER,
     WATER_SOURCES_LAYER,
     HYDRANTS_LAYER,
     DEAD_ENDS_LAYER,
     GATES_LAYER,
     WEIGHT_LIMITS_LAYER,
-    // road names first, then the fallbacks for roads they couldn't fit on, then route numbers, over everything else below (see ROAD_LABELS_LAYER)
+    // Road names first, then the fallbacks for roads they couldn't fit on, then house numbers, then the invisible building/driveway obstacles, then route numbers -- so route numbers avoid all of those -- over everything else below (see ROAD_LABELS_LAYER).
     ROUTE_SHIELDS_LAYER,
+    DRIVEWAY_OBSTACLES_LAYER,
+    BUILDING_OBSTACLES_LAYER,
+    HOUSENUMBERS_LAYER,
     ROAD_LABEL_FALLBACKS_LAYER,
     ROAD_LABELS_LAYER,
     // town names, only shown zoomed out
