@@ -36,7 +36,8 @@
 ## {{ dataset.name }}
 
 <section>
-  <p class="text-body-secondary">{{ dataset.description }}</p>
+  {# on one line, since Quarto would otherwise treat the contents as separate Markdown paragraphs; velocity descriptions from datapackage.json #}
+  <p class="text-body-secondary">{{ dataset.description }} <span class="badge text-bg-secondary" title="{% if dataset.data_velocity == 'high' %}Near-real-time or frequently updated feed{% else %}Periodic releases or historical archive{% endif %}">{{ dataset.data_velocity }} velocity</span></p>
   <table class="table table-bordered table-striped">
     <thead>
       <tr>

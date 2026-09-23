@@ -74,7 +74,7 @@ async def get_url_results(
         asyncio.gather(*(resolver.get_rescue(url) for url in urls)),
     )
 
-    results = datasets[["name", "description"]].copy()
+    results = datasets[["name", "description", "data_velocity"]].copy()
     results["type"] = URL_TYPES[url_column]
     results["url"] = urls
     results["status"] = statuses
@@ -99,7 +99,8 @@ def get_dataset_sections(results: pd.DataFrame) -> list[dict]:
         {
             "name": name,
             "description": rows["description"].iloc[0],
-            "rows": rows.drop(columns=["name", "description"]).to_dict(
+            "data_velocity": rows["data_velocity"].iloc[0],
+            "rows": rows.drop(columns=["name", "description", "data_velocity"]).to_dict(
                 orient="records"
             ),
         }
