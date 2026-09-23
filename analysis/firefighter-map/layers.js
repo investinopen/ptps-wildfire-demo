@@ -128,6 +128,25 @@ export const DRIVEWAYS_LAYER = {
   },
 };
 
+// tracks and paths, minus sidewalks. The tiles don't keep OSM's footway=sidewalk tag, so
+// this drops highway=footway altogether (along with steps, plazas, and indoor
+// corridors) -- in OSM, trails outside of town are almost always highway=path/track,
+// while footways are mostly sidewalks/crossings running alongside roads. Cycleways stay,
+// since they're usually their own corridors (rail-trails, bike paths).
+// https://openmaptiles.org/schema/#transportation
+const TRAILS_FILTER = [
+  "all",
+  ["in", ["get", "class"], ["literal", ["track", "path"]]],
+  [
+    "!",
+    [
+      "in",
+      ["get", "subclass"],
+      ["literal", ["footway", "steps", "pedestrian", "corridor", "platform"]],
+    ],
+  ],
+];
+
 // unpaved tracks and foot/bike/horse paths (class "track", "path") -- the same width as
 // driveways so they're as easy to follow over the flame length hatch --
 // https://wiki.openstreetmap.org/wiki/Tag:highway%3Dtrack
@@ -137,7 +156,7 @@ export const TRAILS_LAYER = {
   type: "line",
   source: "roadsSource",
   "source-layer": "transportation",
-  filter: ["in", ["get", "class"], ["literal", ["track", "path"]]],
+  filter: TRAILS_FILTER,
   layout: { visibility: "visible" },
   paint: {
     "line-color": "#557a12",
@@ -171,7 +190,7 @@ export const TRAIL_LABELS_LAYER = {
   type: "symbol",
   source: "roadsSource",
   "source-layer": "transportation_name",
-  filter: ["in", ["get", "class"], ["literal", ["track", "path"]]],
+  filter: TRAILS_FILTER,
   layout: {
     visibility: "visible",
     "text-field": ["get", "name"],
