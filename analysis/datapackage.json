@@ -1,0 +1,106 @@
+{
+  "$schema": "https://datapackage.org/profiles/2.0/datapackage.json",
+  "name": "wildfire-datasets",
+  "title": "Wildfire-related datasets",
+  "description": "A catalog of public datasets relevant to wildfire risk, detection, impact, and response in the United States, with how each can be accessed and how often it changes.",
+  "homepage": "https://github.com/investinopen/ptps-wildfire-demo",
+  "version": "1.0.0",
+  "created": "2026-09-22T00:00:00Z",
+  "keywords": ["wildfire", "fire", "climate", "open data", "data catalog"],
+  "licenses": [
+    {
+      "name": "CC0-1.0",
+      "path": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "title": "CC0 1.0 Universal"
+    }
+  ],
+  "contributors": [
+    {
+      "title": "Invest in Open Infrastructure",
+      "roles": ["publisher"]
+    }
+  ],
+  "resources": [
+    {
+      "name": "fire-datasets",
+      "title": "Fire datasets",
+      "description": "One row per dataset, with its access requirements, a landing page, and (where available) a direct link to example data.",
+      "path": "fire_datasets.csv",
+      "type": "table",
+      "scheme": "file",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "dialect": {
+        "$schema": "https://datapackage.org/profiles/2.0/tabledialect.json",
+        "header": true,
+        "delimiter": ",",
+        "quoteChar": "\""
+      },
+      "schema": {
+        "$schema": "https://datapackage.org/profiles/2.0/tableschema.json",
+        "fields": [
+          {
+            "name": "access_type",
+            "title": "Access type",
+            "description": "What is needed to retrieve the data: nothing (\"No auth\"), a free API key or account (\"Free key\"), a bulk download or analytic tool (\"Bulk or analytic\"), or archived static files (\"Static files\").",
+            "type": "string",
+            "categories": ["No auth", "Free key", "Bulk or analytic", "Static files"],
+            "constraints": {
+              "required": true,
+              "enum": ["No auth", "Free key", "Bulk or analytic", "Static files"]
+            }
+          },
+          {
+            "name": "name",
+            "title": "Name",
+            "description": "Name of the dataset or data source.",
+            "type": "string",
+            "constraints": {
+              "required": true,
+              "unique": true
+            }
+          },
+          {
+            "name": "description",
+            "title": "Description",
+            "description": "Short summary of what the dataset contains.",
+            "type": "string",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "data_velocity",
+            "title": "Data velocity",
+            "description": "How frequently the data changes: \"high\" for near-real-time or frequently updated feeds, \"low\" for periodic releases or historical archives.",
+            "type": "string",
+            "categories": ["low", "high"],
+            "constraints": {
+              "required": true,
+              "enum": ["low", "high"]
+            }
+          },
+          {
+            "name": "webpage",
+            "title": "Webpage",
+            "description": "Landing page or documentation for the dataset.",
+            "type": "string",
+            "format": "uri",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "example_data_url",
+            "title": "Example data URL",
+            "description": "Direct link to a sample file or API response, if one is available. Bracketed segments (e.g. [MAP_KEY]) are placeholders to fill in.",
+            "type": "string"
+          }
+        ],
+        "primaryKey": ["name"],
+        "missingValues": [""]
+      }
+    }
+  ]
+}
