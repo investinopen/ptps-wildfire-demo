@@ -60,7 +60,7 @@ const FLAME_LENGTH_EXPORT_URL =
 
 // a hatch tile: a single diagonal ("/"), repeated to fill each class's area
 export const HATCH_SIZE = 14;
-const HATCH_LINE_WIDTH = 1.5;
+const HATCH_LINE_WIDTH = 1;
 const makeHatchTile = () => {
   const canvas = new OffscreenCanvas(HATCH_SIZE, HATCH_SIZE);
   const ctx = canvas.getContext("2d");
