@@ -108,6 +108,40 @@ def get_dataset_sections(results: pd.DataFrame) -> list[dict]:
     ]
 
 
+def format_share(matches: pd.Series) -> str:
+    """Renders what share of the values are true, e.g. "60% (12/20)", or "N/A" if there are none."""
+
+    if matches.empty:
+        return "N/A"
+
+    count = int(matches.sum())
+    return f"{count / len(matches):.0%} ({count}/{len(matches)})"
+
+
+def get_summary_row(label: str, results: pd.DataFrame) -> dict:
+    """Stats across the URLs in the given results, leaving out URLs an archive isn't applicable to."""
+
+    wayback = results[results["wayback_applicable"]]
+    drp = results[results["drp_applicable"]]
+    return {
+        "label": label,
+        "datasets": results["name"].nunique(),
+        "urls": len(results),
+        "live": format_share(results["status"].str.startswith("🟢")),
+        "wayback": format_share(wayback["wayback_url"].notna()),
+        "drp": format_share(drp["drp_url"].notna()),
+    }
+
+
+def get_summary(results: pd.DataFrame) -> list[dict]:
+    """One row of stats per data velocity (high first), plus a total."""
+
+    return [
+        get_summary_row(velocity.capitalize(), rows)
+        for velocity, rows in results.groupby("data_velocity")
+    ] + [get_summary_row("All", results)]
+
+
 def link_label(url: object, label: str) -> Markup:
     """Renders a label as a link to the given URL."""
 
@@ -131,7 +165,7 @@ def yes_no(url: object) -> Markup:
     return Markup(f'🟢 <a href="{escaped_url}" target="_blank" rel="noopener">Yes</a>')
 
 
-async def get_consolidated_results() -> list[dict]:
+async def get_consolidated_results() -> pd.DataFrame:
     async with httpx.AsyncClient() as client:
         resolver = Resolver(client)
 
@@ -147,17 +181,18 @@ async def get_consolidated_results() -> list[dict]:
             get_url_results(client, resolver, datasets_to_check, "example_data_url"),
         )
 
-    return get_dataset_sections(pd.concat(results))
+    return pd.concat(results)
 
 
 async def render_report() -> str:
-    consolidated_results = await get_consolidated_results()
+    results = await get_consolidated_results()
 
     env = Environment(loader=FileSystemLoader(ANALYSIS_DIR))
     env.filters["link_label"] = link_label
     env.filters["yes_no"] = yes_no
     template = env.get_template("report_template.html.jinja")
     return template.render(
-        datasets=consolidated_results,
+        summary=get_summary(results),
+        datasets=get_dataset_sections(results),
         generated_at=datetime.now(UTC),
     )

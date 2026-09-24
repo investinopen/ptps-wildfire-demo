@@ -31,6 +31,43 @@
   })();
 </script>
 
+## Summary
+
+<section>
+  <p class="text-body-secondary">Shares of the webpage and example data URLs, leaving out the ones an archive isn't applicable to.</p>
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Data velocity</th>
+        <th>Datasets</th>
+        <th>URLs</th>
+        <th>Live</th>
+        <th>
+          In
+          <a href="https://web.archive.org/" target="_blank">Wayback Machine</a>
+        </th>
+        <th>
+          In
+          <a href="https://portal.datarescueproject.org/" target="_blank">Data Rescue Project
+            Portal</a>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in summary %}
+      <tr{% if loop.last %} class="fw-bold"{% endif %}>
+        <th scope="row">{{ row.label }}</th>
+        <td>{{ row.datasets }}</td>
+        <td>{{ row.urls }}</td>
+        <td class="text-nowrap">{{ row.live }}</td>
+        <td class="text-nowrap">{{ row.wayback }}</td>
+        <td class="text-nowrap">{{ row.drp }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
 {% for dataset in datasets %}
 {# a Markdown heading rather than an <h2>, so Quarto includes it in the table of contents #}
 ## {{ dataset.name }}
