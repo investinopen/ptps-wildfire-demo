@@ -89,7 +89,7 @@ jobs:
       # A single-file render always executes, even with `freeze: true` (see site/_quarto.yml). This saves the .qmd's results to site/_freeze/ and writes the .ipynb's outputs back into the notebook.
       - name: Execute pages
         run: |
-          for page in analysis/rescue-status.qmd analysis/risk.ipynb analysis/fire_overlap.ipynb; do
+          for page in analysis/rescue-status.qmd analysis/risk.ipynb analysis/fire_overlap.ipynb analysis/road_graph.ipynb; do
             uv run quarto render "site/$page" --execute
           done
 
@@ -110,5 +110,6 @@ jobs:
             site/_freeze/
             site/analysis/risk.ipynb
             site/analysis/fire_overlap.ipynb
+            site/analysis/road_graph.ipynb
           if-no-files-found: error
           retention-days: 30

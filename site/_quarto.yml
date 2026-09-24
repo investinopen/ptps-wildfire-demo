@@ -15,6 +15,7 @@ project:
     - analysis/rescue-status.qmd
     - analysis/risk.ipynb
     - analysis/fire_overlap.ipynb
+    - analysis/road_graph.ipynb
   # published as-is
   resources:
     # has its own full-screen layout
@@ -43,6 +44,8 @@ website:
             text: Risk calculation
           - href: analysis/fire_overlap.ipynb
             text: Wildfire overlap
+          - href: analysis/road_graph.ipynb
+            text: Road graph
       - href: firefighter-map/index.html
         text: Firefighter map
   page-footer:

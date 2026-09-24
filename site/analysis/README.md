@@ -40,6 +40,10 @@ Draws every mapped fire perimeter in a state since 1984 as a translucent polygon
 1. [Download the fire perimeters.](wumi_perimeters.ipynb) Already in [`data/`](#data) for Wyoming. Dryad's website sits behind bot detection, but its REST API doesn't -- this step needs a [Dryad API account](https://datadryad.org/api#?route=overview--api-accounts) (`DRYAD_CLIENT_ID`/`DRYAD_SECRET` in `.env`; see `.env.sample`) rather than a manual download.
 1. [Run the analysis.](fire_overlap.ipynb)
 
+## [Road graph](road_graph.ipynb)
+
+A simplified map for navigation ([#22](https://github.com/investinopen/ptps-wildfire-demo/issues/22)): the roads around a rural town drawn as a graph of intersections and the roads between them, each drawn with its length proportional to its driving distance, colored by its steepest grade, and with sharp turns, dead ends, and gates marked. Roads come from OpenStreetMap via [OSMnx](https://osmnx.readthedocs.io/), and elevation from [Mapterhorn](https://mapterhorn.com/)'s terrain tiles. Set `PLACE_NAME`/`CENTER` in the configuration cell to move it.
+
 ## Dataset rescue status report
 
 [`generate_report.py`](generate_report.py) checks the rescue status of the [example data sources](fire_datasets.csv). It's run by [`rescue-status.qmd`](rescue-status.qmd) whenever the site is rendered.
