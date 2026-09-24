@@ -3,6 +3,7 @@ import math
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
+from matplotlib import patheffects
 from matplotlib.lines import Line2D
 from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 from scipy.optimize import brentq
@@ -60,6 +61,11 @@ ADDRESS_STYLE = {
     "facecolor": "white",
     "edgecolor": "#333333",
     "linewidth": 0.8,
+}
+# house numbers go over everything else, with a white outline so they're readable over roads and symbols
+HOUSE_NUMBER_STYLE = {
+    "zorder": 6,
+    "path_effects": [patheffects.withStroke(linewidth=2, foreground="white")],
 }
 SCALE_BAR_FEET = [100, 250, 500, 1000, 2500, 5000]
 # roughly how wide a character of the labels is, in points, for deciding whether a label fits along its road
@@ -294,7 +300,7 @@ class Diagram:
         # labels have to fit entirely on the map, rather than running off its edges or into the title
         map_area = ax.get_window_extent(renderer)
 
-        def place(points, text, fontsize, side, fraction):
+        def place(points, text, fontsize, side, fraction, style):
             (x, y), angle = along(points, fraction)
             angle = upright(angle)
             # clear of the line, rather than covering it
@@ -312,9 +318,9 @@ class Diagram:
                 ha="center",
                 va="bottom" if side > 0 else "top",
                 fontsize=fontsize,
-                zorder=3,
                 annotation_clip=True,
                 fontweight="bold" if fontsize > 6 else "normal",
+                **{"zorder": 3, **style},
             )
             extent = annotation.get_window_extent(renderer)
             if (
@@ -327,15 +333,17 @@ class Diagram:
             taken.append(extent)
             return True
 
-        def label(points, text, fontsize, side, fractions=(0.5, 0.3, 0.7), fits=None):
-            """Along the road, just above (side=1) or below (side=-1) it -- if the road's long enough to fit it (or `fits` says so) -- at the first of `fractions` of the way along where it's clear of the other labels."""
+        def label(
+            points, text, fontsize, side, fractions=(0.5, 0.3, 0.7), fits=None, **style
+        ):
+            """Along the road, just above (side=1) or below (side=-1) it -- if the road's long enough to fit it (or `fits` says so) -- at the first of `fractions` of the way along where it's clear of the other labels. `style` goes to the text."""
             length = np.hypot(*np.diff(points, axis=0).T).sum() * points_per_meter
             if fits is None:
                 fits = len(text) * CHAR_POINTS[fontsize] <= length
             if not fits:
                 return
             for fraction in fractions:
-                if place(points, text, fontsize, side, fraction):
+                if place(points, text, fontsize, side, fraction, style):
                     return
 
         # placed in order of importance, since a label that'd overlap an earlier one is left off: each road's name once, below its longest stretch, then the house numbers, above the road
@@ -348,7 +356,9 @@ class Diagram:
             label(points, name, 7.5, -1)
         for (u, v, k), points in paths.items():
             for fraction, number in G.edges[u, v, k]["addresses"]:
-                label(points, number, 5.5, 1, [fraction], fits=True)
+                label(
+                    points, number, 5.5, 1, [fraction], fits=True, **HOUSE_NUMBER_STYLE
+                )
 
         # the longest round length that takes up no more than a sixth of the page
         width = np.diff(ax.get_xlim())[0] * FEET_PER_METER
