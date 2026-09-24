@@ -3,20 +3,26 @@ title: Simplified firefighter map
 # where it was published before moving into firefighter-maps/
 aliases:
   - ../../road-graph.html
-# wide enough for the diagrams, which are laid out for a landscape page
+# wide enough for the diagrams, which are laid out for a landscape page and span the whole window (see `column` below) -- a table of contents would end up underneath them
 page-layout: full
+toc: false
 # just the results -- the code is in ptps_wildfire_demo/simplified_map/
 execute:
   echo: false
 format:
   html:
+    # sharp even when stretched across a wide window
+    fig-dpi: 150
     include-in-header:
       text: |
         <style>
-          /* shrink the diagrams to fit narrower windows, rather than scrolling sideways */
+          /* as wide as the window, rather than their fixed size -- which also keeps them from scrolling sideways in narrower windows */
           .cell-output-display img {
-            max-width: 100%;
+            width: 100%;
             height: auto;
+          }
+          .cell-output-display a:has(> img) {
+            display: block;
           }
         </style>
     include-after-body:
@@ -27,6 +33,11 @@ format:
             const link = document.createElement("a");
             link.href = img.src;
             link.target = "_blank";
+            // the column-* class that widens it (see `column` below) only works on what's directly in the page grid, which is now the link
+            for (const name of [...img.classList].filter((name) => name.startsWith("column-"))) {
+              img.classList.remove(name);
+              link.classList.add(name);
+            }
             img.replaceWith(link);
             link.append(img);
           }
@@ -73,6 +84,7 @@ def meters(value):
 ## Whole area
 
 ```{python}
+#| column: screen-inset
 gold_hill.show()
 ```
 
@@ -81,6 +93,7 @@ gold_hill.show()
 At one scale, the town's short blocks get lost next to the long rural roads, so here's the middle of town on its own page, at a larger scale.
 
 ```{python}
+#| column: screen-inset
 gold_hill.show(zoomed=True)
 ```
 
