@@ -3,14 +3,14 @@ import osmnx as ox
 from shapely import LineString
 from shapely.ops import linemerge
 
-# the same highway types as DRIVABLE_HIGHWAYS in the firefighter map, minus parking lot aisles and drive-throughs
+# the same highway types as DRIVABLE_HIGHWAYS in the detailed firefighter map, minus parking lot aisles and drive-throughs
 # https://wiki.openstreetmap.org/wiki/Key:highway
 DRIVABLE_FILTER = (
     '["highway"~"^(motorway|motorway_link|trunk|trunk_link|primary|primary_link|secondary|secondary_link|tertiary|tertiary_link|unclassified|residential|living_street|service|track)$"]'
     '["service"!~"^(parking_aisle|parking|drive-through)$"]'
     '["area"!="yes"]'
 )
-# barriers an engine can't drive through, even when open some of the time -- also the same as the firefighter map's
+# barriers an engine can't drive through, even when open some of the time -- also the same as the detailed firefighter map's
 # https://wiki.openstreetmap.org/wiki/Key:barrier
 VEHICLE_BARRIERS = {"gate", "lift_gate", "swing_gate", "chain", "bollard"}
 # mapped places to turn around at the end of a road

@@ -27,7 +27,7 @@ We aim to support the following tools:
   - DuckDB
   - PostgreSQL/PostGIS
 
-Also paper! See [firefighter map](firefighter-map/).
+Also paper! See the [firefighter maps](firefighter-maps/detailed/index.html).
 
 ## [HTTP proxy](https://github.com/investinopen/ptps-wildfire-demo/tree/main/proxy) {#http-proxy}
 

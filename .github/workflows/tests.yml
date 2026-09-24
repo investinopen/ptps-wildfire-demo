@@ -70,11 +70,11 @@ jobs:
       - name: Run tests
         run: npm test
 
-  firefighter-map:
+  detailed-firefighter-map:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: tests/firefighter-map
+        working-directory: tests/firefighter-maps/detailed
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -84,7 +84,7 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-          cache-dependency-path: tests/firefighter-map/package-lock.json
+          cache-dependency-path: tests/firefighter-maps/detailed/package-lock.json
 
       - name: Install dependencies
         run: npm ci

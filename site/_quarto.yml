@@ -15,10 +15,12 @@ project:
     - analysis/rescue-status.qmd
     - analysis/risk.ipynb
     - analysis/fire_overlap.ipynb
-    - road_graph.ipynb
+    - firefighter-maps/simplified/index.ipynb
   # published as-is
   resources:
     # has its own full-screen layout
+    - firefighter-maps/detailed/
+    # redirects from where the detailed map used to be
     - firefighter-map/
     # the map links to the logo directly
     - img/
@@ -44,10 +46,12 @@ website:
             text: Risk calculation
           - href: analysis/fire_overlap.ipynb
             text: Wildfire overlap
-      - href: firefighter-map/index.html
-        text: Firefighter map
-      - href: road_graph.ipynb
-        text: Road graph
+      - text: Firefighter maps
+        menu:
+          - href: firefighter-maps/detailed/index.html
+            text: Detailed
+          - href: firefighter-maps/simplified/index.ipynb
+            text: Simplified
   page-footer:
     left: "© 2026 [Invest in Open Infrastructure](https://investinopen.org/) · [MIT License](https://github.com/investinopen/ptps-wildfire-demo/blob/main/LICENSE)"
     right:

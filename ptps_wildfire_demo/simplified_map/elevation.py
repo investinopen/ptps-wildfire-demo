@@ -6,7 +6,7 @@ import numpy as np
 from PIL import Image
 from pyproj import Transformer
 
-# the same terrain tiles as the firefighter map's topographic shading
+# the same terrain tiles as the detailed firefighter map's topographic shading
 TILE_URL = "https://tiles.mapterhorn.com/{z}/{x}/{y}.webp"
 TILE_SIZE = 512
 TILE_ZOOM = 14  # ~5 meters per pixel at this latitude, finer than the grade span

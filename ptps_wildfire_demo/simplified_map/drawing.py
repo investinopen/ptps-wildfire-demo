@@ -11,7 +11,7 @@ from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 from scipy.optimize import brentq
 from shapely import LinearRing, LineString, Point, box
 
-from ptps_wildfire_demo.road_graph.network import TURNAROUNDS
+from ptps_wildfire_demo.simplified_map.network import TURNAROUNDS
 
 FEET_PER_METER = 3.28084
 
@@ -132,7 +132,7 @@ def node_kind(G: nx.MultiGraph, node, center: Point, radius_meters: float) -> st
         if data.get("highway") in TURNAROUNDS:
             return "turnaround"
         ((_, _, road),) = G.edges(node, data=True)
-        # like the firefighter map, tracks aren't flagged, since they routinely end at trails
+        # like the detailed firefighter map, tracks aren't flagged, since they routinely end at trails
         return "track end" if road["highway"] == "track" else "dead end"
     if (
         G.degree(node) == 2

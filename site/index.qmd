@@ -15,7 +15,9 @@ A networked data infrastructure demo for the "Investing in Open Infra to Safegua
   - **[Dataset rescue statuses](analysis/rescue-status.qmd):** checks whether the example wildfire data sources are still up, and whether they've been rescued to the [Wayback Machine](https://web.archive.org/) or the [Data Rescue Project Portal](https://portal.datarescueproject.org/). Updates daily.
   - **[Risk calculation](analysis/risk.ipynb):** ranks a state's fire weather zones by combining burn probability, burn history, Red Flag Warnings, and active fire detections.
   - **[Wildfire overlap](analysis/fire_overlap.ipynb):** maps every fire perimeter in a state since 1984, so places that have burned more than once stand out.
-- **[Firefighter map](firefighter-map/index.html):** a printable map for small/rural fire departments, combining building footprints, fuel load, burn probability, fire hydrants, roads, driveways, and trails.
+- **Firefighter maps:** printable maps for small/rural fire departments.
+  - **[Detailed](firefighter-maps/detailed/index.html):** combines building footprints, fuel load, burn probability, fire hydrants, roads, driveways, and trails.
+  - **[Simplified](firefighter-maps/simplified/index.ipynb):** draws the roads as a graph, to scale by driving distance, with steep grades, sharp turns, dead ends, and house numbers marked.
 
 For progress over time, see the [changelog](https://github.com/investinopen/ptps-wildfire-demo/blob/main/CHANGELOG.md).
 
@@ -49,10 +51,10 @@ Data rescue/resilience has, for the most part, focused on a single aspect of the
 - Most solutions assume a high-speed internet connection on a modern device. How can we make relevant data available to those who (urgently) need it but don't have internet or power?
   - Disaster scenarios
   - Remote areas
-  - This is what the [maps for firefighters](firefighter-map/index.html) is about.
+  - This is what the [maps for firefighters](firefighter-maps/detailed/index.html) is about.
 - What data would be useful to operational folks but is too hard for them to access/use?
   - Example: [Fire risk data](https://open-climate-risk.readthedocs.io/en/stable/access-data.html#download-options) requires using code / GIS software.
-  - This is also what the [maps for firefighters](firefighter-map/index.html) is about.
+  - This is also what the [maps for firefighters](firefighter-maps/detailed/index.html) is about.
 
 ## Design decisions
 
