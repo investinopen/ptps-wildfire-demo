@@ -29,3 +29,9 @@ $footer-fg: #ffffff;
   --bs-link-color-rgb: var(--bs-body-color-rgb);
   --bs-link-hover-color-rgb: var(--bs-body-color-rgb);
 }
+
+// Bootstrap gives every link a fixed weight, which would un-bold links inside bold text
+strong a,
+b a {
+  font-weight: inherit;
+}
