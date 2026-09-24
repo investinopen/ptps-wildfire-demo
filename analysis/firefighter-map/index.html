@@ -220,6 +220,12 @@
       #sidebar-toggle:hover {
         background: #f2f2f2;
       }
+      /* the sidebar is above the map on a phone (see above), so the arrows point up/down rather than left/right */
+      @media screen and (max-width: 700px) {
+        #sidebar-toggle {
+          transform: rotate(90deg);
+        }
+      }
       #map-container.sidebar-collapsed #sidebar {
         display: none;
       }
