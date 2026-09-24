@@ -3,17 +3,13 @@
   "configurations": [
     {
       "name": "site-preview",
-      "runtimeExecutable": "uv",
+      "runtimeExecutable": "sh",
       "runtimeArgs": [
-        "run",
-        "quarto",
-        "preview",
-        "analysis",
-        "--port",
-        "8744",
-        "--no-browser"
+        "-c",
+        "uv run quarto preview analysis --port \"${PORT:-8744}\" --no-browser"
       ],
-      "port": 8744
+      "port": 8744,
+      "autoPort": true
     }
   ]
 }
