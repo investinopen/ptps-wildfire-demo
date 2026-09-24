@@ -19,6 +19,20 @@ A networked data infrastructure demo for the "Investing in Open Infra to Safegua
   - **[Detailed](firefighter-maps/detailed/index.html):** combines building footprints, fuel load, burn probability, fire hydrants, roads, driveways, and trails.
   - **[Simplified](firefighter-maps/simplified/index.qmd):** draws the roads as a graph, to scale by driving distance, with steep grades, sharp turns, dead ends, and house numbers marked.
 
+::: {.screenshots layout-ncol=3}
+[![Browser extension](img/screenshots/extension.webp){fig-alt="The browser extension's modal over a missing EPA page, offering the rescued data"}](fallbacks.qmd#browser-extension)
+
+[![Dataset rescue statuses](img/screenshots/rescue-status.webp){fig-alt="Summary table of how many example data sources are live and archived"}](analysis/rescue-status.qmd)
+
+[![Risk calculation](img/screenshots/risk.webp){fig-alt="Map of Wyoming's fire weather zones, shaded by risk score"}](analysis/risk.ipynb)
+
+[![Wildfire overlap](img/screenshots/fire-overlap.webp){fig-alt="Map of fire perimeters across Wyoming since 1984, darker where they overlap"}](analysis/fire_overlap.ipynb)
+
+[![Detailed firefighter map](img/screenshots/detailed-map.webp){fig-alt="Detailed map of Gold Hill, Colorado, with buildings colored by wildfire risk, roads, trails, and house numbers"}](firefighter-maps/detailed/index.html)
+
+[![Simplified firefighter map](img/screenshots/simplified-map.webp){fig-alt="Road graph of Gold Hill, Colorado, colored by steepness, with dead ends and sharp turns marked"}](firefighter-maps/simplified/index.qmd)
+:::
+
 For progress over time, see the [changelog](https://github.com/investinopen/ptps-wildfire-demo/blob/main/CHANGELOG.md).
 
 ## Background

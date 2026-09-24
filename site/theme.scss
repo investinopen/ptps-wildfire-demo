@@ -35,3 +35,8 @@ strong a,
 b a {
   font-weight: inherit;
 }
+
+// thumbnails on the home page; several are mostly white, so they'd otherwise blend into the page
+.screenshots img {
+  border: 1px solid var(--bs-border-color);
+}
