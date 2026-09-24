@@ -22,6 +22,15 @@ LOAD spatial;
 -- https://duckdb.org/2026/03/09/announcing-duckdb-150
 SET geometry_always_xy = true;
 
+-- Identify ourselves to the data sources, rather than as a generic DuckDB client. Keep in sync with USER_AGENT in ptps_wildfire_demo/constants.py.
+-- https://duckdb.org/docs/current/core_extensions/httpfs/https#http-secrets
+CREATE OR REPLACE SECRET user_agent (
+        TYPE http,
+        EXTRA_HTTP_HEADERS MAP {
+            'User-Agent': 'ptps-wildfire-demo/0.1.0 (+https://github.com/investinopen/ptps-wildfire-demo)'
+        }
+    );
+
 -- https://docs.source.coop/data-proxy
 -- https://github.com/source-cooperative/docs.source.coop/pull/29
 CREATE OR REPLACE SECRET source_coop (
