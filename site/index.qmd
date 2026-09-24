@@ -7,14 +7,15 @@ A networked data infrastructure demo for the "Investing in Open Infra to Safegua
 
 ## What's here
 
-- **[Dataset rescue statuses](rescue-status.qmd):** checks whether the example wildfire data sources are still up, and whether they've been rescued to the [Wayback Machine](https://web.archive.org/) or the [Data Rescue Project Portal](https://portal.datarescueproject.org/). Updates daily.
-- **[Risk calculation](risk.ipynb):** ranks a state's fire weather zones by combining burn probability, burn history, Red Flag Warnings, and active fire detections.
-- **[Wildfire overlap](fire_overlap.ipynb):** maps every fire perimeter in a state since 1984, so places that have burned more than once stand out.
-- **[Firefighter map](firefighter-map/index.html):** a printable map for small/rural fire departments, combining building footprints, fuel load, burn probability, fire hydrants, roads, driveways, and trails.
-- **[Fallbacks](fallbacks.qmd)**, tools for finding a backup when a source URL goes away:
+- **[Fallbacks](fallbacks.qmd):** tools for finding a backup when a source URL goes away.
   - [HTTP proxy](fallbacks.qmd#http-proxy)
   - [Python package](fallbacks.qmd#python-package)
   - [Browser extension](fallbacks.qmd#browser-extension)
+- **Analysis**
+  - **[Dataset rescue statuses](analysis/rescue-status.qmd):** checks whether the example wildfire data sources are still up, and whether they've been rescued to the [Wayback Machine](https://web.archive.org/) or the [Data Rescue Project Portal](https://portal.datarescueproject.org/). Updates daily.
+  - **[Risk calculation](analysis/risk.ipynb):** ranks a state's fire weather zones by combining burn probability, burn history, Red Flag Warnings, and active fire detections.
+  - **[Wildfire overlap](analysis/fire_overlap.ipynb):** maps every fire perimeter in a state since 1984, so places that have burned more than once stand out.
+- **[Firefighter map](firefighter-map/index.html):** a printable map for small/rural fire departments, combining building footprints, fuel load, burn probability, fire hydrants, roads, driveways, and trails.
 
 For progress over time, see the [changelog](https://github.com/investinopen/ptps-wildfire-demo/blob/main/CHANGELOG.md).
 

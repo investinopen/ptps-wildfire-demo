@@ -8,13 +8,13 @@ execute:
 
 project:
   type: website
-  # everything else in this directory is a working notebook/script, not a page
+  # everything else is a working notebook/script or supporting file, not a page
   render:
     - index.qmd
     - fallbacks.qmd
-    - rescue-status.qmd
-    - risk.ipynb
-    - fire_overlap.ipynb
+    - analysis/rescue-status.qmd
+    - analysis/risk.ipynb
+    - analysis/fire_overlap.ipynb
   # published as-is
   resources:
     # has its own full-screen layout
@@ -28,19 +28,21 @@ website:
   favicon: img/ioi-icon.png
   repo-url: https://github.com/investinopen/ptps-wildfire-demo
   repo-branch: main
-  repo-subdir: analysis
+  repo-subdir: site
   navbar:
     logo: img/ioi-logo-dark.svg
     logo-alt: Invest in Open Infrastructure
     left:
       - href: fallbacks.qmd
         text: Fallbacks
-      - href: rescue-status.qmd
-        text: Dataset rescue statuses
-      - href: risk.ipynb
-        text: Risk calculation
-      - href: fire_overlap.ipynb
-        text: Wildfire overlap
+      - text: Analysis
+        menu:
+          - href: analysis/rescue-status.qmd
+            text: Dataset rescue statuses
+          - href: analysis/risk.ipynb
+            text: Risk calculation
+          - href: analysis/fire_overlap.ipynb
+            text: Wildfire overlap
       - href: firefighter-map/index.html
         text: Firefighter map
   page-footer:

@@ -14,14 +14,14 @@ Only includes notable updates.
   - Suggest places as you type in the search box.
   - Cache map data for offline use.
   - Upgraded to MapLibre 6, and added tests.
-- [**Analysis:**](analysis/)
-  - Show [what percentage of terminated federal datasets have been rescued](analysis/federal_data_terminations.ipynb).
+- [**Analysis:**](site/analysis/)
+  - Show [what percentage of terminated federal datasets have been rescued](site/analysis/federal_data_terminations.ipynb).
   - Added titles and legends to the maps that were missing them.
 - Documented [running the site locally](CONTRIBUTING.md).
 
 ## 2026-09-22
 
-- [**Analysis:**](analysis/) The [risk](https://investinopen.github.io/ptps-wildfire-demo/risk.html) and [wildfire overlap](https://investinopen.github.io/ptps-wildfire-demo/fire-overlap.html) pages are now re-run daily, so the Red Flag Warnings and active fire detections stay current. Their input data is [stored in Git LFS](analysis/README.md#data).
+- [**Analysis:**](site/analysis/) The [risk](https://investinopen.github.io/ptps-wildfire-demo/analysis/risk.html) and [wildfire overlap](https://investinopen.github.io/ptps-wildfire-demo/analysis/fire-overlap.html) pages are now re-run daily, so the Red Flag Warnings and active fire detections stay current. Their input data is [stored in Git LFS](site/analysis/README.md#data).
 
 ## 2026-09-17
 
@@ -30,12 +30,12 @@ Only includes notable updates.
   - Add a "search for a place" box, and make the current view linkable.
   - Add a disclaimer that it's a proof of concept and hasn't been validated.
   - Tune it for printing (keep the legend fills, hide the layer toggles) and for mobile.
-- [**Analysis:**](analysis/)
-  - [Rank a state's fire weather zones](analysis/risk.ipynb) by a composite of burn probability, burn history, active fire detections, and red flag warnings.
-  - [Map every fire perimeter that's burned a state since 1984](analysis/fire_overlap.ipynb), using WUMI perimeters fetched from Dryad.
-  - [Fuzzy-match terminated federal datasets](analysis/federal_data_terminations.ipynb) against Data Rescue Project rescues.
-  - Show when the [dataset rescue status report](analysis/README.md#dataset-rescue-status-report) was generated, and fix a few example dataset URLs.
-  - Consolidated the analysis documentation into [analysis/README.md](analysis/README.md).
+- [**Analysis:**](site/analysis/)
+  - [Rank a state's fire weather zones](site/analysis/risk.ipynb) by a composite of burn probability, burn history, active fire detections, and red flag warnings.
+  - [Map every fire perimeter that's burned a state since 1984](site/analysis/fire_overlap.ipynb), using WUMI perimeters fetched from Dryad.
+  - [Fuzzy-match terminated federal datasets](site/analysis/federal_data_terminations.ipynb) against Data Rescue Project rescues.
+  - Show when the [dataset rescue status report](site/analysis/README.md#dataset-rescue-status-report) was generated, and fix a few example dataset URLs.
+  - Consolidated the analysis documentation into [analysis/README.md](site/analysis/README.md).
 - [**HTTP proxy:**](https://investinopen.github.io/ptps-wildfire-demo/fallbacks.html#http-proxy) Documented [QGIS and httpx usage](https://investinopen.github.io/ptps-wildfire-demo/fallbacks.html#proxy-usage) against the proxy, and made passive archiving more tolerant of slow sites.
 
 ## 2026-09-03 - status update
@@ -46,9 +46,9 @@ After some initial scoping conversations, we landed on a technical goal of "maki
   - [HTTP proxy](https://investinopen.github.io/ptps-wildfire-demo/fallbacks.html#http-proxy)
   - [Python package](https://investinopen.github.io/ptps-wildfire-demo/fallbacks.html#python-package)
   - [Browser extension](https://investinopen.github.io/ptps-wildfire-demo/fallbacks.html#browser-extension)
-- [Analysis/dashboards](analysis/)
-  - [Wildfire data](https://investinopen.github.io/ptps-wildfire-demo/rescue-status.html)
-  - [Federal Data Terminations](analysis/federal_data_terminations.ipynb)
+- [Analysis/dashboards](site/analysis/)
+  - [Wildfire data](https://investinopen.github.io/ptps-wildfire-demo/analysis/rescue-status.html)
+  - [Federal Data Terminations](site/analysis/federal_data_terminations.ipynb)
 
 The tools are all centered around the same problem: when a source URL (file, webpage, etc.) becomes unavailable, how do you find a backup? The tools leverage these mappings to answer that question:
 
@@ -150,7 +150,7 @@ All that said, the best way to know what users want it is to talk to them 🙂 P
 
 - [**Browser extension:**](https://investinopen.github.io/ptps-wildfire-demo/fallbacks.html#browser-extension) Introduced the extension, linking matched pages to the [Data Rescue Project Portal](https://portal.datarescueproject.org/datasets/) through a modal overlay.
 
-  ![modal showing over the EPA EJScreener](analysis/img/extension_modal_2026-08-31.png)
+  ![modal showing over the EPA EJScreener](site/img/extension_modal_2026-08-31.png)
 
 - [**HTTP proxy:**](https://investinopen.github.io/ptps-wildfire-demo/fallbacks.html#http-proxy)
   - Look for archives of redirect URLs, when archives of the original aren't available.
@@ -159,17 +159,17 @@ All that said, the best way to know what users want it is to talk to them 🙂 P
     - This pattern can be expanded to save data to other repositories, such as [Dryad](https://datadryad.org/) / [Source Cooperative](https://docs.source.coop/data-upload).
   - Improved URL matching.
   - Improved error handling.
-- [**Analysis:**](analysis/) Expanded the wildfire dataset status analysis.
-  - Include [all datasets](analysis/fire_datasets.csv) that don't require authentication.
+- [**Analysis:**](site/analysis/) Expanded the wildfire dataset status analysis.
+  - Include [all datasets](site/analysis/fire_datasets.csv) that don't require authentication.
   - Display the source and rescue status of each data URL and webpage. This is meant to mimic the status dashboard from [**@jring-o**'s prototype](https://github.com/jring-o/scsd).
-  - [Publish a report to GitHub Pages.](analysis/README.md#dataset-rescue-status-report)
+  - [Publish a report to GitHub Pages.](site/analysis/README.md#dataset-rescue-status-report)
 
 ## 2026-08-24
 
 - [**HTTP proxy:**](https://investinopen.github.io/ptps-wildfire-demo/fallbacks.html#http-proxy) Find rescued data in the [Data Rescue Project](https://portal.datarescueproject.org/datasets/) and [Wayback Machine](https://web.archive.org/).
-- [**Analysis:**](analysis/)
+- [**Analysis:**](site/analysis/)
   - Show the rescue status of the wildfire datasets.
-  - [Show the statuses of the source URLs archived by the Data Rescue Project.](analysis/rescues.ipynb)
+  - [Show the statuses of the source URLs archived by the Data Rescue Project.](site/analysis/rescues.ipynb)
 
 ## 2026-08-20
 
@@ -177,7 +177,7 @@ All that said, the best way to know what users want it is to talk to them 🙂 P
 
 ## 2026-08-10
 
-- [**Analysis:**](analysis/) Started [working with wildfire risk data](analysis/risk.ipynb).
+- [**Analysis:**](site/analysis/) Started [working with wildfire risk data](site/analysis/risk.ipynb).
   - Established a DuckDB- and notebook-based workflow for wildfire, burn-probability, active-fire, and climate-risk data.
   - Added nationwide risk and burn-probability visualizations, including state boundaries and red-flag alerts.
 

@@ -10,22 +10,22 @@
 .python-version
 __pycache__
 **/data/*
-!analysis/data/burn_prob_1km.parquet
-!analysis/data/cb_2018_us_state_20m.zip
-!analysis/data/wumi_perimeters/
+!site/analysis/data/burn_prob_1km.parquet
+!site/analysis/data/cb_2018_us_state_20m.zip
+!site/analysis/data/wumi_perimeters/
 data_cache/
 
 .coverage
 .env
 
-# Quarto site (analysis/_quarto.yml)
-analysis/_site/
+# Quarto site (site/_quarto.yml)
+site/_site/
 # executed notebook results -- made by the "Refresh notebooks" workflow and passed to publishing as an artifact, rather than committed
-analysis/_freeze/
+site/_freeze/
 # intermediate files, moved into _site/ once rendering finishes
-analysis/site_libs/
-analysis/*_files/
-analysis/*.html
+site/site_libs/
+site/*_files/
+site/*.html
 
 # extension/
 node_modules/

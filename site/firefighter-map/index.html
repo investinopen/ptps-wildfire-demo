@@ -22,11 +22,23 @@
         />PtPS Wildfire Demo</a
       >
       <a href="../fallbacks.html">Fallbacks</a>
-      <a href="../rescue-status.html">Dataset rescue statuses</a>
-      <a href="../risk.html">Risk calculation</a>
-      <a href="../fire-overlap.html">Wildfire overlap</a>
+      <details class="nav-menu">
+        <summary>Analysis</summary>
+        <div>
+          <a href="../analysis/rescue-status.html">Dataset rescue statuses</a>
+          <a href="../analysis/risk.html">Risk calculation</a>
+          <a href="../analysis/fire-overlap.html">Wildfire overlap</a>
+        </div>
+      </details>
       <a href="./" aria-current="page">Firefighter map</a>
     </nav>
+    <script>
+      // close the Analysis menu on a click anywhere else, like Quarto's dropdowns
+      document.addEventListener("click", (event) => {
+        const menu = document.querySelector("#site-nav .nav-menu");
+        if (!menu.contains(event.target)) menu.open = false;
+      });
+    </script>
     <div id="disclaimer-banner">
       This is a map that's meant to be printed out for use by small/rural fire
       departments. It's a proof of concept and hasn't been validated;

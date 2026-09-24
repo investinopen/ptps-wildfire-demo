@@ -6,7 +6,7 @@
       "runtimeExecutable": "sh",
       "runtimeArgs": [
         "-c",
-        "uv run quarto preview analysis --port \"${PORT:-8744}\" --no-browser"
+        "uv run quarto preview site --port \"${PORT:-8744}\" --no-browser"
       ],
       "port": 8744,
       "autoPort": true

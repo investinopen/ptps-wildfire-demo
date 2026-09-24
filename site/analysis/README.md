@@ -42,15 +42,7 @@ Draws every mapped fire perimeter in a state since 1984 as a translucent polygon
 
 ## Dataset rescue status report
 
-[`generate_report.py`](generate_report.py) checks the rescue status of the example data sources. It's run by [`rescue-status.qmd`](rescue-status.qmd), a page of the site below, whenever the site is rendered.
-
-## GitHub Pages site
-
-A [homepage](index.qmd) introducing the project, the dataset rescue status report, the [risk](risk.ipynb) and [wildfire overlap](fire_overlap.ipynb) notebooks, and the [firefighter map](firefighter-map/) are published together as a [Quarto](https://quarto.org/) website, configured in [`_quarto.yml`](_quarto.yml). The pages that run against live data (the rescue status report and the two notebooks) are [re-executed daily](../.github/workflows/refresh-notebooks.yml) and whenever their code changes, so their live layers stay current. The site is [published](../.github/workflows/publish-site.yml) after each of those refreshes and whenever it changes, using the latest refreshed results rather than executing anything itself -- so if a data source is down, the pages just stay as of the last refresh. To preview locally, [install Quarto](https://quarto.org/docs/get-started/), then from the repository root run:
-
-```sh
-uv run quarto preview analysis
-```
+[`generate_report.py`](generate_report.py) checks the rescue status of the [example data sources](fire_datasets.csv). It's run by [`rescue-status.qmd`](rescue-status.qmd) whenever the site is rendered.
 
 ## [Data Rescue Project datasets](rescues.ipynb)
 
@@ -59,5 +51,3 @@ Check the statuses of source data archived by the [Data Rescue Project](https://
 ## [Federal Data Terminations](federal_data_terminations.ipynb)
 
 Looking at the rescue status of terminated federal datasets.
-
-## [Firefigher map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map/)

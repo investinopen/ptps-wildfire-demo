@@ -29,8 +29,8 @@ dev = [
     "ipywidgets>=8.1.9",
     "jupysql>=0.11.1",
     "matplotlib>=3.11.1",
-    "nbclient>=0.11.0",      # for Quarto to execute analysis/rescue-status.qmd
-    "nbformat>=5.11.1",      # for Quarto to execute analysis/rescue-status.qmd
+    "nbclient>=0.11.0",      # for Quarto to execute site/analysis/rescue-status.qmd
+    "nbformat>=5.11.1",      # for Quarto to execute site/analysis/rescue-status.qmd
     "pytest>=9.1.1",
     "pytest-asyncio>=1.4.0",
     "pytest-cov>=7.1.0",
@@ -43,7 +43,7 @@ dev = [
     "xarray>=2026.7.0",
 ]
 
-# loaded by `%load_ext sql` in analysis/risk.ipynb
+# loaded by `%load_ext sql` in site/analysis/risk.ipynb
 # https://jupysql.readthedocs.io/en/latest/api/configuration.html#loading-from-a-file
 [tool.jupysql.SqlMagic]
 autopandas = true

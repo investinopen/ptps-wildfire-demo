@@ -43,7 +43,7 @@ jobs:
           enable-cache: true
 
       - name: Validate data package
-        run: uvx frictionless validate analysis/datapackage.json
+        run: uvx frictionless validate site/analysis/datapackage.json
 
   vitest:
     runs-on: ubuntu-latest

@@ -1,0 +1,19 @@
+---
+title: Dataset rescue statuses
+# where it was published before moving into analysis/
+aliases:
+  - ../rescue-status.html
+---
+
+```{python}
+#| echo: false
+#| output: asis
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path.cwd().parents[1]))
+
+from generate_report import render_report
+
+print(await render_report())
+```

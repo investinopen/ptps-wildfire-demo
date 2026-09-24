@@ -7,7 +7,7 @@ on:
     branches:
       - main
     paths:
-      - analysis/**
+      - site/**
       - ptps_wildfire_demo/**
       - .github/workflows/publish-site.yml
   # picks up freshly executed pages
@@ -52,7 +52,7 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: executed-pages
-          path: analysis
+          path: site
           run-id: ${{ steps.refresh.outputs.run-id }}
           github-token: ${{ github.token }}
 
@@ -75,14 +75,14 @@ jobs:
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      # no --execute: with `freeze: true` (see analysis/_quarto.yml), pages use their saved results
+      # no --execute: with `freeze: true` (see site/_quarto.yml), pages use their saved results
       - name: Render site
-        run: uv run quarto render analysis
+        run: uv run quarto render site
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: analysis/_site
+          path: site/_site
 
   deploy:
     needs: build

@@ -24,8 +24,31 @@ body {
   text-decoration: none;
 }
 #site-nav a:hover,
-#site-nav a[aria-current] {
+#site-nav a[aria-current],
+#site-nav summary:hover {
   color: #ffde17;
+}
+/* the Analysis dropdown, like Quarto's navbar menus */
+#site-nav .nav-menu {
+  position: relative;
+}
+#site-nav summary {
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+}
+#site-nav .nav-menu > div {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  /* over the map and its controls */
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: max-content;
+  background: #000000;
+  padding: 8px 12px;
+  border-radius: 0 0 4px 4px;
 }
 #site-nav .site-title {
   display: flex;

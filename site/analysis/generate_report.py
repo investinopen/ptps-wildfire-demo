@@ -12,7 +12,7 @@ import pandas as pd
 from jinja2 import Environment, FileSystemLoader
 from markupsafe import Markup
 
-from analysis.helpers import get_statuses
+from helpers import get_statuses
 from ptps_wildfire_demo import Resolver
 
 ANALYSIS_DIR = Path(__file__).parent

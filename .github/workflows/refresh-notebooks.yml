@@ -8,11 +8,13 @@ on:
       - main
     # anything that changes what the pages compute
     paths:
-      - analysis/*.ipynb
-      - analysis/*.qmd
-      - analysis/*.sql
-      - analysis/*.py
-      - analysis/data/**
+      - site/analysis/*.ipynb
+      - site/analysis/*.qmd
+      - site/analysis/*.jinja
+      - site/analysis/*.sql
+      - site/analysis/*.py
+      - site/analysis/*.csv
+      - site/analysis/data/**
       - ptps_wildfire_demo/**
       - pyproject.toml
       - uv.lock
@@ -31,7 +33,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # where DuckDB's cache_httpfs extension (see analysis/setup.sql) keeps downloaded data by default
+  # where DuckDB's cache_httpfs extension (see site/analysis/setup.sql) keeps downloaded data by default
   DUCKDB_CACHE_DIR: /tmp/duckdb_cache_httpfs_cache
 
 jobs:
@@ -84,11 +86,11 @@ jobs:
       - name: Create DuckDB download cache directory
         run: mkdir -p "$DUCKDB_CACHE_DIR"
 
-      # A single-file render always executes, even with `freeze: true` (see analysis/_quarto.yml). This saves the .qmd's results to analysis/_freeze/ and writes the .ipynb's outputs back into the notebook.
+      # A single-file render always executes, even with `freeze: true` (see site/_quarto.yml). This saves the .qmd's results to site/_freeze/ and writes the .ipynb's outputs back into the notebook.
       - name: Execute pages
         run: |
-          for page in rescue-status.qmd risk.ipynb fire_overlap.ipynb; do
-            uv run quarto render "analysis/$page" --execute
+          for page in analysis/rescue-status.qmd analysis/risk.ipynb analysis/fire_overlap.ipynb; do
+            uv run quarto render "site/$page" --execute
           done
 
       # even after a failure, so whatever did download doesn't have to be again
@@ -103,10 +105,10 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: executed-pages
-          # stored relative to analysis/, where publish-site.yml puts them back
+          # stored relative to site/, where publish-site.yml puts them back
           path: |
-            analysis/_freeze/
-            analysis/risk.ipynb
-            analysis/fire_overlap.ipynb
+            site/_freeze/
+            site/analysis/risk.ipynb
+            site/analysis/fire_overlap.ipynb
           if-no-files-found: error
           retention-days: 30

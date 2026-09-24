@@ -6,7 +6,7 @@ import {
   HATCH_SIZE,
   hatchCss,
   hatchOffset,
-} from "../../analysis/firefighter-map/scripts/rasters.js";
+} from "../../site/firefighter-map/scripts/rasters.js";
 
 describe("flame length classes", () => {
   test("are contiguous, starting at 4 ft", () => {
