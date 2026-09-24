@@ -4,7 +4,7 @@ Only includes notable updates.
 
 ## 2026-09-24
 
-- [**Analysis:**](site/analysis/) Draw [the roads around Gold Hill, Colorado as a graph](https://investinopen.github.io/ptps-wildfire-demo/analysis/road-graph.html), a simplified map for navigation: each road's length is proportional to its driving distance, colored by its steepest grade, with sharp turns, dead ends, and gates marked.
+- [**Analysis:**](site/analysis/) Draw [the roads around Gold Hill, Colorado as a graph](https://investinopen.github.io/ptps-wildfire-demo/analysis/road-graph.html), a simplified map for navigation: each road's length is proportional to its driving distance, colored by its steepest grade, with sharp turns, dead ends, gates, and addresses marked.
 
 ## 2026-09-23
 

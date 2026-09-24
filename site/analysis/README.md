@@ -42,7 +42,7 @@ Draws every mapped fire perimeter in a state since 1984 as a translucent polygon
 
 ## [Road graph](road_graph.ipynb)
 
-A simplified map for navigation ([#22](https://github.com/investinopen/ptps-wildfire-demo/issues/22)): the roads around a rural town drawn as a graph of intersections and the roads between them, each drawn with its length proportional to its driving distance, colored by its steepest grade, and with sharp turns, dead ends, and gates marked. Roads come from OpenStreetMap via [OSMnx](https://osmnx.readthedocs.io/), and elevation from [Mapterhorn](https://mapterhorn.com/)'s terrain tiles. Set `PLACE_NAME`/`CENTER` in the configuration cell to move it.
+A simplified map for navigation ([#22](https://github.com/investinopen/ptps-wildfire-demo/issues/22)): the roads around a rural town drawn as a graph of intersections and the roads between them, each drawn with its length proportional to its driving distance, colored by its steepest grade, and with sharp turns, dead ends, gates, and addresses marked. Roads come from OpenStreetMap via [OSMnx](https://osmnx.readthedocs.io/), and elevation from [Mapterhorn](https://mapterhorn.com/)'s terrain tiles. Set `PLACE_NAME`/`CENTER` in the configuration cell to move it.
 
 ## Dataset rescue status report
 
