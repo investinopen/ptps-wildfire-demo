@@ -2,7 +2,7 @@
 // for a repo that's otherwise just static HTML files.
 // https://developer.chrome.com/docs/workbox/modules/workbox-sw
 importScripts(
-  "https://storage.googleapis.com/workbox-cdn/releases/7.3.0/workbox-sw.js",
+  "https://storage.googleapis.com/workbox-cdn/releases/7.4.1/workbox-sw.js",
 );
 
 // take over immediately on update rather than waiting for every open tab to close --
