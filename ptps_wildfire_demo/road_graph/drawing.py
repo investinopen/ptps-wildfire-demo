@@ -297,8 +297,10 @@ class Diagram:
             / fig.dpi
         )
         renderer = fig.canvas.get_renderer()
-        # the space each label takes up, so later ones don't land on top of it
-        taken = []
+        # the space each label takes up, so later ones don't land on top of it -- starting with the title
+        taken = [ax.title.get_window_extent(renderer)]
+        # labels have to fit entirely on the map, rather than running off its edges or into the title
+        map_area = ax.get_window_extent(renderer)
 
         def place(points, text, fontsize, side, fraction):
             (x, y), angle = along(points, fraction)
@@ -323,7 +325,11 @@ class Diagram:
                 fontweight="bold" if fontsize > 6 else "normal",
             )
             extent = annotation.get_window_extent(renderer)
-            if any(extent.overlaps(other) for other in taken):
+            if (
+                not map_area.contains(extent.x0, extent.y0)
+                or not map_area.contains(extent.x1, extent.y1)
+                or any(extent.overlaps(other) for other in taken)
+            ):
                 annotation.remove()
                 return False
             taken.append(extent)
