@@ -6,10 +6,11 @@ import numpy as np
 from matplotlib import patheffects
 from matplotlib.lines import Line2D
 from matplotlib.markers import MarkerStyle
-from matplotlib.transforms import Affine2D, Bbox
+from matplotlib.transforms import Affine2D
 from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 from scipy.optimize import brentq
 from shapely import LinearRing, LineString, Point, box
+from shapely.affinity import rotate
 
 from ptps_wildfire_demo.simplified_map.network import TURNAROUNDS
 
@@ -73,6 +74,23 @@ ROAD_NAME_STYLE = {
 }
 # how far a house number's middle is from its road's line, in points: half a main road's width, plus half the text's height
 HOUSE_NUMBER_GAP = MAJOR_WIDTH / 2 + 4
+# the least space around a house number, in points, so ones side by side don't run together
+HOUSE_NUMBER_PADDING = 2.5
+# where to try putting a house number, in order, as (distance from the road's line, distance along the road from the house), in points: right across from the house, then nudged along the road, then farther out
+HOUSE_NUMBER_SPOTS = [
+    (HOUSE_NUMBER_GAP, 0),
+    *[
+        (HOUSE_NUMBER_GAP, sign * nudge)
+        for nudge in (4, 8, 12, 16, 20)
+        for sign in (1, -1)
+    ],
+    *[
+        (HOUSE_NUMBER_GAP * row, sign * nudge)
+        for row in (2.2,)
+        for nudge in (0, 6, 12)
+        for sign in ((1, -1) if nudge else (1,))
+    ],
+]
 # roughly how wide a character of the labels is, in points, for deciding whether a label fits along its road
 CHAR_POINTS = {7.5: 4.8}
 
@@ -303,7 +321,7 @@ class Diagram:
         )
 
     def draw(self, title: str, bounds=None):
-        """One page, with the legend in its own column. Afterward, `unlabeled` lists any road names on the page that there wasn't room for. `bounds` is (xmin, ymin, xmax, ymax) in layout coordinates, or the whole network if None."""
+        """One page, with the legend in its own column. Afterward, `unlabeled` lists any road names on the page that there wasn't room for, and `house_numbers` is how many house numbers there was room for, out of how many on the page. `bounds` is (xmin, ymin, xmax, ymax) in layout coordinates, or the whole network if None."""
         G, pos, paths = self.G, self.pos, self.paths
         fig, (ax, key) = plt.subplots(1, 2, figsize=(11, 8.5), width_ratios=[5, 1])
         # fills the page, showing extra around the network rather than shrinking to fit it exactly
@@ -388,8 +406,8 @@ class Diagram:
                         zorder=5,
                         **{**style, "marker": marker, "color": color},
                     )
-        # the space each label takes up, so later ones don't land on top of it -- starting with the title
-        taken = [ax.title.get_window_extent()]
+        # the space each label takes up on the page (in pixels, as shapes rather than boxes, so a label along a slanted road doesn't claim the whole rectangle around it), so later ones don't land on top of it -- starting with the title
+        taken = [box(*ax.title.get_window_extent().extents)]
         # the symbols (intersections, dead ends, etc.), which labels stay off of where they can
         symbols_taken = []
         for symbols in ax.collections:
@@ -397,13 +415,11 @@ class Diagram:
             for i, (x, y) in enumerate(ax.transData.transform(symbols.get_offsets())):
                 # a marker's size is its area in points
                 half = math.sqrt(sizes[i % len(sizes)]) / 2 * fig.dpi / 72
-                symbols_taken.append(
-                    Bbox.from_extents(x - half, y - half, x + half, y + half)
-                )
-        # switched off as a last resort for road names, which matter more than a symbol showing in full
-        rules = {"avoid_symbols": True}
+                symbols_taken.append(box(x - half, y - half, x + half, y + half))
+        # avoid_symbols is switched off as a last resort, when a label matters more than a symbol showing in full; padding is the least space (in points) to leave around the label
+        rules = {"avoid_symbols": True, "padding": 0}
         # labels have to fit entirely on the map, rather than running off its edges or into the title
-        map_area = ax.get_window_extent()
+        map_area = box(*ax.get_window_extent().extents)
 
         def place(xy, text, fontsize, angle, offset, ha, va, style):
             """Adds a label at `xy`, `offset` points away, if it fits on the map clear of the other labels."""
@@ -412,7 +428,6 @@ class Diagram:
                 xy,
                 xytext=offset,
                 textcoords="offset points",
-                rotation=angle,
                 rotation_mode="anchor",
                 ha=ha,
                 va=va,
@@ -420,19 +435,26 @@ class Diagram:
                 annotation_clip=True,
                 **{"zorder": 3, **style},
             )
-            extent = annotation.get_window_extent()
+            # laid out level first, then turned about the point it's aligned to (which is what rotation_mode="anchor" does), to get its actual shape
+            level = annotation.get_window_extent()
+            pivot = ax.transData.transform(xy) + np.array(offset) * fig.dpi / 72
+            shape = rotate(box(*level.extents), angle, origin=Point(pivot))
+            annotation.set_rotation(angle)
+            # with some space around it where asked, so neighboring house numbers don't run together
+            padded = shape.buffer(rules["padding"] * fig.dpi / 72)
             if (
-                not map_area.contains(extent.x0, extent.y0)
-                or not map_area.contains(extent.x1, extent.y1)
-                or any(extent.overlaps(other) for other in taken)
+                not map_area.contains(shape)
+                # matplotlib hides a label whose point is off the map (annotation_clip), even if the text itself would fit
+                or not map_area.contains(Point(ax.transData.transform(xy)))
+                or any(padded.intersects(other) for other in taken)
                 or (
                     rules["avoid_symbols"]
-                    and any(extent.overlaps(other) for other in symbols_taken)
+                    and any(shape.intersects(other) for other in symbols_taken)
                 )
             ):
                 annotation.remove()
                 return False
-            taken.append(extent)
+            taken.append(shape)
             return True
 
         def along_road(points, text, fontsize, side, fraction, style):
@@ -518,22 +540,43 @@ class Diagram:
             ]
             if shown and not label_road(text, shown, 7.5, ROAD_NAME_STYLE):
                 self.unlabeled.append(text)
+
+        def place_house_number(xy, angle, number, offset):
+            """Beside the road on the side the house is (`offset`'s sign) -- right across from it if there's room, or else nudged a little along the road or farther out. Returns whether it fit."""
+            radians = math.radians(angle)
+            along_road = np.array([math.cos(radians), math.sin(radians)])
+            # to the left of the road's direction
+            across = np.array([-math.sin(radians), math.cos(radians)])
+            side = math.copysign(1, offset)
+            rules["padding"] = HOUSE_NUMBER_PADDING
+            for avoid_symbols in (True, False):
+                rules["avoid_symbols"] = avoid_symbols
+                for gap, nudge in HOUSE_NUMBER_SPOTS:
+                    shift = side * gap * across + nudge * along_road
+                    if place(
+                        xy,
+                        number,
+                        7,
+                        upright(angle),
+                        tuple(shift),
+                        "center",
+                        "center",
+                        HOUSE_NUMBER_STYLE,
+                    ):
+                        rules.update(avoid_symbols=True, padding=0)
+                        return True
+            rules.update(avoid_symbols=True, padding=0)
+            return False
+
+        # how many house numbers on this page there was room for, out of how many
+        self.house_numbers = [0, 0]
         for (u, v, k), points in paths.items():
             for fraction, number, offset in G.edges[u, v, k]["addresses"]:
                 xy, angle = along(points, fraction)
-                # on the side of the road the house is
-                gap = math.copysign(HOUSE_NUMBER_GAP, offset)
-                radians = math.radians(angle)
-                place(
-                    xy,
-                    number,
-                    7,
-                    upright(angle),
-                    (-gap * math.sin(radians), gap * math.cos(radians)),
-                    "center",
-                    "center",
-                    HOUSE_NUMBER_STYLE,
-                )
+                if not view.covers(Point(xy)):
+                    continue
+                self.house_numbers[1] += 1
+                self.house_numbers[0] += place_house_number(xy, angle, number, offset)
 
         # the longest round length that takes up no more than a sixth of the page
         width = np.diff(ax.get_xlim())[0] * FEET_PER_METER

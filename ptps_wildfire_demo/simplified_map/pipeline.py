@@ -10,7 +10,10 @@ from IPython.display import Markdown, display
 from pyproj import Transformer
 from shapely import Point
 
-from ptps_wildfire_demo.simplified_map.addresses import place_addresses
+from ptps_wildfire_demo.simplified_map.addresses import (
+    place_addresses,
+    unique_addresses,
+)
 from ptps_wildfire_demo.simplified_map.drawing import Diagram
 from ptps_wildfire_demo.simplified_map.elevation import ElevationModel
 from ptps_wildfire_demo.simplified_map.layout import Layout, layout
@@ -118,9 +121,11 @@ class SimplifiedMap:
             turn_span_meters=settings.turn_span_meters,
         )
 
-        found = ox.features_from_point(
-            center, tags={"addr:housenumber": True}, dist=radius_meters
-        ).to_crs(G.graph["crs"])
+        found = unique_addresses(
+            ox.features_from_point(
+                center, tags={"addr:housenumber": True}, dist=radius_meters
+            ).to_crs(G.graph["crs"])
+        )
         # buildings/lots are mapped as areas
         found["geometry"] = found.geometry.representative_point()
         placed, on_driveways = place_addresses(G, found, settings.max_address_meters)
@@ -171,6 +176,8 @@ class SimplifiedMap:
         notes = [
             f"Click to enlarge. The same area on the [detailed firefighter map]({detailed_map_url(self.center, radius)}) and [OpenStreetMap]({openstreetmap_url(self.center, radius)})."
         ]
+        shown, total = self.diagram.house_numbers
+        notes.append(f"There was room for {shown} of the {total} house numbers here.")
         if self.diagram.unlabeled:
             notes.append(f"No room to label: {', '.join(self.diagram.unlabeled)}.")
         display(Markdown(" ".join(notes)))

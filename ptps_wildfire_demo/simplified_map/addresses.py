@@ -37,6 +37,13 @@ def offset_from(line: LineString, point: Point) -> tuple[float, float]:
     return along / line.length, distance if cross >= 0 else -distance
 
 
+def unique_addresses(addresses):
+    """`addresses` (a DataFrame with `addr:street` and `addr:housenumber`) with each one only once -- OpenStreetMap often has the same address both as a point and on the building. Ones with no street are all kept, since the same number could be on different roads."""
+    no_street = addresses["addr:street"].isna()
+    duplicate = addresses.duplicated(subset=["addr:street", "addr:housenumber"])
+    return addresses[no_street | ~duplicate]
+
+
 def place_addresses(G: nx.MultiGraph, addresses, max_meters: float) -> tuple[int, int]:
     """Adds each of `addresses` (a GeoDataFrame of points in the graph's CRS, with `addr:street` and `addr:housenumber`) to its road's `addresses`, as (fraction of the way from the road's `from` node, house number, distance from the road -- see offset_from()). Ones more than `max_meters` from their road are left off. Returns how many were placed, and how many of those on driveways."""
     for _, _, data in G.edges(data=True):

@@ -2,10 +2,15 @@ import math
 
 import networkx as nx
 import numpy as np
+import pandas as pd
 import pytest
 from shapely import LineString, Point
 
-from ptps_wildfire_demo.simplified_map.addresses import offset_from, place_address
+from ptps_wildfire_demo.simplified_map.addresses import (
+    offset_from,
+    place_address,
+    unique_addresses,
+)
 from ptps_wildfire_demo.simplified_map.drawing import (
     along,
     arc,
@@ -368,3 +373,13 @@ def test_settings_text():
     assert text.max_grade == "12%"
     assert text.sharp_turn_degrees == "110°"
     assert text.geography_weight == "0.001"
+
+
+def test_unique_addresses():
+    addresses = pd.DataFrame(
+        {
+            "addr:street": ["Main Street", "Main Street", "Hill Street", None, None],
+            "addr:housenumber": ["10", "10", "10", "5", "5"],
+        }
+    )
+    assert unique_addresses(addresses).index.tolist() == [0, 2, 3, 4]
