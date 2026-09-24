@@ -72,7 +72,7 @@ HOUSE_NUMBER_STYLE = {
 }
 SCALE_BAR_FEET = [100, 250, 500, 1000, 2500, 5000]
 # roughly how wide a character of the labels is, in points, for deciding whether a label fits along its road
-CHAR_POINTS = {5.5: 3.3, 7.5: 4.8}
+CHAR_POINTS = {7.5: 4.8}
 
 
 def upright(degrees: float) -> float:
@@ -413,7 +413,6 @@ class Diagram:
                 va="bottom" if side > 0 else "top",
                 fontsize=fontsize,
                 annotation_clip=True,
-                fontweight="bold" if fontsize > 6 else "normal",
                 **{"zorder": 3, **style},
             )
             extent = annotation.get_window_extent(renderer)
@@ -447,12 +446,10 @@ class Diagram:
             if data["name"] and data["length"] > longest.get(data["name"], (0,))[0]:
                 longest[data["name"]] = (data["length"], points)
         for name, (_, points) in longest.items():
-            label(points, name, 7.5, -1)
+            label(points, name, 7.5, -1, fontweight="bold")
         for (u, v, k), points in paths.items():
             for fraction, number in G.edges[u, v, k]["addresses"]:
-                label(
-                    points, number, 5.5, 1, [fraction], fits=True, **HOUSE_NUMBER_STYLE
-                )
+                label(points, number, 7, 1, [fraction], fits=True, **HOUSE_NUMBER_STYLE)
 
         # the longest round length that takes up no more than a sixth of the page
         width = np.diff(ax.get_xlim())[0] * FEET_PER_METER
