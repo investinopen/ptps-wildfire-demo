@@ -85,9 +85,12 @@ async def get_url_results(
         else True
     )
     results["drp_url"] = [rescue.drp_url for rescue in rescues]
-    results["drp_repositories"] = [
-        get_drp_repositories(resolver, rescue.drp_url) for rescue in rescues
-    ]
+    # a list per row, which a plain list of lists isn't typed to allow as a column
+    results["drp_repositories"] = pd.Series(
+        [get_drp_repositories(resolver, rescue.drp_url) for rescue in rescues],
+        index=results.index,
+        dtype=object,
+    )
     results["drp_applicable"] = is_drp_applicable(datasets["webpage"])
     return results
 
@@ -137,7 +140,7 @@ def get_summary(results: pd.DataFrame) -> list[dict]:
     """One row of stats per data velocity (high first), plus a total."""
 
     return [
-        get_summary_row(velocity.capitalize(), rows)
+        get_summary_row(str(velocity).capitalize(), rows)
         for velocity, rows in results.groupby("data_velocity")
     ] + [get_summary_row("All", results)]
 

@@ -1,5 +1,3 @@
-from typing import cast
-
 import httpx
 import pandas as pd
 
@@ -72,9 +70,8 @@ class Resolver:
         )
         matches = self.drp_rescues[is_partial_match]
         if not matches.empty:
-            match_idx = matches["data_source"].str.len().idxmax()
-            match = cast(pd.Series, matches.loc[match_idx])
-            return match
+            # by position, since a label from idxmax() is only typed as Hashable
+            return matches.iloc[int(matches["data_source"].str.len().argmax())]
 
         return None
 

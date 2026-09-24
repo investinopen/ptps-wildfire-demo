@@ -388,9 +388,8 @@ class Diagram:
                         zorder=5,
                         **{**style, "marker": marker, "color": color},
                     )
-        renderer = fig.canvas.get_renderer()
         # the space each label takes up, so later ones don't land on top of it -- starting with the title
-        taken = [ax.title.get_window_extent(renderer)]
+        taken = [ax.title.get_window_extent()]
         # the symbols (intersections, dead ends, etc.), which labels stay off of where they can
         symbols_taken = []
         for symbols in ax.collections:
@@ -404,7 +403,7 @@ class Diagram:
         # switched off as a last resort for road names, which matter more than a symbol showing in full
         rules = {"avoid_symbols": True}
         # labels have to fit entirely on the map, rather than running off its edges or into the title
-        map_area = ax.get_window_extent(renderer)
+        map_area = ax.get_window_extent()
 
         def place(xy, text, fontsize, angle, offset, ha, va, style):
             """Adds a label at `xy`, `offset` points away, if it fits on the map clear of the other labels."""
@@ -421,7 +420,7 @@ class Diagram:
                 annotation_clip=True,
                 **{"zorder": 3, **style},
             )
-            extent = annotation.get_window_extent(renderer)
+            extent = annotation.get_window_extent()
             if (
                 not map_area.contains(extent.x0, extent.y0)
                 or not map_area.contains(extent.x1, extent.y1)

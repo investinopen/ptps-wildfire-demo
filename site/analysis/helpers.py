@@ -2,11 +2,13 @@ import asyncio
 from collections.abc import Iterable
 from html import escape
 from pathlib import Path
+from typing import cast
 
 import folium
 import geopandas as gpd
 import httpx
 import pandas as pd
+from branca.element import Figure
 from duckdb import DuckDBPyConnection
 from IPython.display import HTML
 
@@ -40,7 +42,8 @@ def add_map_caption(
             f"{escape(label)}"
         )
 
-    m.get_root().html.add_child(
+    # a map's root is always a Figure, though it's only typed as an Element
+    cast(Figure, m.get_root()).html.add_child(
         folium.Element(
             '<div style="position: absolute; bottom: 24px; left: 10px; z-index: 1000; '
             "padding: 4px 10px; background: rgba(255, 255, 255, 0.85); "
