@@ -27,6 +27,7 @@ from ptps_wildfire_demo.simplified_map.network import (
     edge_line,
     first,
 )
+from ptps_wildfire_demo.simplified_map.pipeline import bounds_around
 from ptps_wildfire_demo.simplified_map.profile import max_grade, sample, sharp_turns
 
 
@@ -349,3 +350,13 @@ def test_loop_direction():
     # heading right first when counter-clockwise from the bottom of the circle, left when clockwise
     assert loop(p, 100, away)[1][0] > 0
     assert loop(p, 100, away, clockwise=True)[1][0] < 0
+
+
+def test_bounds_around():
+    G = road_network({1: (0, 0), 2: (100, 0), 3: (1000, 0)}, [(1, 2, {}), (2, 3, {})])
+    # laid out at twice the scale
+    pos = {n: np.array([G.nodes[n]["x"] * 2, 0.0]) for n in G.nodes}
+    xmin, ymin, xmax, ymax = bounds_around(G, pos, Point(0, 0), 150)
+    # nodes 1 and 2, plus a margin of a tenth of the width
+    assert (xmin, xmax) == pytest.approx((-20, 220))
+    assert (ymin, ymax) == pytest.approx((-20, 20))
