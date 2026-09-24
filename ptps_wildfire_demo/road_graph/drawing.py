@@ -11,7 +11,6 @@ from shapely import Point
 from ptps_wildfire_demo.road_graph.network import TURNAROUNDS
 
 FEET_PER_METER = 3.28084
-FEET_PER_MILE = 5280
 
 # drawn thicker the bigger the road
 WIDTHS = {"track": 1.6, "service": 1.6, "residential": 2.2, "unclassified": 2.2}
@@ -64,14 +63,7 @@ ADDRESS_STYLE = {
 }
 SCALE_BAR_FEET = [100, 250, 500, 1000, 2500, 5000]
 # roughly how wide a character of the labels is, in points, for deciding whether a label fits along its road
-CHAR_POINTS = {5.5: 3.3, 6: 3.6, 7.5: 4.8}
-
-
-def format_distance(meters: float) -> str:
-    feet = meters * FEET_PER_METER
-    if feet < 1000:
-        return f"{round(feet, -1):.0f} ft"
-    return f"{feet / FEET_PER_MILE:.1f} mi"
+CHAR_POINTS = {5.5: 3.3, 7.5: 4.8}
 
 
 def upright(degrees: float) -> float:
@@ -346,7 +338,7 @@ class Diagram:
                 if place(points, text, fontsize, side, fraction):
                     return
 
-        # placed in order of importance, since a label that'd overlap an earlier one is left off: each road's name once, below its longest stretch, then the distances, then the house numbers
+        # placed in order of importance, since a label that'd overlap an earlier one is left off: each road's name once, below its longest stretch, then the house numbers, above the road
         longest = {}
         for (u, v, k), points in paths.items():
             data = G.edges[u, v, k]
@@ -355,10 +347,8 @@ class Diagram:
         for name, (_, points) in longest.items():
             label(points, name, 7.5, -1)
         for (u, v, k), points in paths.items():
-            label(points, format_distance(G.edges[u, v, k]["length"]), 6, 1)
-        for (u, v, k), points in paths.items():
             for fraction, number in G.edges[u, v, k]["addresses"]:
-                label(points, number, 5.5, -1, [fraction], fits=True)
+                label(points, number, 5.5, 1, [fraction], fits=True)
 
         # the longest round length that takes up no more than a sixth of the page
         width = np.diff(ax.get_xlim())[0] * FEET_PER_METER

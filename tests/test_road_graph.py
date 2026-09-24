@@ -9,7 +9,6 @@ from ptps_wildfire_demo.road_graph.addresses import place_address
 from ptps_wildfire_demo.road_graph.drawing import (
     along,
     arc,
-    format_distance,
     loop,
     node_kind,
     upright,
@@ -244,13 +243,6 @@ def test_along():
 )
 def test_upright(degrees, expected):
     assert upright(degrees) == pytest.approx(expected)
-
-
-@pytest.mark.parametrize(
-    "meters,expected", [(30, "100 ft"), (250, "820 ft"), (805, "0.5 mi")]
-)
-def test_format_distance(meters, expected):
-    assert format_distance(meters) == expected
 
 
 def test_node_kind():
