@@ -9,8 +9,10 @@ from ptps_wildfire_demo.road_graph.addresses import place_address
 from ptps_wildfire_demo.road_graph.drawing import (
     along,
     arc,
+    exits,
     loop,
     node_kind,
+    outward_angle,
     upright,
 )
 from ptps_wildfire_demo.road_graph.elevation import decode_terrarium
@@ -291,3 +293,43 @@ def test_openstreetmap_url():
         openstreetmap_url((40.063, -105.409), 1200)
         == "https://www.openstreetmap.org/#map=15/40.06300/-105.40900"
     )
+
+
+def test_outward_angle():
+    node = np.array([100.0, 0])
+    # a road coming in from the west, and a curvy one from the south drawn starting at the node
+    from_west = np.array([[0.0, 0], [100, 0]])
+    from_south = np.array([[100.0, 0], [100, -50], [80, -100]])
+    assert outward_angle(node, [from_west]) == pytest.approx(0)
+    assert outward_angle(node, [from_south]) == pytest.approx(90)
+    assert outward_angle(node, [from_west, from_south]) == pytest.approx(45)
+
+
+def test_exits():
+    bounds = (0, 0, 100, 100)
+    # starts inside, heads out the right side, then comes back in through the top
+    points = np.array([[50.0, 50], [150, 50], [150, 150], [50, 90]])
+    (out_point, out_angle), (back_point, back_angle) = exits(points, bounds)
+    assert out_point == pytest.approx((100, 50))
+    assert out_angle == pytest.approx(0)
+    # heading out the way it came in
+    assert back_point[1] == pytest.approx(100)
+    assert 0 < back_angle < 90
+
+
+def test_exits_inside():
+    assert exits(np.array([[10.0, 10], [90, 90]]), (0, 0, 100, 100)) == []
+
+
+def test_exits_cutting_across():
+    # both ends outside, passing through
+    points = np.array([[-50.0, 50], [150, 50]])
+    (first, first_angle), (second, second_angle) = exits(points, (0, 0, 100, 100))
+    assert first == pytest.approx((0, 50))
+    assert first_angle == pytest.approx(180)
+    assert second == pytest.approx((100, 50))
+    assert second_angle == pytest.approx(0)
+
+
+def test_exits_missing_the_view():
+    assert exits(np.array([[-50.0, 150], [150, 150]]), (0, 0, 100, 100)) == []

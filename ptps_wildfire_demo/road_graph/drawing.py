@@ -5,9 +5,11 @@ import networkx as nx
 import numpy as np
 from matplotlib import patheffects
 from matplotlib.lines import Line2D
+from matplotlib.markers import MarkerStyle
+from matplotlib.transforms import Affine2D
 from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 from scipy.optimize import brentq
-from shapely import Point
+from shapely import LineString, Point, box
 
 from ptps_wildfire_demo.road_graph.network import TURNAROUNDS
 
@@ -51,7 +53,8 @@ NODE_STYLES = {
     "continues": {
         "marker": ">",
         "s": 40,
-        "color": "#999999",
+        # in the legend -- on the map, each is the color of its road
+        "color": "#333333",
         "label": "Road continues",
     },
 }
@@ -135,6 +138,52 @@ def node_kind(G: nx.MultiGraph, node, center: Point, radius_meters: float) -> st
     return "intersection"
 
 
+def outward_angle(node_pos: np.ndarray, node_paths: list) -> float:
+    """The direction, in degrees, that roads head as they reach a node at the end of `node_paths` (each starting or ending there) -- for pointing where a road leaves the area."""
+    directions = []
+    for points in node_paths:
+        # from the second point in to the node, at whichever end the node is
+        end, inside = (
+            (points[0], points[1])
+            if np.allclose(points[0], node_pos)
+            else (points[-1], points[-2])
+        )
+        direction = end - inside
+        directions.append(direction / np.linalg.norm(direction))
+    dx, dy = np.mean(directions, axis=0)
+    return math.degrees(math.atan2(dy, dx))
+
+
+def exits(points: np.ndarray, bounds: tuple) -> list[tuple[np.ndarray, float]]:
+    """Where a path crosses the edge of `bounds` (xmin, ymin, xmax, ymax), and the direction in degrees it's heading out there, for each time it does -- including both ends of a stretch that cuts across the view with neither end in it."""
+    view = box(*bounds)
+    inside = [view.covers(Point(p)) for p in points]
+    crossings = []
+    for a, b, a_inside, b_inside in zip(points, points[1:], inside, inside[1:]):
+        if a_inside and b_inside:
+            continue
+        hits = LineString([a, b]).intersection(view.boundary)
+        # in order from a
+        hits = sorted(
+            (
+                np.array(p.coords[0])
+                for p in getattr(hits, "geoms", [hits])
+                if not p.is_empty
+            ),
+            key=lambda p: np.linalg.norm(p - a),
+        )
+        if not a_inside and not b_inside and len(hits) != 2:
+            # misses the view, or just touches a corner of it
+            continue
+        for i, hit in enumerate(hits):
+            # heading out toward whichever end is outside on that side
+            direction = a - b if i == 0 and not a_inside else b - a
+            crossings.append(
+                (hit, math.degrees(math.atan2(direction[1], direction[0])))
+            )
+    return crossings
+
+
 def road_paths(G: nx.MultiGraph, pos: dict) -> dict:
     """Each edge's path on the page, running from its `from` node: straight between its ends where that's the right length, otherwise an arc (or, for a loop, a circle) of it."""
     paths = {}
@@ -175,6 +224,14 @@ class Diagram:
         self.pos = pos
         self.paths = road_paths(G, pos)
         self.kinds = {n: node_kind(G, n, center, radius_meters) for n in G.nodes}
+        self.outward = {
+            n: outward_angle(
+                pos[n],
+                [points for (u, v, _), points in self.paths.items() if n in (u, v)],
+            )
+            for n, kind in self.kinds.items()
+            if kind == "continues"
+        }
         low, high = grade_limits
         self.grade_colors = list(
             zip(
@@ -268,16 +325,33 @@ class Diagram:
                 (x, y), _ = along(points, fraction)
                 ax.scatter(x, y, zorder=4, **ADDRESS_STYLE)
         for kind, style in NODE_STYLES.items():
-            shown = [pos[n] for n, k in self.kinds.items() if k == kind]
-            if shown:
-                ax.scatter(*np.array(shown).T, zorder=5, **style)
+            shown = [n for n, k in self.kinds.items() if k == kind]
+            if kind == "continues":
+                # each pointing the way its road leaves the area, in its color (the steepest one's, if several leave together)
+                for n in shown:
+                    marker = MarkerStyle(
+                        style["marker"],
+                        transform=Affine2D().rotate_deg(self.outward[n]),
+                    )
+                    grade = max(data["grade"] for _, _, data in G.edges(n, data=True))
+                    ax.scatter(
+                        *pos[n],
+                        zorder=5,
+                        **{
+                            **style,
+                            "marker": marker,
+                            "color": self.grade_color(grade),
+                        },
+                    )
+            elif shown:
+                ax.scatter(*np.array([pos[n] for n in shown]).T, zorder=5, **style)
 
         fig.tight_layout()
         if bounds is not None:
             # widened to the shape of the space on the page, so it's filled
             xmin, ymin, xmax, ymax = bounds
-            box = ax.get_window_extent()
-            page_ratio = box.height / box.width
+            space = ax.get_window_extent()
+            page_ratio = space.height / space.width
             if (ymax - ymin) / (xmax - xmin) < page_ratio:
                 pad = ((xmax - xmin) * page_ratio - (ymax - ymin)) / 2
                 ymin, ymax = ymin - pad, ymax + pad
@@ -294,6 +368,26 @@ class Diagram:
             * 72
             / fig.dpi
         )
+        if bounds is not None:
+            # where roads run off the page, the same as where they leave the area -- just inside the edge, so the whole arrow shows
+            style = NODE_STYLES["continues"]
+            inset = 5 / points_per_meter
+            (x0, x1), (y0, y1) = ax.get_xlim(), ax.get_ylim()
+            for (u, v, k), points in paths.items():
+                color = self.grade_color(G.edges[u, v, k]["grade"])
+                for crossing, angle in exits(points, (x0, y0, x1, y1)):
+                    radians = math.radians(angle)
+                    marker = MarkerStyle(
+                        style["marker"], transform=Affine2D().rotate_deg(angle)
+                    )
+                    ax.scatter(
+                        *(
+                            crossing
+                            - inset * np.array([math.cos(radians), math.sin(radians)])
+                        ),
+                        zorder=5,
+                        **{**style, "marker": marker, "color": color},
+                    )
         renderer = fig.canvas.get_renderer()
         # the space each label takes up, so later ones don't land on top of it -- starting with the title
         taken = [ax.title.get_window_extent(renderer)]
