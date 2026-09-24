@@ -255,17 +255,12 @@
         }
       }
 
-      /* in normal document flow (like the disclaimer banner) rather than floated over the
-         map, so it can't collide with the legend at narrow widths */
+      /* in the sidebar under the town name(s), rather than floated over the map */
       #place-search {
-        flex: none;
-        padding: 8px 12px;
-        background: #f5f5f5;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+        margin: 0;
       }
       #place-search input {
         width: 100%;
-        max-width: 320px;
         box-sizing: border-box;
         padding: 6px 10px;
         border: 1px solid rgba(0, 0, 0, 0.2);
@@ -431,18 +426,18 @@
       departments. It's a proof of concept and hasn't been validated;
       <strong>use at your own risk</strong>.
     </div>
-    <form id="place-search" autocomplete="off">
-      <input
-        type="search"
-        id="place-search-input"
-        placeholder="Search for a place…"
-      />
-    </form>
     <div id="map-container">
       <!-- the legend, scale, and attribution, beside the map rather than over it -->
       <aside id="sidebar">
         <!-- the town(s) in view, filled in by places.js -->
         <h1 id="map-places" hidden></h1>
+        <form id="place-search" autocomplete="off">
+          <input
+            type="search"
+            id="place-search-input"
+            placeholder="Search for a place…"
+          />
+        </form>
         <!-- see overview.js -->
         <div id="overview-map"></div>
         <div id="layer-controls">
