@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { unlabeledRoadAnchors } from "../../analysis/firefighter-map/labels.js";
+import { unlabeledRoadAnchors } from "../../analysis/firefighter-map/scripts/labels.js";
 
 const viewport = { width: 400, height: 300 };
 // a straight road across the middle of the view

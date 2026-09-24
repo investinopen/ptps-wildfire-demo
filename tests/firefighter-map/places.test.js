@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { placeHeading } from "../../analysis/firefighter-map/places.js";
+import { placeHeading } from "../../analysis/firefighter-map/scripts/places.js";
 
 const view = { width: 400, height: 300 };
 const place = (name, cls, x, y, rank = 10) => ({

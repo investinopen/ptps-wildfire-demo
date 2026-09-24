@@ -10,7 +10,7 @@ import {
   padBounds,
   snapToGrid,
   toSources,
-} from "../../analysis/firefighter-map/overpass.js";
+} from "../../analysis/firefighter-map/scripts/overpass.js";
 
 const [WATER_GROUP, ROADS_GROUP] = OVERPASS_GROUPS;
 
