@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from shapely import LineString, Point
 
-from ptps_wildfire_demo.road_graph.addresses import place_address
+from ptps_wildfire_demo.road_graph.addresses import offset_from, place_address
 from ptps_wildfire_demo.road_graph.drawing import (
     along,
     arc,
@@ -333,3 +333,19 @@ def test_exits_cutting_across():
 
 def test_exits_missing_the_view():
     assert exits(np.array([[-50.0, 150], [150, 150]]), (0, 0, 100, 100)) == []
+
+
+def test_offset_from():
+    line = LineString([(0, 0), (100, 0)])
+    # heading east, north is on the left
+    assert offset_from(line, Point(25, 30)) == pytest.approx((0.25, 30))
+    assert offset_from(line, Point(75, -10)) == pytest.approx((0.75, -10))
+    assert offset_from(line.reverse(), Point(75, -10)) == pytest.approx((0.25, 10))
+
+
+def test_loop_direction():
+    p = np.array([0.0, 0])
+    away = np.array([0, 1.0])
+    # heading right first when counter-clockwise from the bottom of the circle, left when clockwise
+    assert loop(p, 100, away)[1][0] > 0
+    assert loop(p, 100, away, clockwise=True)[1][0] < 0

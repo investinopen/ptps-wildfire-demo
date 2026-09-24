@@ -6,10 +6,10 @@ import numpy as np
 from matplotlib import patheffects
 from matplotlib.lines import Line2D
 from matplotlib.markers import MarkerStyle
-from matplotlib.transforms import Affine2D
+from matplotlib.transforms import Affine2D, Bbox
 from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 from scipy.optimize import brentq
-from shapely import LineString, Point, box
+from shapely import LinearRing, LineString, Point, box
 
 from ptps_wildfire_demo.road_graph.network import TURNAROUNDS
 
@@ -58,19 +58,21 @@ NODE_STYLES = {
         "label": "Road continues",
     },
 }
-ADDRESS_STYLE = {
-    "marker": "o",
-    "s": 10,
-    "facecolor": "white",
-    "edgecolor": "#333333",
-    "linewidth": 0.8,
-}
 # house numbers go over everything else, with a white outline so they're readable over roads and symbols
 HOUSE_NUMBER_STYLE = {
     "zorder": 6,
     "path_effects": [patheffects.withStroke(linewidth=2, foreground="white")],
 }
 SCALE_BAR_FEET = [100, 250, 500, 1000, 2500, 5000]
+ROAD_NAME_STYLE = {
+    "fontweight": "bold",
+    # over the symbols, since one may end up over one when there's no other room
+    "zorder": 6,
+    # readable even where one is set beside its road, over another
+    "path_effects": [patheffects.withStroke(linewidth=2, foreground="white")],
+}
+# how far a house number's middle is from its road's line, in points: half a main road's width, plus half the text's height
+HOUSE_NUMBER_GAP = MAJOR_WIDTH / 2 + 4
 # roughly how wide a character of the labels is, in points, for deciding whether a label fits along its road
 CHAR_POINTS = {7.5: 4.8}
 
@@ -98,12 +100,14 @@ def arc(p0: np.ndarray, p1: np.ndarray, length: float, side: int = 1) -> np.ndar
     return center + radius * np.column_stack([np.cos(angles), np.sin(angles)])
 
 
-def loop(p: np.ndarray, length: float, away: np.ndarray) -> np.ndarray:
-    """A circle `length` around that starts and ends at p, on the side facing `away`."""
+def loop(
+    p: np.ndarray, length: float, away: np.ndarray, clockwise: bool = False
+) -> np.ndarray:
+    """A circle `length` around that starts and ends at p, on the side facing `away`, going around `clockwise` or not."""
     radius = length / (2 * math.pi)
     center = p + away / np.linalg.norm(away) * radius
     start = math.atan2(*(p - center)[::-1])
-    angles = start + np.linspace(0, 2 * math.pi, 50)
+    angles = start + (-1 if clockwise else 1) * np.linspace(0, 2 * math.pi, 50)
     return center + radius * np.column_stack([np.cos(angles), np.sin(angles)])
 
 
@@ -195,7 +199,9 @@ def road_paths(G: nx.MultiGraph, pos: dict) -> dict:
             away = (
                 pos[a] - np.mean(neighbors, axis=0) if neighbors else np.array([0, 1])
             )
-            paths[u, v, k] = loop(pos[a], data["length"], away)
+            # the same way around as the actual road, so its left and right sides (where its houses are) stay put
+            clockwise = not LinearRing(data["geometry"].coords).is_ccw
+            paths[u, v, k] = loop(pos[a], data["length"], away, clockwise)
         else:
             # roads between the same two intersections bow out to alternating sides
             pair = tuple(sorted((a, b)))
@@ -292,15 +298,12 @@ class Diagram:
                     markeredgecolor=s.get("edgecolor", s.get("color")),
                     label=s["label"],
                 )
-                for s in [
-                    *NODE_STYLES.values(),
-                    {**ADDRESS_STYLE, "label": "Address"},
-                ]
+                for s in NODE_STYLES.values()
             ]
         )
 
     def draw(self, title: str, bounds=None):
-        """One page, with the legend in its own column. `bounds` is (xmin, ymin, xmax, ymax) in layout coordinates, or the whole network if None."""
+        """One page, with the legend in its own column. Afterward, `unlabeled` lists any road names on the page that there wasn't room for. `bounds` is (xmin, ymin, xmax, ymax) in layout coordinates, or the whole network if None."""
         G, pos, paths = self.G, self.pos, self.paths
         fig, (ax, key) = plt.subplots(1, 2, figsize=(11, 8.5), width_ratios=[5, 1])
         # fills the page, showing extra around the network rather than shrinking to fit it exactly
@@ -321,9 +324,6 @@ class Diagram:
             for fraction in data["turns"]:
                 (x, y), _ = along(points, fraction)
                 ax.scatter(x, y, marker=TURN_MARKER, s=90, color="black", zorder=4)
-            for fraction, _ in data["addresses"]:
-                (x, y), _ = along(points, fraction)
-                ax.scatter(x, y, zorder=4, **ADDRESS_STYLE)
         for kind, style in NODE_STYLES.items():
             shown = [n for n, k in self.kinds.items() if k == kind]
             if kind == "continues":
@@ -391,26 +391,32 @@ class Diagram:
         renderer = fig.canvas.get_renderer()
         # the space each label takes up, so later ones don't land on top of it -- starting with the title
         taken = [ax.title.get_window_extent(renderer)]
+        # the symbols (intersections, dead ends, etc.), which labels stay off of where they can
+        symbols_taken = []
+        for symbols in ax.collections:
+            sizes = symbols.get_sizes()
+            for i, (x, y) in enumerate(ax.transData.transform(symbols.get_offsets())):
+                # a marker's size is its area in points
+                half = math.sqrt(sizes[i % len(sizes)]) / 2 * fig.dpi / 72
+                symbols_taken.append(
+                    Bbox.from_extents(x - half, y - half, x + half, y + half)
+                )
+        # switched off as a last resort for road names, which matter more than a symbol showing in full
+        rules = {"avoid_symbols": True}
         # labels have to fit entirely on the map, rather than running off its edges or into the title
         map_area = ax.get_window_extent(renderer)
 
-        def place(points, text, fontsize, side, fraction, style):
-            (x, y), angle = along(points, fraction)
-            angle = upright(angle)
-            # clear of the line, rather than covering it
-            offset = side * (MAJOR_WIDTH / 2 + 1)
+        def place(xy, text, fontsize, angle, offset, ha, va, style):
+            """Adds a label at `xy`, `offset` points away, if it fits on the map clear of the other labels."""
             annotation = ax.annotate(
                 text,
-                (x, y),
-                xytext=(
-                    -offset * math.sin(math.radians(angle)),
-                    offset * math.cos(math.radians(angle)),
-                ),
+                xy,
+                xytext=offset,
                 textcoords="offset points",
                 rotation=angle,
                 rotation_mode="anchor",
-                ha="center",
-                va="bottom" if side > 0 else "top",
+                ha=ha,
+                va=va,
                 fontsize=fontsize,
                 annotation_clip=True,
                 **{"zorder": 3, **style},
@@ -420,36 +426,115 @@ class Diagram:
                 not map_area.contains(extent.x0, extent.y0)
                 or not map_area.contains(extent.x1, extent.y1)
                 or any(extent.overlaps(other) for other in taken)
+                or (
+                    rules["avoid_symbols"]
+                    and any(extent.overlaps(other) for other in symbols_taken)
+                )
             ):
                 annotation.remove()
                 return False
             taken.append(extent)
             return True
 
-        def label(
-            points, text, fontsize, side, fractions=(0.5, 0.3, 0.7), fits=None, **style
-        ):
-            """Along the road, just above (side=1) or below (side=-1) it -- if the road's long enough to fit it (or `fits` says so) -- at the first of `fractions` of the way along where it's clear of the other labels. `style` goes to the text."""
-            length = np.hypot(*np.diff(points, axis=0).T).sum() * points_per_meter
-            if fits is None:
-                fits = len(text) * CHAR_POINTS[fontsize] <= length
-            if not fits:
-                return
-            for fraction in fractions:
-                if place(points, text, fontsize, side, fraction, style):
-                    return
+        def along_road(points, text, fontsize, side, fraction, style):
+            """Along the road at `fraction` of the way, just above (side=1) or below (side=-1) it."""
+            xy, angle = along(points, fraction)
+            angle = upright(angle)
+            # clear of the line, rather than covering it
+            gap = side * (MAJOR_WIDTH / 2 + 1)
+            offset = (
+                -gap * math.sin(math.radians(angle)),
+                gap * math.cos(math.radians(angle)),
+            )
+            return place(
+                xy,
+                text,
+                fontsize,
+                angle,
+                offset,
+                "center",
+                "bottom" if side > 0 else "top",
+                style,
+            )
 
-        # placed in order of importance, since a label that'd overlap an earlier one is left off: each road's name once, below its longest stretch, then the house numbers, above the road
-        longest = {}
+        def beside_road(points, text, fontsize, fraction, style):
+            """Level, next to the road at `fraction` of the way, on whichever side there's room -- for roads too short or crowded to label along."""
+            xy, _ = along(points, fraction)
+            gap = MAJOR_WIDTH / 2 + 2
+            for offset, ha, va in (
+                ((0, gap), "center", "bottom"),
+                ((0, -gap), "center", "top"),
+                ((gap, 0), "left", "center"),
+                ((-gap, 0), "right", "center"),
+                ((gap, gap), "left", "bottom"),
+                ((-gap, gap), "right", "bottom"),
+                ((gap, -gap), "left", "top"),
+                ((-gap, -gap), "right", "top"),
+            ):
+                if place(xy, text, fontsize, 0, offset, ha, va, style):
+                    return True
+            return False
+
+        def label_road(text, stretches, fontsize, style):
+            """Labels a road once, made up of `stretches` (paths, longest first): along whichever stretch has room, trying several spots on either side, or failing that, level beside one -- clear of the symbols if possible, or over them if not. Returns whether it fit anywhere."""
+            for avoid_symbols in (True, False):
+                rules["avoid_symbols"] = avoid_symbols
+                placed = try_label_road(text, stretches, fontsize, style)
+                rules["avoid_symbols"] = True
+                if placed:
+                    return True
+            return False
+
+        def try_label_road(text, stretches, fontsize, style):
+            for points in stretches:
+                length = np.hypot(*np.diff(points, axis=0).T).sum() * points_per_meter
+                if len(text) * CHAR_POINTS[fontsize] > length:
+                    continue
+                for fraction in (0.5, 0.35, 0.65, 0.2, 0.8):
+                    for side in (-1, 1):
+                        if along_road(points, text, fontsize, side, fraction, style):
+                            return True
+            for points in stretches:
+                for fraction in (0.5, 0.25, 0.75):
+                    if beside_road(points, text, fontsize, fraction, style):
+                        return True
+            return False
+
+        # placed in order of importance, since a label that'd overlap an earlier one is left off: every road's name (or route number, if it has no name) once, then the house numbers
+        stretches = {}
         for (u, v, k), points in paths.items():
             data = G.edges[u, v, k]
-            if data["name"] and data["length"] > longest.get(data["name"], (0,))[0]:
-                longest[data["name"]] = (data["length"], points)
-        for name, (_, points) in longest.items():
-            label(points, name, 7.5, -1, fontweight="bold")
+            text = data["name"] or data["ref"]
+            if text:
+                stretches.setdefault(text, []).append((data["length"], points))
+        # only the roads that show on this page need labels
+        (x0, x1), (y0, y1) = ax.get_xlim(), ax.get_ylim()
+        view = box(x0, y0, x1, y1)
+        self.unlabeled = []
+        for text, roads in stretches.items():
+            shown = [
+                points
+                for _, points in sorted(roads, key=lambda road: -road[0])
+                if view.intersects(LineString(points))
+            ]
+            if shown and not label_road(text, shown, 7.5, ROAD_NAME_STYLE):
+                self.unlabeled.append(text)
         for (u, v, k), points in paths.items():
-            for fraction, number in G.edges[u, v, k]["addresses"]:
-                label(points, number, 7, 1, [fraction], fits=True, **HOUSE_NUMBER_STYLE)
+            for fraction, number, offset in G.edges[u, v, k]["addresses"]:
+                xy, angle = along(points, fraction)
+                # on the side of the road the house is
+                gap = math.copysign(HOUSE_NUMBER_GAP, offset)
+                radians = math.radians(angle)
+                place(
+                    xy,
+                    number,
+                    7,
+                    upright(angle),
+                    (-gap * math.sin(radians), gap * math.cos(radians)),
+                    "center",
+                    "center",
+                    HOUSE_NUMBER_STYLE,
+                )
 
         # the longest round length that takes up no more than a sixth of the page
         width = np.diff(ax.get_xlim())[0] * FEET_PER_METER
