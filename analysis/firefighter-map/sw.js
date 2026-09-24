@@ -18,13 +18,14 @@ const { CacheableResponsePlugin } = workbox.cacheableResponse;
 // only cache real successes -- avoids poisoning a cache with an opaque/error response
 const cacheableResponse = new CacheableResponsePlugin({ statuses: [0, 200] });
 
-// the page itself and its own scripts (main.js etc.): NetworkFirst so a fresh deploy is
+// the page itself and its own scripts and stylesheet (main.js, index.css, etc.): NetworkFirst so a fresh deploy is
 // picked up whenever there's a connection, but the last-successfully-loaded version still
 // works offline
 registerRoute(
   ({ request, url }) =>
     request.mode === "navigate" ||
-    (url.origin === self.location.origin && request.destination === "script"),
+    (url.origin === self.location.origin &&
+      (request.destination === "script" || request.destination === "style")),
   new NetworkFirst({
     cacheName: "pages",
     plugins: [

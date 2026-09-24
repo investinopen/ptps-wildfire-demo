@@ -62,7 +62,7 @@ bindFallbackRoadLabels(map, {
 });
 
 // zoom + compass share the default top-right group; only the zoom buttons get
-// hidden on paper (see print styles in index.html), the compass survives printing since it
+// hidden on paper (see print styles in index.css), the compass survives printing since it
 // tracks the map's actual bearing and still points true north on a rotated map
 map.addControl(new maplibregl.NavigationControl());
 map.addControl(
