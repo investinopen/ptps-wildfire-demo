@@ -7,18 +7,6 @@ A networked data infrastructure demo for the "Investing in Open Infra to Safegua
 
 ## What's here
 
-- **[Fallbacks](fallbacks.qmd):** tools for finding a backup when a source URL goes away.
-  - [HTTP proxy](fallbacks.qmd#http-proxy)
-  - [Python package](fallbacks.qmd#python-package)
-  - [Browser extension](fallbacks.qmd#browser-extension)
-- **Analysis**
-  - **[Dataset rescue statuses](analysis/rescue-status.qmd):** checks whether the example wildfire data sources are still up, and whether they've been rescued to the [Wayback Machine](https://web.archive.org/) or the [Data Rescue Project Portal](https://portal.datarescueproject.org/). Updates daily.
-  - **[Risk calculation](analysis/risk.ipynb):** ranks a state's fire weather zones by combining burn probability, burn history, Red Flag Warnings, and active fire detections.
-  - **[Wildfire overlap](analysis/fire_overlap.ipynb):** maps every fire perimeter in a state since 1984, so places that have burned more than once stand out.
-- **Firefighter maps:** printable maps for small/rural fire departments.
-  - **[Detailed](firefighter-maps/detailed/index.html):** combines building footprints, fuel load, burn probability, fire hydrants, roads, driveways, and trails.
-  - **[Simplified](firefighter-maps/simplified/index.qmd):** draws the roads as a graph, to scale by driving distance, with steep grades, sharp turns, dead ends, and house numbers marked.
-
 ::: {.screenshots layout-ncol=3}
 [![Browser extension](img/screenshots/extension.webp){fig-alt="The browser extension's modal over a missing EPA page, offering the rescued data"}](fallbacks.qmd#browser-extension)
 
@@ -32,6 +20,18 @@ A networked data infrastructure demo for the "Investing in Open Infra to Safegua
 
 [![Simplified firefighter map](img/screenshots/simplified-map.webp){fig-alt="Road graph of Gold Hill, Colorado, colored by steepness, with dead ends and sharp turns marked"}](firefighter-maps/simplified/index.qmd)
 :::
+
+- **[Fallbacks](fallbacks.qmd):** tools for finding a backup when a source URL goes away.
+  - [HTTP proxy](fallbacks.qmd#http-proxy)
+  - [Python package](fallbacks.qmd#python-package)
+  - [Browser extension](fallbacks.qmd#browser-extension)
+- **Analysis**
+  - **[Dataset rescue statuses](analysis/rescue-status.qmd):** checks whether the example wildfire data sources are still up, and whether they've been rescued to the [Wayback Machine](https://web.archive.org/) or the [Data Rescue Project Portal](https://portal.datarescueproject.org/). Updates daily.
+  - **[Risk calculation](analysis/risk.ipynb):** ranks a state's fire weather zones by combining burn probability, burn history, Red Flag Warnings, and active fire detections.
+  - **[Wildfire overlap](analysis/fire_overlap.ipynb):** maps every fire perimeter in a state since 1984, so places that have burned more than once stand out.
+- **Firefighter maps:** printable maps for small/rural fire departments.
+  - **[Detailed](firefighter-maps/detailed/index.html):** combines building footprints, fuel load, burn probability, fire hydrants, roads, driveways, and trails.
+  - **[Simplified](firefighter-maps/simplified/index.qmd):** draws the roads as a graph, to scale by driving distance, with steep grades, sharp turns, dead ends, and house numbers marked.
 
 For progress over time, see the [changelog](https://github.com/investinopen/ptps-wildfire-demo/blob/main/CHANGELOG.md).
 
