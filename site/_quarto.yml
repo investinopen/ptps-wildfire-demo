@@ -15,7 +15,7 @@ project:
     - analysis/rescue-status.qmd
     - analysis/risk.ipynb
     - analysis/fire_overlap.ipynb
-    - firefighter-maps/simplified/index.ipynb
+    - firefighter-maps/simplified/index.qmd
   # published as-is
   resources:
     # has its own full-screen layout
@@ -50,7 +50,7 @@ website:
         menu:
           - href: firefighter-maps/detailed/index.html
             text: Detailed
-          - href: firefighter-maps/simplified/index.ipynb
+          - href: firefighter-maps/simplified/index.qmd
             text: Simplified
   page-footer:
     left: "© 2026 [Invest in Open Infrastructure](https://investinopen.org/) · [MIT License](https://github.com/investinopen/ptps-wildfire-demo/blob/main/LICENSE)"
