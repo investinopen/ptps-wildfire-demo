@@ -27,7 +27,7 @@ from ptps_wildfire_demo.simplified_map.network import (
     edge_line,
     first,
 )
-from ptps_wildfire_demo.simplified_map.pipeline import bounds_around
+from ptps_wildfire_demo.simplified_map.pipeline import Settings, bounds_around
 from ptps_wildfire_demo.simplified_map.profile import max_grade, sample, sharp_turns
 
 
@@ -360,3 +360,11 @@ def test_bounds_around():
     # nodes 1 and 2, plus a margin of a tenth of the width
     assert (xmin, xmax) == pytest.approx((-20, 220))
     assert (ymin, ymax) == pytest.approx((-20, 20))
+
+
+def test_settings_text():
+    text = Settings(min_driveway_meters=1500, max_grade=0.125).text()
+    assert text.min_driveway_meters == "1,500 m"
+    assert text.max_grade == "12%"
+    assert text.sharp_turn_degrees == "110°"
+    assert text.geography_weight == "0.001"

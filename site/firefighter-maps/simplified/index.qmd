@@ -61,24 +61,16 @@ How it's made is [below](#how-its-made).
 import sys
 from pathlib import Path
 
-import osmnx as ox
-
 # so the package's modules (in ../../../ptps_wildfire_demo/simplified_map/) can be imported
 sys.path.insert(0, str(Path.cwd().parents[2]))
 from ptps_wildfire_demo.simplified_map.pipeline import SimplifiedMap
-
-# not committed -- see .gitignore
-ox.settings.cache_folder = "data_cache/osmnx"
 
 # a small mountain town west of Boulder, where roads are steep and winding and many homes are down long private drives
 gold_hill = SimplifiedMap.build(
     "Gold Hill, Colorado", center=(40.063, -105.409), radius_meters=1200
 )
-settings = gold_hill.settings
-
-
-def meters(value):
-    return f"{value:,.0f} m"
+# the settings, written out for the explanation below
+text = gold_hill.settings.text()
 ```
 
 ## Whole area
@@ -105,7 +97,7 @@ The code is in [`ptps_wildfire_demo/simplified_map/`](../../../ptps_wildfire_dem
 
 Drivable roads from [OpenStreetMap](https://www.openstreetmap.org/copyright), via [OSMnx](https://osmnx.readthedocs.io/). Tracks are included, since engines use them as fire roads. The network is then simplified so the only nodes are intersections, dead ends, gates, and places where a road's name changes, with each stretch of road between two of them as one edge.
 
-Short driveways (under `{python} meters(settings.min_driveway_meters)`) that just lead to one house are left off, since they'd outnumber the roads -- the same as the detailed firefighter map's dead ends, since they can be backed out of. Removing them leaves nodes where only two roads meet, so those are merged back into single edges.
+Short driveways (under `{python} text.min_driveway_meters`) that just lead to one house are left off, since they'd outnumber the roads -- the same as the detailed firefighter map's dead ends, since they can be backed out of. Removing them leaves nodes where only two roads meet, so those are merged back into single edges.
 
 ### Elevation
 
@@ -113,13 +105,13 @@ From [Mapterhorn](https://mapterhorn.com/)'s open terrain tiles -- the same ones
 
 ### Grades and sharp turns
 
-Each road is sampled every `{python} meters(settings.step_meters)` along its length. Its grade is the steepest climb over any `{python} meters(settings.grade_span_meters)` stretch, so one noisy elevation sample doesn't read as a cliff. The colors break at `{python} f"{settings.max_grade:.0%}"` -- fire apparatus access roads "shall not exceed 10 percent in grade" under the International Fire Code (Appendix D103.2), unless the fire code official approves otherwise -- and `{python} f"{settings.steep_grade:.0%}"`.
+Each road is sampled every `{python} text.step_meters` along its length. Its grade is the steepest climb over any `{python} text.grade_span_meters` stretch, so one noisy elevation sample doesn't read as a cliff. The colors break at `{python} text.max_grade` -- fire apparatus access roads "shall not exceed 10 percent in grade" under the International Fire Code (Appendix D103.2), unless the fire code official approves otherwise -- and `{python} text.steep_grade`.
 
-A sharp turn is anywhere a road's heading changes by at least `{python} f"{settings.sharp_turn_degrees:.0f}°"` from `{python} meters(settings.turn_span_meters)` before to `{python} meters(settings.turn_span_meters)` after -- roughly a curve tighter than a 30 m (100 ft) radius. The tightest spot of each bend is marked.
+A sharp turn is anywhere a road's heading changes by at least `{python} text.sharp_turn_degrees` from `{python} text.turn_span_meters` before to `{python} text.turn_span_meters` after -- roughly a curve tighter than a 30 m (100 ft) radius. The tightest spot of each bend is marked.
 
 ### Addresses
 
-Addresses from OpenStreetMap -- mapped on the house, or on the building itself -- are placed along the road they're on (their `addr:street`), at the point on that road closest to them, on the side of the road the house is. That makes each one a stop along the road, so the diagram shows how far down the road it is. Addresses with no street, or none that matches a road here, go on the closest road, and ones more than `{python} meters(settings.max_address_meters)` from any road are left off. A house down one of the long driveways still on the diagram goes on the driveway instead, when the driveway comes off its street, since that's where it's reached from.
+Addresses from OpenStreetMap -- mapped on the house, or on the building itself -- are placed along the road they're on (their `addr:street`), at the point on that road closest to them, on the side of the road the house is. That makes each one a stop along the road, so the diagram shows how far down the road it is. Addresses with no street, or none that matches a road here, go on the closest road, and ones more than `{python} text.max_address_meters` from any road are left off. A house down one of the long driveways still on the diagram goes on the driveway instead, when the driveway comes off its street, since that's where it's reached from.
 
 ### Layout
 

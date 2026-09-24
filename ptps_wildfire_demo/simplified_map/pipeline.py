@@ -1,5 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from datetime import UTC, datetime
+from types import SimpleNamespace
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -39,6 +40,22 @@ class Settings:
     spacing_weight: float = 0.001
     # the zoomed-in page shows the part of the diagram for intersections within this distance of the center on the ground
     zoomed_radius_meters: float = 400
+
+    def text(self) -> SimpleNamespace:
+        """Each setting written out for prose, by the same name, e.g. min_driveway_meters as "150 m", max_grade as "10%", or sharp_turn_degrees as "110°"."""
+
+        def written(name, value):
+            if name.endswith("_meters"):
+                return f"{value:,.0f} m"
+            if name.endswith("_grade"):
+                return f"{value:.0%}"
+            if name.endswith("_degrees"):
+                return f"{value:.0f}°"
+            return f"{value:g}"
+
+        return SimpleNamespace(
+            **{f.name: written(f.name, getattr(self, f.name)) for f in fields(self)}
+        )
 
 
 def bounds_around(
@@ -82,9 +99,11 @@ class SimplifiedMap:
         center: tuple[float, float],
         radius_meters: float,
         settings: Settings | None = None,
+        cache_folder: str = "data_cache/osmnx",
     ) -> "SimplifiedMap":
-        """Fetches the roads, elevation, and addresses, and lays out the diagram."""
+        """Fetches the roads, elevation, and addresses, and lays out the diagram. OpenStreetMap responses are cached in `cache_folder` (relative to the working directory), which isn't committed -- see .gitignore."""
         settings = settings or Settings()
+        ox.settings.cache_folder = cache_folder
         run_at = datetime.now(UTC)
         G = fetch_roads(center, radius_meters)
         drop_short_driveways(G, settings.min_driveway_meters)
