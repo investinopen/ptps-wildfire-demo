@@ -20,6 +20,8 @@ DEFAULT_REQUEST_INTERVAL = 1.0
 SAVE_INTERVAL = 24 * 60 * 60
 # Bounds memory in a long-running proxy; if exceeded, the oldest entries are evicted early.
 MAX_TRACKED_SAVES = 10_000
+# The availability API intermittently errors or returns no snapshot for URLs it does have, so look up a second time before giving up.
+MATCH_ATTEMPTS = 2
 
 
 class InternetArchiveClient:
@@ -82,6 +84,13 @@ class InternetArchiveClient:
     async def get_match(self, url: str) -> str | None:
         """https://archive.org/help/wayback_api.php"""
 
+        for _ in range(MATCH_ATTEMPTS):
+            match = await self._get_match_once(url)
+            if match:
+                return match
+        return None
+
+    async def _get_match_once(self, url: str) -> str | None:
         try:
             response = await self.request(
                 "https://archive.org/wayback/available", params={"url": url}
@@ -92,7 +101,7 @@ class InternetArchiveClient:
 
         try:
             results = response.json()["archived_snapshots"]
-        except JSONDecodeError:
+        except (JSONDecodeError, KeyError):
             return None
 
         return results.get("closest", {}).get("url")

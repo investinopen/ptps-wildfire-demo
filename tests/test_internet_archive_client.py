@@ -57,17 +57,30 @@ async def test_save_allows_resubmitting_after_interval(
 async def test_get_match_500(client, httpx_mock: HTTPXMock):
     """Imagining that the Resolver isn't able to reach the Internet Archive sometimes"""
 
-    httpx_mock.add_response(status_code=500)
+    httpx_mock.add_response(status_code=500, is_reusable=True)
 
     match = await client.get_match("https://investinopen.org/")
     assert match is None
 
 
 async def test_get_match_timeout(client, httpx_mock: HTTPXMock):
-    httpx_mock.add_exception(httpx.TimeoutException("Timed out"))
+    httpx_mock.add_exception(httpx.TimeoutException("Timed out"), is_reusable=True)
 
     match = await client.get_match("https://investinopen.org/")
     assert match is None
+
+
+async def test_get_match_retries_empty_result(client, httpx_mock: HTTPXMock):
+    """The availability API sometimes returns no snapshot for a URL it has archived"""
+
+    snapshot_url = "http://web.archive.org/web/20250101000000/https://investinopen.org/"
+    httpx_mock.add_response(json={"archived_snapshots": {}})
+    httpx_mock.add_response(
+        json={"archived_snapshots": {"closest": {"url": snapshot_url}}}
+    )
+
+    match = await client.get_match("https://investinopen.org/")
+    assert match == snapshot_url
 
 
 async def test_requests_are_throttled(client, httpx_mock: HTTPXMock, monkeypatch):
