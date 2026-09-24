@@ -1,4 +1,4 @@
-import { ROAD } from "./colors";
+import { ROAD } from "./colors.js";
 
 // map symbols drawn on a canvas, so the same drawing can be registered as a map image
 // (see main.js) and shown as its legend swatch (see legend.js). All black/white/yellow,

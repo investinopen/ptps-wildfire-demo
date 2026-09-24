@@ -5,7 +5,7 @@ import {
   RISK_PROPERTY,
   SOURCE_LAYER,
 } from "./buildings.js";
-import { ROAD } from "./colors";
+import { ROAD } from "./colors.js";
 
 // one const per layer -- keeping these standalone makes the draw order (the `layers`
 // array in main.js) easy to see and rearrange without hunting through each definition
