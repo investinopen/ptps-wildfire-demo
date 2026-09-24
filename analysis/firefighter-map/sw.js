@@ -72,7 +72,7 @@ registerRoute(
 );
 
 // water sources/road access (Overpass, or its fallback mirrors -- queried with GET so
-// they can be cached here, see overpass.js) and place search (Nominatim) are live,
+// they can be cached here, see overpass.js) and place search (Photon) are live,
 // safety-relevant data -- always prefer the network, and only fall back to a
 // short-lived cache entry if there's genuinely no connection, so a stale hydrant or
 // one-way status is never shown in preference to a fresh one
@@ -81,7 +81,7 @@ registerRoute(
     url.hostname === "overpass-api.de" ||
     url.hostname === "maps.mail.ru" ||
     url.hostname === "overpass.private.coffee" ||
-    url.hostname === "nominatim.openstreetmap.org",
+    url.hostname === "photon.komoot.io",
   new NetworkFirst({
     cacheName: "live-data",
     networkTimeoutSeconds: 10,

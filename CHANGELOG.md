@@ -10,7 +10,8 @@ Only includes notable updates.
   - Add water sources, swimming pools, gates, dead ends, and bridge weight limits (in US tons).
   - Label every named road in view, and show route numbers as sign-style boxes that stay clear of buildings and house numbers.
   - Make roads near-black, and driveways and trails thicker and easier to see; hide sidewalks.
-  - Move the legend, attribution, and scale into a collapsible sidebar, with the name of the town(s) in view and an overview map.
+  - Move the legend, attribution, and scale into a collapsible sidebar, with the name of the town(s) in view, the place search, and an overview map.
+  - Suggest places as you type in the search box.
   - Cache map data for offline use.
   - Upgraded to MapLibre 6, and added tests.
 - [**Analysis:**](analysis/)

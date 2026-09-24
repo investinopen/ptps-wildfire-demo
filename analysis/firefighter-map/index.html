@@ -257,7 +257,34 @@
 
       /* in the sidebar under the town name(s), rather than floated over the map */
       #place-search {
+        position: relative;
         margin: 0;
+      }
+      /* over the rest of the sidebar, rather than pushing it down */
+      #place-search-suggestions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 2;
+        margin: 2px 0 0;
+        padding: 0;
+        list-style: none;
+        background: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      }
+      #place-search-suggestions[hidden] {
+        display: none;
+      }
+      #place-search-suggestions li {
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+      #place-search-suggestions li:hover,
+      #place-search-suggestions li[aria-selected="true"] {
+        background: #eef3fb;
       }
       #place-search input {
         width: 100%;
@@ -436,7 +463,13 @@
             type="search"
             id="place-search-input"
             placeholder="Search for a place…"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-controls="place-search-suggestions"
+            aria-expanded="false"
           />
+          <!-- filled in by search.js as you type -->
+          <ul id="place-search-suggestions" role="listbox" hidden></ul>
         </form>
         <!-- see overview.js -->
         <div id="overview-map"></div>
