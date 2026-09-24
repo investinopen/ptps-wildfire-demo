@@ -11,6 +11,7 @@ project:
   # everything else in this directory is a working notebook/script, not a page
   render:
     - index.qmd
+    - fallbacks.qmd
     - rescue-status.qmd
     - risk.ipynb
     - fire_overlap.ipynb
@@ -32,6 +33,8 @@ website:
     logo: img/ioi-logo-dark.svg
     logo-alt: Invest in Open Infrastructure
     left:
+      - href: fallbacks.qmd
+        text: Fallbacks
       - href: rescue-status.qmd
         text: Dataset rescue statuses
       - href: risk.ipynb

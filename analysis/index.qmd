@@ -11,10 +11,10 @@ A networked data infrastructure demo for the "Investing in Open Infra to Safegua
 - **[Risk calculation](risk.ipynb):** ranks a state's fire weather zones by combining burn probability, burn history, Red Flag Warnings, and active fire detections.
 - **[Wildfire overlap](fire_overlap.ipynb):** maps every fire perimeter in a state since 1984, so places that have burned more than once stand out.
 - **[Firefighter map](firefighter-map/index.html):** a printable map for small/rural fire departments, combining building footprints, fuel load, burn probability, fire hydrants, roads, driveways, and trails.
-- **Tools**, for finding a backup when a source URL goes away:
-  - [HTTP proxy](https://github.com/investinopen/ptps-wildfire-demo#http-proxy)
-  - [Python package](https://github.com/investinopen/ptps-wildfire-demo#python-package)
-  - [Browser extension](https://github.com/investinopen/ptps-wildfire-demo#browser-extension)
+- **[Fallbacks](fallbacks.qmd)**, tools for finding a backup when a source URL goes away:
+  - [HTTP proxy](fallbacks.qmd#http-proxy)
+  - [Python package](fallbacks.qmd#python-package)
+  - [Browser extension](fallbacks.qmd#browser-extension)
 
 For progress over time, see the [changelog](https://github.com/investinopen/ptps-wildfire-demo/blob/main/CHANGELOG.md).
 
@@ -33,10 +33,10 @@ The project will design, build, and document a working end-to-end data infrastru
 Data rescue/resilience has, for the most part, focused on a single aspect of the problem: Take data from a source location, make a copy elsewhere. There are various angles that are less explored:
 
 - If someone is looking for a dataset that's been disrupted, how do they find the (appropriate) backup?
-  - This is where the [fallbacks](https://github.com/investinopen/ptps-wildfire-demo#fallbacks) come in.
-    - [HTTP proxy](https://github.com/investinopen/ptps-wildfire-demo#http-proxy)
-    - [Python package](https://github.com/investinopen/ptps-wildfire-demo#python-package)
-    - [Browser extension](https://github.com/investinopen/ptps-wildfire-demo#browser-extension)
+  - This is where the [fallbacks](fallbacks.qmd) come in.
+    - [HTTP proxy](fallbacks.qmd#http-proxy)
+    - [Python package](fallbacks.qmd#python-package)
+    - [Browser extension](fallbacks.qmd#browser-extension)
 - If someone's using backed-up data, how do they verify its integrity (relative to the source)?
   - This is where [varve](https://github.com/tylere/varve) comes in.
 - What datasets have people not thought to back up yet? How do we avoid losing them?

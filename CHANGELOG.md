@@ -25,7 +25,7 @@ Only includes notable updates.
 
 ## 2026-09-17
 
-- **[Wildfire risk map:](analysis/README.md#firefigher-map)** [Published a printable map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map/) meant to be handed to small/rural fire departments, combining building footprints, fuel load, fire hydrants, roads, driveways, and trails for an area.
+- **Wildfire risk map:** [Published a printable map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-map/) meant to be handed to small/rural fire departments, combining building footprints, fuel load, fire hydrants, roads, driveways, and trails for an area.
   - Show a legend that doubles as the layer toggle, and highlight moderate/high fuel load risk with a hatch pattern.
   - Add a "search for a place" box, and make the current view linkable.
   - Add a disclaimer that it's a proof of concept and hasn't been validated.
@@ -36,16 +36,16 @@ Only includes notable updates.
   - [Fuzzy-match terminated federal datasets](analysis/federal_data_terminations.ipynb) against Data Rescue Project rescues.
   - Show when the [dataset rescue status report](analysis/README.md#dataset-rescue-status-report) was generated, and fix a few example dataset URLs.
   - Consolidated the analysis documentation into [analysis/README.md](analysis/README.md).
-- [**HTTP proxy:**](README.md#http-proxy) Documented [QGIS and httpx usage](README.md#usage) against the proxy, and made passive archiving more tolerant of slow sites.
+- [**HTTP proxy:**](https://investinopen.github.io/ptps-wildfire-demo/fallbacks.html#http-proxy) Documented [QGIS and httpx usage](https://investinopen.github.io/ptps-wildfire-demo/fallbacks.html#proxy-usage) against the proxy, and made passive archiving more tolerant of slow sites.
 
 ## 2026-09-03 - status update
 
 After some initial scoping conversations, we landed on a technical goal of "making it easier to work with rescued data." This has resulted in several sub-projects:
 
 - Tools
-  - [HTTP proxy](README.md#http-proxy)
-  - [Python package](README.md#python-package)
-  - [Browser extension](README.md#browser-extension)
+  - [HTTP proxy](https://investinopen.github.io/ptps-wildfire-demo/fallbacks.html#http-proxy)
+  - [Python package](https://investinopen.github.io/ptps-wildfire-demo/fallbacks.html#python-package)
+  - [Browser extension](https://investinopen.github.io/ptps-wildfire-demo/fallbacks.html#browser-extension)
 - [Analysis/dashboards](analysis/)
   - [Wildfire data](https://investinopen.github.io/ptps-wildfire-demo/rescue-status.html)
   - [Federal Data Terminations](analysis/federal_data_terminations.ipynb)
@@ -107,7 +107,7 @@ This seems to be the direction [varve (the new Radiant Earth project)](https://g
 
 #### Passive archiving
 
-As an alternative approach to active crawling: When using [the proxy](README.md#http-proxy), it checks if the URL is available in the Internet Archive. If it's not, the proxy automatically triggers a capture. This **archives data that people are actively using, when they're using it**. This idea could be expanded:
+As an alternative approach to active crawling: When using [the proxy](https://investinopen.github.io/ptps-wildfire-demo/fallbacks.html#http-proxy), it checks if the URL is available in the Internet Archive. If it's not, the proxy automatically triggers a capture. This **archives data that people are actively using, when they're using it**. This idea could be expanded:
 
 - [Automatically saving data to other repositories](https://github.com/investinopen/ptps-wildfire-demo/issues/11) (that are more data-focused)
 - Assigning DOIs
@@ -148,11 +148,11 @@ All that said, the best way to know what users want it is to talk to them 🙂 P
 
 ## 2026-08-31
 
-- [**Browser extension:**](README.md#browser-extension) Introduced the extension, linking matched pages to the [Data Rescue Project Portal](https://portal.datarescueproject.org/datasets/) through a modal overlay.
+- [**Browser extension:**](https://investinopen.github.io/ptps-wildfire-demo/fallbacks.html#browser-extension) Introduced the extension, linking matched pages to the [Data Rescue Project Portal](https://portal.datarescueproject.org/datasets/) through a modal overlay.
 
-  ![modal showing over the EPA EJScreener](img/extension_modal_2026-08-31.png)
+  ![modal showing over the EPA EJScreener](analysis/img/extension_modal_2026-08-31.png)
 
-- [**HTTP proxy:**](README.md#http-proxy)
+- [**HTTP proxy:**](https://investinopen.github.io/ptps-wildfire-demo/fallbacks.html#http-proxy)
   - Look for archives of redirect URLs, when archives of the original aren't available.
   - Respond with JSON when appropriate.
   - Introduce "passive archiving", saving the URL to the [Internet Archive](https://archive.org/) if the request is a GET and the URL isn't archived there already.
@@ -166,14 +166,14 @@ All that said, the best way to know what users want it is to talk to them 🙂 P
 
 ## 2026-08-24
 
-- [**HTTP proxy:**](README.md#http-proxy) Find rescued data in the [Data Rescue Project](https://portal.datarescueproject.org/datasets/) and [Wayback Machine](https://web.archive.org/).
+- [**HTTP proxy:**](https://investinopen.github.io/ptps-wildfire-demo/fallbacks.html#http-proxy) Find rescued data in the [Data Rescue Project](https://portal.datarescueproject.org/datasets/) and [Wayback Machine](https://web.archive.org/).
 - [**Analysis:**](analysis/)
   - Show the rescue status of the wildfire datasets.
   - [Show the statuses of the source URLs archived by the Data Rescue Project.](analysis/rescues.ipynb)
 
 ## 2026-08-20
 
-- [**HTTP proxy:**](README.md#http-proxy) Introduced the [mitmproxy](https://www.mitmproxy.org/) fallback addon. [Demo.](https://drive.google.com/file/d/1IuWQqmfLEJsdH916C8GE9MWRktg6EKA9/view?usp=drivesdk)
+- [**HTTP proxy:**](https://investinopen.github.io/ptps-wildfire-demo/fallbacks.html#http-proxy) Introduced the [mitmproxy](https://www.mitmproxy.org/) fallback addon. [Demo.](https://drive.google.com/file/d/1IuWQqmfLEJsdH916C8GE9MWRktg6EKA9/view?usp=drivesdk)
 
 ## 2026-08-10
 

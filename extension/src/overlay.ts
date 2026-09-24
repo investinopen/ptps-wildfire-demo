@@ -66,7 +66,7 @@ export function showFallbackOverlay(drpUrl: string): void {
   const attributionLink = document.createElement("a");
   attributionLink.textContent = "PtPS browser extension";
   attributionLink.href =
-    "https://github.com/investinopen/ptps-wildfire-demo#browser-extension";
+    "https://investinopen.github.io/ptps-wildfire-demo/fallbacks.html#browser-extension";
   attributionLink.target = "_blank";
   attribution.append(attributionLink);
 

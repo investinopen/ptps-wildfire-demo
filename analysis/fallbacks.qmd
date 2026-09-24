@@ -1,0 +1,187 @@
+---
+title: Fallbacks
+---
+
+When source data (from a government, etc.) gets taken down, this can stop its users dead in their tracks. Sometimes the data has been rescued by a third party, but it's not always easy to find, use, or comprehend. This project aims to make that simpler, providing a "fallback" behavior when original data sources aren't available. Essentially, we want to save data users from digging through the [Data Rescue Project (DRP) Portal](https://portal.datarescueproject.org/datasets/), if they even know to look for it.
+
+## Use cases
+
+### User groups
+
+For this phase of the project, we are targeting the following user groups:
+
+- Researchers
+- Operational people
+  - Emergency managers
+  - Fire departments
+
+### Tools
+
+We aim to support the following tools:
+
+- Python
+- R
+- ArcGIS
+- QGIS
+- Nice-to-haves:
+  - DuckDB
+  - PostgreSQL/PostGIS
+
+Also paper! See [firefighter map](firefighter-map/).
+
+## [HTTP proxy](https://github.com/investinopen/ptps-wildfire-demo/tree/main/proxy) {#http-proxy}
+
+The fallback behavior is available through a proxy, retrieving source data that's available or letting you know where to find data that's missing. The proxy will also passively archive URLs in the [Internet Archive](https://archive.org/) if they don't already exist there, preventing any future situation where a dataset disappears.
+
+A **proxy** routes web requests through another service (here, `127.0.0.1:8080`).
+A **certificate** lets tools trust secure (`https://`) traffic from that proxy.
+
+### Architecture
+
+```{mermaid}
+flowchart TD
+    user("user")
+
+    python["Python"]
+    r["R"]
+    arcgis["ArcGIS"]
+    qgis["QGIS"]
+
+    proxy(["proxy"])
+
+    source[("source")]
+    rescue1[("rescued data")]
+    rescue2[("rescued data")]
+
+    wayback[("WayBack Machine")]
+    repo[("other repositories?")]
+
+    user --> python
+    user --> r
+    user --> arcgis
+    user --> qgis
+
+    python --> proxy
+    r --> proxy
+    arcgis --> proxy
+    qgis --> proxy
+
+    proxy -->|ensures backup| wayback
+    proxy -->|ensures backup| repo
+
+    proxy --> source
+    source -->|falls back to| rescue1
+    rescue1 -->|falls back to| rescue2
+
+    classDef sourceTool fill:#cfe2f3,stroke:#000,color:#000
+    classDef process fill:#ffff00,stroke:#000,color:#000
+    classDef datastore fill:#cfe2f3,stroke:#000,color:#000
+
+    class python,r,arcgis,qgis sourceTool
+    class proxy process
+    class source,rescue1,rescue2 datastore
+
+    click repo href "https://github.com/investinopen/ptps-wildfire-demo/issues/11" _blank
+```
+
+### Usage {#proxy-usage}
+
+1. Install dependencies:
+   - Python
+   - [uv](https://docs.astral.sh/uv/getting-started/installation/)
+1. Clone [the repository](https://github.com/investinopen/ptps-wildfire-demo) and install Python dependencies:
+
+   ```sh
+   uv sync
+   ```
+
+1. Optional: Set up credentials for the Internet Archive. This avoids rate limits.
+   1. [Get credentials.](https://archive.org/developers/tutorial-get-ia-credentials.html)
+   1. Create environment variables file.
+
+      ```sh
+      cp .env.sample .env
+      ```
+
+   1. Fill out that file.
+
+1. [Start the proxy.](https://docs.mitmproxy.org/stable/overview/getting-started/#launch-the-tool-you-need)
+
+   ```sh
+   uv run mitmdump -s ptps_wildfire_demo/proxy/fallback.py
+   ```
+
+1. In another terminal, [install the certificate](https://docs.mitmproxy.org/stable/concepts/certificates/#installing-the-mitmproxy-ca-certificate-manually).
+
+   ```sh
+   curl --proxy 127.0.0.1:8080 --cacert ~/.mitmproxy/mitmproxy-ca-cert.pem https://example.com/
+   ```
+
+1. Connect from [a supported tool](#tools).
+   1. Python: see [demo notebook](https://github.com/investinopen/ptps-wildfire-demo/blob/main/proxy/demo.ipynb).
+   1. QGIS:
+      1. Open **Preferences** → **Network** → **Proxy**.
+      1. Enable **Use proxy for web access**, then set type `HTTP`, host `127.0.0.1`, and port `8080`.
+      1. For `https://` dataset URLs, install/trust the mitmproxy CA certificate from the previous step:
+         1. Temporarily enable manual browser proxy `127.0.0.1:8080`.
+         1. Open [http://mitm.it/](http://mitm.it/) and follow the install steps for your OS.
+         1. Disable the browser proxy again.
+      1. Click **OK**, restart QGIS, and load a web dataset URL (WMS/WFS/WCS).
+   1. Instructions for the others to come.
+
+## [Python package](https://github.com/investinopen/ptps-wildfire-demo/tree/main/ptps_wildfire_demo) {#python-package}
+
+Install the package directly from GitHub using [uv](https://docs.astral.sh/uv/) (preferred):
+
+```sh
+uv add git+https://github.com/investinopen/ptps-wildfire-demo.git
+```
+
+Or with pip:
+
+```sh
+pip install git+https://github.com/investinopen/ptps-wildfire-demo.git
+```
+
+Use `Resolver` to look up available rescue sources for a URL:
+
+```python
+import httpx
+
+from ptps_wildfire_demo import Resolver
+
+async with httpx.AsyncClient() as client:
+    rescue = await Resolver(client).get_rescue("https://example.com/data.csv")
+```
+
+## [Browser extension](https://github.com/investinopen/ptps-wildfire-demo/tree/main/extension) {#browser-extension}
+
+![modal showing over the EPA EJScreener](img/extension_modal_2026-08-31.png)
+
+### Usage {#extension-usage}
+
+It's recommended that you use this alongside the [official Internet Archive Wayback Machine extension](https://web.archive.org/).
+
+1. Install [Node.js](https://nodejs.org/).
+1. Clone [the repository](https://github.com/investinopen/ptps-wildfire-demo) and install npm dependencies:
+
+   ```sh
+   cd extension
+   npm install
+   ```
+
+1. Build the extension:
+
+   ```sh
+   npm run build
+   ```
+
+1. Load the unpacked extension from `extension/dist/` into your browser:
+   - Chrome/Edge: `chrome://extensions` → enable "Developer mode" → "Load unpacked" → select `extension/dist/`
+   - Firefox: `about:debugging#/runtime/this-firefox` → "Load Temporary Add-on" → select `extension/dist/manifest.json`
+
+### Development {#extension-development}
+
+- `npm run watch` — rebuild on file changes
+- `npm run typecheck` — type-check without emitting
+- `npm test` — run the test suite (hits live network endpoints, mirroring the [proxy](#http-proxy)'s Python tests)
