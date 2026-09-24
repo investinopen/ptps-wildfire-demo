@@ -9,13 +9,13 @@ import { describe, expect, test } from "vitest";
 import {
   NO_RISK_COLOR,
   RISK_BINS,
-} from "../../site/firefighter-map/scripts/buildings.js";
+} from "../../../site/firefighter-maps/detailed/scripts/buildings.js";
 import {
   BUILDINGS_FILL_LAYER,
   ROUTE_SHIELDS_LAYER,
   TRAILS_LAYER,
-} from "../../site/firefighter-map/scripts/layers.js";
-import { STYLE } from "../../site/firefighter-map/scripts/style.js";
+} from "../../../site/firefighter-maps/detailed/scripts/layers.js";
+import { STYLE } from "../../../site/firefighter-maps/detailed/scripts/style.js";
 
 // MapLibre's own validator, against the style spec version the page's maplibre-gl@6 uses
 test("the style is valid", () => {

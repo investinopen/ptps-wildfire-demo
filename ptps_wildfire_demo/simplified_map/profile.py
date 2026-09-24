@@ -4,7 +4,7 @@ import networkx as nx
 import numpy as np
 from shapely import LineString
 
-from ptps_wildfire_demo.road_graph.network import edge_line
+from ptps_wildfire_demo.simplified_map.network import edge_line
 
 
 def sample(line: LineString, step_meters: float):

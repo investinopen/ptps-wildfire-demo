@@ -16,10 +16,10 @@ def zoom_for(lat: float, radius_meters: float) -> float:
     )
 
 
-def firefighter_map_url(
-    center: tuple[float, float], radius_meters: float, base: str = "firefighter-map/"
+def detailed_map_url(
+    center: tuple[float, float], radius_meters: float, base: str = "../detailed/"
 ) -> str:
-    """The firefighter map, showing about `radius_meters` around `center` (lat, lon). `base` is the map's URL, relative to the page linking to it."""
+    """The detailed firefighter map, showing about `radius_meters` around `center` (lat, lon). `base` is the map's URL, relative to the page linking to it."""
     lat, lon = center
     # MapLibre's #zoom/lat/lon
     return f"{base}#{zoom_for(lat, radius_meters):.2f}/{lat:.5f}/{lon:.5f}"

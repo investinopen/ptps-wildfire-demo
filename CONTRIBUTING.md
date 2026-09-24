@@ -15,10 +15,10 @@ uv run pytest
 
 [Debugging in VSCode](https://code.visualstudio.com/docs/python/debugging) is supported.
 
-The [firefighter map](site/firefighter-map/)'s JavaScript has its own tests, in [`tests/firefighter-map/`](tests/firefighter-map/):
+The [detailed firefighter map](site/firefighter-maps/detailed/)'s JavaScript has its own tests, in [`tests/firefighter-maps/detailed/`](tests/firefighter-maps/detailed/):
 
 ```sh
-cd tests/firefighter-map
+cd tests/firefighter-maps/detailed
 npm install
 npm test
 ```

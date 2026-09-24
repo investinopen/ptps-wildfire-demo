@@ -1,0 +1,161 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Detailed firefighter map</title>
+    <!-- same as the rest of the site's (see ../../_quarto.yml), which this page isn't rendered with -->
+    <link rel="icon" href="../../img/ioi-icon.png" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/maplibre-gl@6/dist/maplibre-gl.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/pmtiles@4/dist/pmtiles.js"></script>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <nav id="site-nav">
+      <a class="site-title" href="../../"
+        ><img
+          src="../../img/ioi-logo-dark.svg"
+          alt="Invest in Open Infrastructure"
+        />PtPS Wildfire Demo</a
+      >
+      <a href="../../fallbacks.html">Fallbacks</a>
+      <details class="nav-menu">
+        <summary>Analysis</summary>
+        <div>
+          <a href="../../analysis/rescue-status.html">Dataset rescue statuses</a>
+          <a href="../../analysis/risk.html">Risk calculation</a>
+          <a href="../../analysis/fire-overlap.html">Wildfire overlap</a>
+        </div>
+      </details>
+      <details class="nav-menu">
+        <summary aria-current="page">Firefighter maps</summary>
+        <div>
+          <a href="./" aria-current="page">Detailed</a>
+          <a href="../simplified/">Simplified</a>
+        </div>
+      </details>
+    </nav>
+    <script>
+      // close the dropdown menus on a click anywhere else, like Quarto's dropdowns
+      document.addEventListener("click", (event) => {
+        for (const menu of document.querySelectorAll("#site-nav .nav-menu")) {
+          if (!menu.contains(event.target)) menu.open = false;
+        }
+      });
+    </script>
+    <div id="disclaimer-banner">
+      This is a map that's meant to be printed out for use by small/rural fire
+      departments. It's a proof of concept and hasn't been validated;
+      <strong>use at your own risk</strong>.
+    </div>
+    <div id="map-container">
+      <!-- the legend, scale, and attribution, beside the map rather than over it -->
+      <aside id="sidebar">
+        <!-- the town(s) in view, filled in by places.js -->
+        <h1 id="map-places" hidden></h1>
+        <form id="place-search" autocomplete="off">
+          <input
+            type="search"
+            id="place-search-input"
+            placeholder="Search for a place…"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-controls="place-search-suggestions"
+            aria-expanded="false"
+          />
+          <!-- filled in by search.js as you type -->
+          <ul id="place-search-suggestions" role="listbox" hidden></ul>
+        </form>
+        <!-- see overview.js -->
+        <div id="overview-map"></div>
+        <div id="layer-controls">
+          <label>
+            <input type="checkbox" id="hillshade-toggle" checked />
+            <span class="swatch hillshade"></span>
+            Topographic shading
+          </label>
+          <label>
+            <input type="checkbox" id="flame-length-toggle" checked />
+            <span class="swatch flame-length"></span>
+            Flame length, if a fire starts
+          </label>
+          <!-- filled in from FLAME_LENGTH_CLASSES below -->
+          <div id="flame-length-key" class="layer-key table-key"></div>
+          <label>
+            <input type="checkbox" id="buildings-toggle" checked />
+            <span class="swatch buildings"></span>
+            Buildings, by wildfire risk
+          </label>
+          <label>
+            <input type="checkbox" id="roads-toggle" checked />
+            <span class="swatch roads"></span>
+            Roads
+          </label>
+          <!-- shown/hidden along with roads, rather than toggled on their own -->
+          <div class="layer-key sub-items">
+            <div class="sub-item">
+              <span class="swatch driveways"></span>
+              Driveways & service roads
+            </div>
+            <div class="sub-item">
+              <span class="swatch trails"></span>
+              Paths & trails
+            </div>
+          </div>
+          <label>
+            <input type="checkbox" id="gates-toggle" checked />
+            <span class="swatch icon" data-icon="gate"></span>
+            Gates & barriers
+          </label>
+          <label>
+            <input type="checkbox" id="dead-ends-toggle" checked />
+            <span class="swatch icon" data-icon="dead-end"></span>
+            Dead ends, no turnaround mapped
+          </label>
+          <label>
+            <input type="checkbox" id="weight-limits-toggle" checked />
+            <span class="swatch sign weight-limit">t</span>
+            Bridge weight limits
+          </label>
+          <label>
+            <input type="checkbox" id="hydrants-toggle" checked />
+            <span class="swatch hydrants"></span>
+            Fire hydrants
+          </label>
+          <label>
+            <input type="checkbox" id="water-sources-toggle" checked />
+            <span class="swatch water-sources"></span>
+            Water tanks, ponds, & suction points
+          </label>
+          <label>
+            <input type="checkbox" id="pools-toggle" checked />
+            <span class="swatch pools"></span>
+            Swimming pools
+          </label>
+        </div>
+        <!-- filled in by main.js -->
+        <div id="map-scale"></div>
+        <div id="map-attribution"></div>
+      </aside>
+      <div id="map-area">
+        <div id="map"></div>
+        <!-- labeled/iconed by sidebar.js -->
+        <button
+          type="button"
+          id="sidebar-toggle"
+          aria-controls="sidebar"
+          aria-expanded="true"
+        ></button>
+        <div
+          id="live-data-spinner"
+          title="Loading water sources & road access…"
+          hidden
+        ></div>
+      </div>
+    </div>
+    <script type="module" src="scripts/main.js"></script>
+  </body>
+</html>

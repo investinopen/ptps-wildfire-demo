@@ -7,7 +7,7 @@ body {
   display: flex;
   flex-direction: column;
 }
-/* links to the rest of the site (see ../_quarto.yml) -- the map isn't rendered by
+/* links to the rest of the site (see ../../_quarto.yml) -- the map isn't rendered by
    Quarto, so this stands in for its navbar, matching the theme's colors */
 #site-nav {
   flex: none;
@@ -25,10 +25,11 @@ body {
 }
 #site-nav a:hover,
 #site-nav a[aria-current],
+#site-nav summary[aria-current],
 #site-nav summary:hover {
   color: #ffde17;
 }
-/* the Analysis dropdown, like Quarto's navbar menus */
+/* the dropdowns, like Quarto's navbar menus */
 #site-nav .nav-menu {
   position: relative;
 }

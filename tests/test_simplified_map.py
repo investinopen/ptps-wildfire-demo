@@ -5,8 +5,8 @@ import numpy as np
 import pytest
 from shapely import LineString, Point
 
-from ptps_wildfire_demo.road_graph.addresses import offset_from, place_address
-from ptps_wildfire_demo.road_graph.drawing import (
+from ptps_wildfire_demo.simplified_map.addresses import offset_from, place_address
+from ptps_wildfire_demo.simplified_map.drawing import (
     along,
     arc,
     exits,
@@ -15,19 +15,19 @@ from ptps_wildfire_demo.road_graph.drawing import (
     outward_angle,
     upright,
 )
-from ptps_wildfire_demo.road_graph.elevation import decode_terrarium
-from ptps_wildfire_demo.road_graph.layout import layout
-from ptps_wildfire_demo.road_graph.links import (
-    firefighter_map_url,
+from ptps_wildfire_demo.simplified_map.elevation import decode_terrarium
+from ptps_wildfire_demo.simplified_map.layout import layout
+from ptps_wildfire_demo.simplified_map.links import (
+    detailed_map_url,
     openstreetmap_url,
     zoom_for,
 )
-from ptps_wildfire_demo.road_graph.network import (
+from ptps_wildfire_demo.simplified_map.network import (
     drop_short_driveways,
     edge_line,
     first,
 )
-from ptps_wildfire_demo.road_graph.profile import max_grade, sample, sharp_turns
+from ptps_wildfire_demo.simplified_map.profile import max_grade, sample, sharp_turns
 
 
 def polyline_length(points):
@@ -281,10 +281,10 @@ def test_zoom_for():
     assert 15 < zoom_for(40.063, 1200) < 16
 
 
-def test_firefighter_map_url():
+def test_detailed_map_url():
     assert (
-        firefighter_map_url((40.063, -105.409), 1200)
-        == f"firefighter-map/#{zoom_for(40.063, 1200):.2f}/40.06300/-105.40900"
+        detailed_map_url((40.063, -105.409), 1200)
+        == f"../detailed/#{zoom_for(40.063, 1200):.2f}/40.06300/-105.40900"
     )
 
 
