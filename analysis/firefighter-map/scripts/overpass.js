@@ -81,7 +81,7 @@ export const fetchOverpass = async (
   for (const url of available) {
     try {
       // GET rather than POST so the service worker can cache it for offline use (see
-      // sw.js) -- the Cache API can't store responses to POSTs. Whitespace is collapsed
+      // ../sw.js) -- the Cache API can't store responses to POSTs. Whitespace is collapsed
       // to keep the URL short.
       const response = await fetch(
         `${url}?data=${encodeURIComponent(query.replace(/\s+/g, " "))}`,

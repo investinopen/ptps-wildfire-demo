@@ -93,7 +93,7 @@ bindLayerToggles(map);
 window.addEventListener("beforeprint", () => map.resize());
 
 // caches this page, its scripts, and map tiles so a previously-viewed area still
-// works offline/on a bad connection -- see sw.js for what's cached and why
+// works offline/on a bad connection -- see ../sw.js for what's cached and why
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("sw.js")
