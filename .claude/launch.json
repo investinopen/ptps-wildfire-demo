@@ -2,15 +2,17 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "static-preview",
-      "runtimeExecutable": "uv",
-      "runtimeArgs": ["run", "python", "-m", "http.server", "8743", "--directory", "analysis"],
-      "port": 8743
-    },
-    {
       "name": "site-preview",
       "runtimeExecutable": "uv",
-      "runtimeArgs": ["run", "quarto", "preview", "analysis", "--port", "8744", "--no-browser"],
+      "runtimeArgs": [
+        "run",
+        "quarto",
+        "preview",
+        "analysis",
+        "--port",
+        "8744",
+        "--no-browser"
+      ],
       "port": 8744
     }
   ]
