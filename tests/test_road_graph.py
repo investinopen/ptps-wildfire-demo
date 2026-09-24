@@ -16,6 +16,11 @@ from ptps_wildfire_demo.road_graph.drawing import (
 )
 from ptps_wildfire_demo.road_graph.elevation import decode_terrarium
 from ptps_wildfire_demo.road_graph.layout import layout
+from ptps_wildfire_demo.road_graph.links import (
+    firefighter_map_url,
+    openstreetmap_url,
+    zoom_for,
+)
 from ptps_wildfire_demo.road_graph.network import (
     drop_short_driveways,
     edge_line,
@@ -274,3 +279,23 @@ def test_node_kind():
 def test_decode_terrarium():
     # 128 * 256 + 5 + 128 / 256 - 32768 = 5.5
     assert decode_terrarium(np.array([[[128, 5, 128]]]))[0, 0] == pytest.approx(5.5)
+
+
+def test_zoom_for():
+    # each zoom level in is half as far across
+    assert zoom_for(40, 500) == pytest.approx(zoom_for(40, 1000) + 1)
+    assert 15 < zoom_for(40.063, 1200) < 16
+
+
+def test_firefighter_map_url():
+    assert (
+        firefighter_map_url((40.063, -105.409), 1200)
+        == f"firefighter-map/#{zoom_for(40.063, 1200):.2f}/40.06300/-105.40900"
+    )
+
+
+def test_openstreetmap_url():
+    assert (
+        openstreetmap_url((40.063, -105.409), 1200)
+        == "https://www.openstreetmap.org/#map=15/40.06300/-105.40900"
+    )
