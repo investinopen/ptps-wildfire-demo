@@ -15,6 +15,7 @@ project:
     - analysis/rescue-status.qmd
     - analysis/risk.ipynb
     - analysis/fire_overlap.ipynb
+    - road_graph.ipynb
   # published as-is
   resources:
     # has its own full-screen layout
@@ -45,6 +46,8 @@ website:
             text: Wildfire overlap
       - href: firefighter-map/index.html
         text: Firefighter map
+      - href: road_graph.ipynb
+        text: Road graph
   page-footer:
     left: "© 2026 [Invest in Open Infrastructure](https://investinopen.org/) · [MIT License](https://github.com/investinopen/ptps-wildfire-demo/blob/main/LICENSE)"
     right:
