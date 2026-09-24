@@ -17,7 +17,7 @@ A networked data infrastructure demo for the "Investing in Open Infra to Safegua
   - **[Wildfire overlap](analysis/fire_overlap.ipynb):** maps every fire perimeter in a state since 1984, so places that have burned more than once stand out.
 - **Firefighter maps:** printable maps for small/rural fire departments.
   - **[Detailed](firefighter-maps/detailed/index.html):** combines building footprints, fuel load, burn probability, fire hydrants, roads, driveways, and trails.
-  - **[Simplified](firefighter-maps/simplified/index.ipynb):** draws the roads as a graph, to scale by driving distance, with steep grades, sharp turns, dead ends, and house numbers marked.
+  - **[Simplified](firefighter-maps/simplified/index.qmd):** draws the roads as a graph, to scale by driving distance, with steep grades, sharp turns, dead ends, and house numbers marked.
 
 For progress over time, see the [changelog](https://github.com/investinopen/ptps-wildfire-demo/blob/main/CHANGELOG.md).
 
