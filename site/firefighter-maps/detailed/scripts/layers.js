@@ -341,6 +341,20 @@ export const WATER_LABELS_LAYER = {
   },
 };
 
+// a white ring around each building, cutting it out of the flame length hatch and hillshade behind it. Drawn under the fill, so the fill covers the inner half of the line and only the outer half shows.
+export const BUILDINGS_HALO_LAYER = {
+  id: "buildings-halo",
+  type: "line",
+  source: "buildings",
+  "source-layer": SOURCE_LAYER,
+  minzoom: BUILDING_MIN_ZOOM,
+  layout: { visibility: "visible" },
+  paint: {
+    "line-color": "#ffffff",
+    "line-width": ["interpolate", ["linear"], ["zoom"], 14.5, 3, 18, 6],
+  },
+};
+
 export const BUILDINGS_FILL_LAYER = {
   id: "buildings-fill",
   type: "fill",
@@ -373,9 +387,9 @@ export const BUILDINGS_OUTLINE_LAYER = {
   minzoom: BUILDING_MIN_ZOOM,
   layout: { visibility: "visible" },
   paint: {
-    // dark enough to separate the palest risk bins from the white/hillshade behind them
-    "line-color": "#4d4d4d",
-    "line-width": 1,
+    // near-black, like the roads, so even the palest risk bins stand out from the white/hillshade behind them; thicker as buildings get bigger on screen
+    "line-color": ROAD,
+    "line-width": ["interpolate", ["linear"], ["zoom"], 14.5, 1, 18, 2],
   },
 };
 

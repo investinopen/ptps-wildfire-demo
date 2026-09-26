@@ -349,7 +349,8 @@ body {
 /* matches the low-to-high colors of RISK_BINS in buildings.js -- the only key for them, deliberately without the individual levels */
 #layer-controls .swatch.buildings {
   background: linear-gradient(135deg, #fcbba1, #fb6a4a, #67000d);
-  border-color: #4d4d4d;
+  /* matches the buildings' outline (ROAD in colors.js) */
+  border-color: #2b2b2b;
 }
 /* no key for a layer that isn't shown, on screen or on paper */
 #layer-controls label:has(input:not(:checked)) + .layer-key {
