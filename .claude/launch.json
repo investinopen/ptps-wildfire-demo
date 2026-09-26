@@ -10,6 +10,16 @@
       ],
       "port": 8744,
       "autoPort": true
+    },
+    {
+      "name": "detailed-map",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "uv run python -m http.server \"${PORT:-8745}\" --bind 127.0.0.1 --directory site"
+      ],
+      "port": 8745,
+      "autoPort": true
     }
   ]
 }
