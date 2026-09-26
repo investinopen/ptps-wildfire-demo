@@ -2,6 +2,10 @@
 
 Only includes notable updates.
 
+## 2026-09-25
+
+- **[Detailed firefighter map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-maps/detailed/):** Tell the flame length classes apart by hatch density (sparse, dense, crosshatch) in a single deep orange, rather than by yellow/orange/red lines, so they're easier to see, print in grayscale, and don't blend in with the buildings' reds.
+
 ## 2026-09-24
 
 - **Firefighter maps:** Put the firefighter map and the new simplified map together under "Firefighter maps", as [Detailed](https://investinopen.github.io/ptps-wildfire-demo/firefighter-maps/detailed/) and [Simplified](https://investinopen.github.io/ptps-wildfire-demo/firefighter-maps/simplified/). Links to their old addresses redirect.

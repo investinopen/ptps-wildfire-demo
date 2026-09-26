@@ -17,8 +17,8 @@ const keyRow = (key, background, name, description) => {
 // one row per class: its hatch, range, and what that flame length means for attack
 const buildFlameLengthKey = () => {
   const key = document.getElementById("flame-length-key");
-  for (const { color, range, meaning } of FLAME_LENGTH_CLASSES) {
-    keyRow(key, hatchCss(color), range, meaning);
+  for (const { hatch, range, meaning } of FLAME_LENGTH_CLASSES) {
+    keyRow(key, hatchCss(hatch), range, meaning);
   }
 };
 

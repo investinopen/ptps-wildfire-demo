@@ -23,9 +23,8 @@ export const FLAME_LENGTH_LAYER = {
   type: "raster",
   source: "flameLength",
   layout: { visibility: "visible" },
-  // a hatch already reads as sparse, unlike a solid fill, so this can sit close to
-  // fully opaque
-  paint: { "raster-opacity": 0.9 },
+  // softened so the dense hatches don't drown out the hillshade and the buildings' pale risk colors
+  paint: { "raster-opacity": 0.7 },
 };
 
 export const WATER_LAYER = {

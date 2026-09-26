@@ -356,15 +356,16 @@ body {
   display: none;
 }
 /* matches FLAME_LENGTH_CLASSES below */
-/* the middle (orange) class's hatch -- see hatchCss in rasters.js (9.9px is
-   HATCH_SIZE / sqrt(2)) */
+/* the middle (dense "/") class's hatch -- see hatchCss in rasters.js (5.66px is
+   its spacing / sqrt(2)) */
 #layer-controls .swatch.flame-length {
   background:
     repeating-linear-gradient(
       -45deg,
-      rgb(240, 120, 0) 0 1px,
-      transparent 1px 9.9px
+      rgb(209, 101, 11) 0 1.5px,
+      transparent 1.5px 5.66px
     ),
+    linear-gradient(rgba(209, 101, 11, 0.08), rgba(209, 101, 11, 0.08)),
     #ffffff;
 }
 /* one row per class: its color + what that flame length means for attack */
