@@ -1,3 +1,4 @@
 site/analysis/data/**/*.parquet filter=lfs diff=lfs merge=lfs -text
 site/analysis/data/*.parquet filter=lfs diff=lfs merge=lfs -text
 site/analysis/data/*.zip filter=lfs diff=lfs merge=lfs -text
+site/firefighter-maps/detailed/us-states.geojson linguist-generated=true
