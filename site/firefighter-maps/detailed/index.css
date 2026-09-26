@@ -398,6 +398,19 @@ body {
 #layer-controls .swatch.driveways {
   background: #6a2fb8;
 }
+/* a short stretch of the dash-dot from STATE_LINES_LAYER, across the middle of the swatch, in STATE_LINE from colors.js */
+#layer-controls .swatch.state-lines {
+  background:
+    repeating-linear-gradient(
+        90deg,
+        #666666 0 6px,
+        transparent 6px 8px,
+        #666666 8px 9px,
+        transparent 9px 11px
+      )
+      center / 100% 2px no-repeat,
+    #ffffff;
+}
 #layer-controls .swatch.trails {
   background: #557a12;
 }
@@ -444,6 +457,10 @@ body {
 @media print {
   #sidebar {
     width: 224px;
+  }
+  /* tighter than on screen, where the rows are also click targets -- keeps the whole legend and attribution on the one page */
+  #layer-controls {
+    gap: 2px;
   }
   #layer-controls label,
   #layer-controls .sub-item {

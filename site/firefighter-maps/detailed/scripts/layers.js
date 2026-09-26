@@ -5,7 +5,7 @@ import {
   RISK_PROPERTY,
   SOURCE_LAYER,
 } from "./buildings.js";
-import { ROAD } from "./colors.js";
+import { ROAD, STATE_LINE } from "./colors.js";
 
 // one const per layer -- keeping these standalone makes the draw order (the `layers`
 // array in main.js) easy to see and rearrange without hunting through each definition
@@ -45,6 +45,27 @@ export const WATERWAYS_LAYER = {
   paint: {
     "line-color": "#a3d3e8",
     "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.5, 18, 2],
+  },
+};
+
+// state lines, from the map's own tiles rather than us-states.geojson (which places.js uses), since the tiles' boundaries are full-precision and the GeoJSON's are simplified by up to a kilometer. A dash-dot, the usual map convention, so it isn't mistaken for a road or trail.
+// https://openmaptiles.org/schema/#boundary
+export const STATE_LINES_LAYER = {
+  id: "state-lines",
+  type: "line",
+  source: "roadsSource",
+  "source-layer": "boundary",
+  filter: [
+    "all",
+    ["==", ["get", "admin_level"], 4],
+    ["!=", ["get", "maritime"], 1],
+  ],
+  layout: { visibility: "visible", "line-join": "round" },
+  paint: {
+    "line-color": STATE_LINE,
+    "line-width": ["interpolate", ["linear"], ["zoom"], 10, 1, 18, 3],
+    // in line widths
+    "line-dasharray": [6, 2, 1, 2],
   },
 };
 

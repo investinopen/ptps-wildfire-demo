@@ -8,6 +8,7 @@ Only includes notable updates.
   - Tell the flame length classes apart by hatch density (sparse, dense, crosshatch) in a single deep orange, rather than by yellow/orange/red lines, so they're easier to see, print in grayscale, and don't blend in with the buildings' reds.
   - Make buildings stand out more, with a white halo and a darker, thicker outline.
   - Include the state with the town(s) at the top of the sidebar.
+  - Show state lines.
 
 ## 2026-09-24
 
