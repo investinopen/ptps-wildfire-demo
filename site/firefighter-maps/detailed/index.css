@@ -142,6 +142,21 @@ body {
 #map-attribution .maplibregl-ctrl-attrib a {
   color: inherit;
 }
+#data-delay-note {
+  margin: 0;
+  /* wraps at the same width as the attribution, rather than widening the sidebar */
+  max-width: 240px;
+  font-size: 12px;
+  color: #666666;
+}
+#data-delay-note a {
+  color: inherit;
+}
+@media print {
+  #data-delay-note {
+    display: none;
+  }
+}
 
 @media print {
   @page {
