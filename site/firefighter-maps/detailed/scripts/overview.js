@@ -1,4 +1,4 @@
-// A small overview map in the sidebar: the same spot zoomed out, with a box showing what the main map covers -- so a printout (or a zoomed-in view) shows where it is in the wider area. Uses OpenFreeMap's plain Positron style, from the same data (and attribution) as the main map.
+// A small overview map in the sidebar: the same spot zoomed out, with a box showing what the main map covers -- so a printout (or a zoomed-in view) shows where it is in the wider area. Dragging it (or clicking a spot on it) moves the main map, for getting around faster than panning the zoomed-in map. Uses OpenFreeMap's plain Positron style, from the same data (and attribution) as the main map.
 import * as maplibregl from "https://cdn.jsdelivr.net/npm/maplibre-gl@6/dist/maplibre-gl.mjs";
 
 const STYLE_URL = "https://tiles.openfreemap.org/styles/positron";
@@ -9,7 +9,14 @@ export const bindOverviewMap = (map) => {
   const overview = new maplibregl.Map({
     container: "overview-map",
     style: STYLE_URL,
-    interactive: false,
+    // panning only; zooming stays with the main map, which the overview follows
+    scrollZoom: false,
+    boxZoom: false,
+    doubleClickZoom: false,
+    touchZoomRotate: false,
+    dragRotate: false,
+    touchPitch: false,
+    keyboard: false,
     attributionControl: false,
     center: map.getCenter(),
     zoom: Math.max(0, map.getZoom() - ZOOM_OUT),
@@ -44,12 +51,26 @@ export const bindOverviewMap = (map) => {
     });
   });
 
+  // the main map moving (below) would otherwise jump the overview around under the pointer while it's being dragged
+  let dragging = false;
+  overview.on("dragstart", () => {
+    dragging = true;
+  });
+  overview.on("drag", () => map.jumpTo({ center: overview.getCenter() }));
+  overview.on("dragend", () => {
+    dragging = false;
+    // the main map stops at its maxBounds, so line the overview back up with where it actually ended up
+    sync();
+  });
+  overview.on("click", (e) => map.jumpTo({ center: e.lngLat }));
+
   const sync = () => {
+    overview.getSource("view")?.setData(viewBox());
+    if (dragging) return;
     overview.jumpTo({
       center: map.getCenter(),
       zoom: Math.max(0, map.getZoom() - ZOOM_OUT),
     });
-    overview.getSource("view")?.setData(viewBox());
   };
   map.on("move", sync);
   // the main map's canvas changing size (e.g. the sidebar collapsing) changes what it covers
