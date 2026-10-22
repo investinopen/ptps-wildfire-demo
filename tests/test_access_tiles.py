@@ -8,6 +8,7 @@ from ptps_wildfire_demo.access_tiles import (
     extract,
     format_weight,
     length_meters,
+    osmium_filters,
     use_counts,
 )
 
@@ -199,3 +200,19 @@ def test_length_meters():
 )
 def test_format_weight(maxweight: str, expected: str):
     assert format_weight(maxweight) == expected
+
+
+def test_osmium_filters():
+    filters = osmium_filters()
+    assert "n/barrier=bollard,chain,gate,lift_gate,swing_gate" in filters
+    assert "n/highway=turning_circle,turning_loop" in filters
+    assert (
+        "nwr/emergency=fire_hydrant,fire_water_pond,suction_point,water_tank" in filters
+    )
+    assert "nwr/leisure=swimming_pool" in filters
+    (roads,) = (f for f in filters if f.startswith("w/highway="))
+    assert set(roads.removeprefix("w/highway=").split(",")) >= {
+        "residential",
+        "track",
+        "motorway_link",
+    }

@@ -71,13 +71,9 @@ jobs:
       # down to just what access_tiles.py reads (with the nodes the roads use), and the area the map shows, which takes it from about 12 GB to about 2.5 GB
       - name: Filter the extract
         run: |
-          osmium tags-filter us.osm.pbf \
-            w/highway=motorway,motorway_link,trunk,trunk_link,primary,primary_link,secondary,secondary_link,tertiary,tertiary_link,unclassified,residential,living_street,service,track \
-            n/barrier=gate,lift_gate,swing_gate,chain,bollard \
-            n/highway=turning_circle,turning_loop \
-            nwr/emergency=fire_hydrant,water_tank,suction_point,fire_water_pond \
-            nwr/leisure=swimming_pool \
-            --output filtered.osm.pbf
+          # the tags come from access_tiles.py, so the two can't drift apart
+          mapfile -t filters < <(uv run python -m ptps_wildfire_demo.access_tiles filters)
+          osmium tags-filter us.osm.pbf "${filters[@]}" --output filtered.osm.pbf
           # how current the data is, for the tiles' attribution
           echo "DATA_DATE=$(osmium fileinfo --get header.option.osmosis_replication_timestamp us.osm.pbf | cut -c1-10)" >> "$GITHUB_ENV"
           rm us.osm.pbf

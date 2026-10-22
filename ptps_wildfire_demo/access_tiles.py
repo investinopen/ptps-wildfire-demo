@@ -78,6 +78,19 @@ PRECISION = 7
 Coords = list[tuple[float, float]]
 
 
+def osmium_filters() -> list[str]:
+    """`osmium tags-filter` expressions for what extract() reads, so an extract can be filtered down to it first."""
+    # https://docs.osmcode.org/osmium/latest/osmium-tags-filter.html
+    expressions = {
+        "w/highway": DRIVABLE_HIGHWAYS,
+        "n/barrier": VEHICLE_BARRIERS,
+        "n/highway": TURNAROUNDS,
+        "nwr/emergency": {"fire_hydrant", *WATER_SOURCES},
+        "nwr/leisure": {"swimming_pool"},
+    }
+    return [f"{key}={','.join(sorted(values))}" for key, values in expressions.items()]
+
+
 def water_kind(tags: osmium.osm.TagList) -> str | None:
     """Which of the map's water layers an element goes in, if any. Indoor pools are left out, since an engine can't draft from them."""
     emergency = tags.get("emergency")
@@ -162,8 +175,8 @@ class Writer:
         self.files: dict[str, TextIO] = {
             # closed by the stack, in __exit__
             layer: self.stack.enter_context(
-                open(self.out_dir / f"{layer}.geojsonl", "w")
-            )  # noqa: SIM115
+                open(self.out_dir / f"{layer}.geojsonl", "w")  # noqa: SIM115
+            )
             for layer in LAYERS
         }
         return self
@@ -294,6 +307,10 @@ def extract(pbf: Path, out_dir: Path) -> Counter[str]:
     return out.counts
 
 
+# `filters` prints osmium_filters(), one per line; `<pbf> <out_dir>` runs extract()
 if __name__ == "__main__":
-    pbf, out_dir = sys.argv[1:]
-    print(json.dumps(extract(Path(pbf), Path(out_dir))))
+    if sys.argv[1:] == ["filters"]:
+        print("\n".join(osmium_filters()))
+    else:
+        pbf, out_dir = sys.argv[1:]
+        print(json.dumps(extract(Path(pbf), Path(out_dir))))
