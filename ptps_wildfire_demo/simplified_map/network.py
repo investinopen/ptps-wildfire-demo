@@ -3,21 +3,17 @@ import osmnx as ox
 from shapely import LineString
 from shapely.ops import linemerge
 
+# which roads are drivable and which barriers block an engine are the same as on the detailed firefighter map
+from ptps_wildfire_demo.access_tiles import DRIVABLE_HIGHWAYS, VEHICLE_BARRIERS
 from ptps_wildfire_demo.simplified_map.overpass import from_overpass
 
-# the same highway types as DRIVABLE_HIGHWAYS in the detailed firefighter map, minus parking lot aisles and drive-throughs
+# the detailed map's drivable roads, minus parking lot aisles and drive-throughs, and roads mapped as areas
 # https://wiki.openstreetmap.org/wiki/Key:highway
 DRIVABLE_FILTER = (
-    '["highway"~"^(motorway|motorway_link|trunk|trunk_link|primary|primary_link|secondary|secondary_link|tertiary|tertiary_link|unclassified|residential|living_street|service|track)$"]'
+    f'["highway"~"^({"|".join(DRIVABLE_HIGHWAYS)})$"]'
     '["service"!~"^(parking_aisle|parking|drive-through)$"]'
     '["area"!="yes"]'
 )
-# barriers an engine can't drive through, even when open some of the time -- also the same as the detailed firefighter map's
-# https://wiki.openstreetmap.org/wiki/Key:barrier
-VEHICLE_BARRIERS = {"gate", "lift_gate", "swing_gate", "chain", "bollard"}
-# mapped places to turn around at the end of a road
-# https://wiki.openstreetmap.org/wiki/Tag:highway%3Dturning_circle
-TURNAROUNDS = {"turning_circle", "turning_loop"}
 # the way tags kept on each edge, as a single value
 EDGE_TAGS = ("name", "highway", "service", "ref")
 

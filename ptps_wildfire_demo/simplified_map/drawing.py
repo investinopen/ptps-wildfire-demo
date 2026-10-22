@@ -12,7 +12,7 @@ from scipy.optimize import brentq
 from shapely import LinearRing, LineString, Point, box
 from shapely.affinity import rotate
 
-from ptps_wildfire_demo.simplified_map.network import TURNAROUNDS
+from ptps_wildfire_demo.access_tiles import TURNAROUNDS
 
 FEET_PER_METER = 3.28084
 

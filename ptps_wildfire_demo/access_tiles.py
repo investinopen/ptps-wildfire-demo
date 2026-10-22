@@ -17,7 +17,7 @@ import osmium
 
 # drivable roads -- tracks are included since engines use them as fire roads, but never flagged as dead ends (they routinely end at trails)
 # https://wiki.openstreetmap.org/wiki/Key:highway
-DRIVABLE_HIGHWAYS = {
+DRIVABLE_HIGHWAYS = (
     "motorway",
     "motorway_link",
     "trunk",
@@ -33,7 +33,7 @@ DRIVABLE_HIGHWAYS = {
     "living_street",
     "service",
     "track",
-}
+)
 # barriers an engine can't drive through, even when open some of the time
 # https://wiki.openstreetmap.org/wiki/Key:barrier
 VEHICLE_BARRIERS = {"gate", "lift_gate", "swing_gate", "chain", "bollard"}
