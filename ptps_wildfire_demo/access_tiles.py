@@ -7,7 +7,7 @@ import re
 import sys
 from array import array
 from collections import Counter
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from contextlib import ExitStack
 from pathlib import Path
 from typing import Self, TextIO
@@ -132,8 +132,8 @@ def length_meters(coords: Coords) -> float:
     return total
 
 
-def may_dead_end(tags: osmium.osm.TagList, coords: Coords) -> bool:
-    """Whether a road ending with no other road there is worth flagging."""
+def may_dead_end(tags: osmium.osm.TagList, coords: Callable[[], Coords]) -> bool:
+    """Whether a road ending with no other road there is worth flagging. `coords` gives the road's line, only asked for when its length matters."""
     highway = tags.get("highway")
     if highway == "track" or tags.get("area") == "yes":
         return False
@@ -143,7 +143,7 @@ def may_dead_end(tags: osmium.osm.TagList, coords: Coords) -> bool:
     if service in NON_ROUTE_SERVICE:
         return False
     if service == "driveway":
-        return length_meters(coords) >= MIN_DEAD_END_DRIVEWAY_METERS
+        return length_meters(coords()) >= MIN_DEAD_END_DRIVEWAY_METERS
     return True
 
 
@@ -245,26 +245,41 @@ class AccessLayers:
         tags = way.tags
         if tags.get("highway") not in DRIVABLE_HIGHWAYS:
             return
-        try:
-            coords = [(n.lon, n.lat) for n in way.nodes]
-        except osmium.InvalidLocationError:
-            # a node outside the extract
-            return
-        ids = [n.ref for n in way.nodes]
+        nodes = way.nodes
+        ids = [n.ref for n in nodes]
         self.road_nodes.extend(ids)
         self.gates.update(ref for ref in ids if ref in self.barriers)
+        try:
+            self.road_access(tags, nodes, ids)
+        except osmium.InvalidLocationError:
+            # a node outside the extract
+            pass
+
+    def road_access(
+        self, tags: osmium.osm.TagList, nodes: osmium.osm.WayNodeList, ids: list[int]
+    ):
+        """Writes a drivable road's one-way and weight-limit lines, and notes its ends if it may dead-end. Its nodes' locations are only read where they're needed, since that's most of the time spent on each road, and most roads only need their ends'."""
+        line: Coords = []
+
+        def coords() -> Coords:
+            if not line:
+                line.extend((n.lon, n.lat) for n in nodes)
+            return line
+
         oneway = tags.get("oneway")
         if oneway in ("yes", "1", "-1"):
-            self.out.line("oneway", coords, {"oneway": -1 if oneway == "-1" else 1})
+            self.out.line("oneway", coords(), {"oneway": -1 if oneway == "-1" else 1})
         bridge, maxweight = tags.get("bridge"), tags.get("maxweight")
         if bridge and bridge != "no" and maxweight:
-            self.out.line("weight-limits", coords, {"label": format_weight(maxweight)})
+            self.out.line(
+                "weight-limits", coords(), {"label": format_weight(maxweight)}
+            )
         # a closed loop has no end
         if ids[0] != ids[-1] and may_dead_end(tags, coords):
-            for i in (0, -1):
+            for i, node in ((0, nodes[0]), (-1, nodes[len(nodes) - 1])):
                 self.ends.append(ids[i])
-                self.end_lons.append(coords[i][0])
-                self.end_lats.append(coords[i][1])
+                self.end_lons.append(node.lon)
+                self.end_lats.append(node.lat)
 
     def area(self, area: osmium.osm.Area):
         kind = water_kind(area.tags)
@@ -293,6 +308,10 @@ def extract(pbf: Path, out_dir: Path) -> Counter[str]:
         .with_locations("sparse_mem_array")
         # only the areas that can be water sources need assembling
         .with_areas(osmium.filter.KeyFilter("emergency", "leisure"))
+        # only objects with the keys read here reach Python, which is most of the time saved -- the rest (mostly the untagged nodes roads are drawn through, hundreds of millions across the US) are dropped natively, after their locations are stored
+        .with_filter(
+            osmium.filter.KeyFilter("highway", "barrier", "emergency", "leisure")
+        )
     )
     with Writer(out_dir) as out:
         layers = AccessLayers(out)
