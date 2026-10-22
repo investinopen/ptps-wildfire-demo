@@ -8,6 +8,8 @@ import {
   formatWeight,
   lineLengthMeters,
   padBounds,
+  readCached,
+  saveCached,
   snapToGrid,
   toSources,
 } from "../../../site/firefighter-maps/detailed/scripts/overpass.js";
@@ -186,6 +188,51 @@ describe("fetchOverpass", () => {
     await expect(request).rejects.toThrow();
     expect(hostsTried()).toEqual(["a.example"]);
     expect(cooldowns.size).toBe(0);
+  });
+});
+
+describe("cached responses", () => {
+  // the parts of the Cache API these use
+  const fakeCache = () => {
+    const entries = new Map();
+    return {
+      match: async (key) => entries.get(key)?.clone(),
+      put: async (key, response) => void entries.set(key, response),
+      keys: async () => [...entries.keys()],
+      delete: async (key) => entries.delete(key),
+    };
+  };
+  afterEach(() => vi.useRealTimers());
+
+  test("returns a saved response", async () => {
+    const cache = fakeCache();
+    await saveCached("q", { elements: [{ id: 1 }] }, cache);
+    expect(await readCached("q", cache)).toEqual({ elements: [{ id: 1 }] });
+    expect(await readCached("other", cache)).toBeNull();
+  });
+
+  test("ignores ones over an hour old", async () => {
+    vi.useFakeTimers();
+    const cache = fakeCache();
+    await saveCached("q", { elements: [] }, cache);
+    vi.advanceTimersByTime(61 * 60 * 1000);
+    expect(await readCached("q", cache)).toBeNull();
+  });
+
+  test("keeps only the newest 50", async () => {
+    const cache = fakeCache();
+    for (let i = 0; i < 51; i++) await saveCached(`q${i}`, {}, cache);
+    expect(await cache.keys()).toHaveLength(50);
+    expect(await readCached("q0", cache)).toBeNull();
+    expect(await readCached("q50", cache)).toEqual({});
+  });
+
+  // e.g. in a private window, where the Cache API can be missing or throw
+  test("does without a cache", async () => {
+    expect(await readCached("q", null)).toBeNull();
+    await saveCached("q", {}, null);
+    const broken = { match: () => Promise.reject(new Error("nope")) };
+    expect(await readCached("q", broken)).toBeNull();
   });
 });
 

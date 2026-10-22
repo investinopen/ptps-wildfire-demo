@@ -53,7 +53,7 @@ export const padBounds = ({ west, south, east, north }, margin) => {
   };
 };
 
-// widens bounds out to a grid one map tile wide at the current zoom, so views that are close to each other produce the exact same query -- which is what lets a cached response be found again offline, since the cache is keyed on the full URL
+// widens bounds out to a grid one map tile wide at the current zoom, so views that are close to each other produce the exact same query -- which is what lets a cached response be found again, since the cache is keyed on the query
 export const snapToGrid = ({ west, south, east, north }, zoom) => {
   const step = 360 / 2 ** Math.floor(zoom);
   const down = (n) => Math.floor(n / step) * step;
@@ -147,6 +147,59 @@ export const fetchOverpass = (
     };
     askNext();
   });
+};
+
+// The page keeps its own copy of each response (rather than leaving that to the service worker) so it can show it right away while a fresh one loads. The same limits the service worker had: worth showing while waiting, but not so old that a hydrant or one-way street that's changed lingers.
+const CACHE_NAME = "overpass";
+const CACHE_MAX_AGE_MS = 60 * 60 * 1000;
+const CACHE_MAX_ENTRIES = 50;
+// a URL to file the response under, since the Cache API needs one -- the same whichever server answered
+const cacheKey = (query) =>
+  `https://overpass.invalid/?data=${encodeURIComponent(query)}`;
+
+// the Cache API's cache for responses, or null where it's unavailable, e.g. some private windows
+export const openCache = async () => {
+  try {
+    return await caches.open(CACHE_NAME);
+  } catch {
+    return null;
+  }
+};
+
+// the saved response to `query`, unless it's missing or over CACHE_MAX_AGE_MS old
+export const readCached = async (query, cache) => {
+  try {
+    const response = await cache?.match(cacheKey(query));
+    if (!response) return null;
+    const age = Date.now() - Number(response.headers.get("X-Saved-At"));
+    return age < CACHE_MAX_AGE_MS ? await response.json() : null;
+  } catch {
+    return null;
+  }
+};
+
+// saves the response to `query`, dropping the oldest beyond CACHE_MAX_ENTRIES
+export const saveCached = async (query, data, cache) => {
+  if (!cache) return;
+  try {
+    // so a re-saved response counts as the newest, since keys() lists them in the order they were added
+    await cache.delete(cacheKey(query));
+    await cache.put(
+      cacheKey(query),
+      new Response(JSON.stringify(data), {
+        headers: {
+          "Content-Type": "application/json",
+          "X-Saved-At": String(Date.now()),
+        },
+      }),
+    );
+    const keys = await cache.keys();
+    await Promise.all(
+      keys.slice(0, -CACHE_MAX_ENTRIES).map((key) => cache.delete(key)),
+    );
+  } catch (error) {
+    console.warn("Couldn't save the Overpass response:", error);
+  }
 };
 
 // what kind of water source an OSM element is, for the water layers' filters in layers.js.
@@ -403,16 +456,25 @@ export const bindOverpassData = (map) => {
     const controller = new AbortController();
     inFlight = controller;
     liveDataSpinner.hidden = false;
-    try {
-      const { elements } = await fetchOverpass(query, controller.signal);
+    const show = ({ elements }) => {
       const sources = toSources(groups, elements, bounds);
       for (const [sourceId, features] of Object.entries(sources)) {
         map
           .getSource(sourceId)
           .setData({ type: "FeatureCollection", features });
       }
+    };
+    try {
+      // a saved response goes up right away, while the spinner shows a fresh one is still loading
+      const cache = await openCache();
+      const cached = await readCached(query, cache);
+      if (cached && !controller.signal.aborted) show(cached);
+
+      const data = await fetchOverpass(query, controller.signal);
+      show(data);
       loadedBounds = bounds;
       loadedGroups = groups;
+      await saveCached(query, data, cache);
     } catch (error) {
       if (!controller.signal.aborted) {
         console.error("Failed to load live data from Overpass:", error);
