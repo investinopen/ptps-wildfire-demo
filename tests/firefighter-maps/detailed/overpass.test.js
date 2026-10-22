@@ -117,6 +117,15 @@ describe("fetchOverpass", () => {
     expect(cooldowns.has(urls[0])).toBe(true);
   });
 
+  test("cools a server down again after an earlier cooldown has run out", async () => {
+    cooldowns.set(urls[0], Date.now() - 1);
+    fetchMock
+      .mockRejectedValueOnce(new TypeError("Failed to fetch"))
+      .mockResolvedValueOnce(ok());
+    await run();
+    expect(cooldowns.get(urls[0])).toBeGreaterThan(Date.now());
+  });
+
   test("throws once every server has failed", async () => {
     fetchMock.mockRejectedValue(new TypeError("Failed to fetch"));
     await expect(run()).rejects.toThrow("No Overpass server available");
@@ -127,6 +136,40 @@ describe("fetchOverpass", () => {
     for (const url of urls) cooldowns.set(url, Date.now() + 60_000);
     await expect(run()).rejects.toThrow("No Overpass server available");
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  const hang = (_url, { signal }) =>
+    new Promise((_resolve, reject) =>
+      signal.addEventListener("abort", () => reject(signal.reason)),
+    );
+
+  test("asks the next server too when the first is slow, and uses whichever answers first", async () => {
+    let slowSignal;
+    fetchMock
+      .mockImplementationOnce((url, options) => {
+        slowSignal = options.signal;
+        return hang(url, options);
+      })
+      .mockResolvedValueOnce(ok({ elements: [{ id: 2 }] }));
+    expect(await run({ hedgeMs: 10 })).toEqual({ elements: [{ id: 2 }] });
+    expect(hostsTried()).toEqual(["a.example", "b.example"]);
+    // the slow one is cancelled, but it didn't fail, so it isn't cooled down
+    expect(slowSignal.aborted).toBe(true);
+    expect(cooldowns.size).toBe(0);
+  });
+
+  test("asks at most two servers at once", async () => {
+    fetchMock.mockImplementation(hang);
+    const controller = new AbortController();
+    const request = fetchOverpass("q", controller.signal, {
+      urls,
+      cooldowns,
+      hedgeMs: 10,
+    });
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    controller.abort();
+    await expect(request).rejects.toThrow();
+    expect(hostsTried()).toEqual(["a.example", "b.example"]);
   });
 
   // a newer request cancelled this one -- not the server's fault

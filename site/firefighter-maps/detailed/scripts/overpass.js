@@ -14,6 +14,7 @@ import { HYDRANTS_LAYER, ONEWAY_ARROWS_LAYER } from "./layers.js";
 // - a newer request cancels an in-flight one, so fast panning doesn't pile them up
 // - a server that's rate-limiting (429) or failing is left alone for a while, and the
 //   next one in OVERPASS_URLS is used instead
+// - a slow server only gets company after OVERPASS_HEDGE_MS, and never more than one
 // https://wiki.openstreetmap.org/wiki/Overpass_API#Public_Overpass_API_instances
 export const OVERPASS_URLS = [
   "https://overpass-api.de/api/interpreter",
@@ -24,6 +25,9 @@ export const OVERPASS_URLS = [
 ];
 // how long to wait on one server before moving on to the next, so one that's hanging (rather than failing outright) doesn't hold up the others. A bit longer than the queries' own [timeout:25].
 const OVERPASS_REQUEST_TIMEOUT_MS = 30 * 1000;
+// how long to wait on one server before also asking the next, so a slow one (overpass-api.de took 33 seconds for a small query while at capacity) doesn't hold things up, without doubling the load on every request to these shared servers
+const OVERPASS_HEDGE_MS = 5 * 1000;
+const OVERPASS_MAX_CONCURRENT = 2;
 // how long to skip a server after it rate-limits or fails, unless it says otherwise
 // via Retry-After
 const OVERPASS_COOLDOWN_MS = 60 * 1000;
@@ -65,48 +69,84 @@ export const snapToGrid = ({ west, south, east, north }, zoom) => {
 // server URL -> timestamp before which it shouldn't be asked again
 const overpassCooldowns = new Map();
 
-// the options are for tests; the page always uses the defaults
-export const fetchOverpass = async (
+// one server's response, or throws (after cooling it down) if it fails. `signal` is aborted when the caller or another server's response makes this one unneeded, which isn't the server's fault.
+const fetchFromServer = async (url, query, signal, timeoutMs, cooldowns) => {
+  let responded = false;
+  try {
+    // GET rather than POST so it can be cached by URL. Whitespace is collapsed to keep the URL short.
+    const response = await fetch(
+      `${url}?data=${encodeURIComponent(query.replace(/\s+/g, " "))}`,
+      { signal: AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]) },
+    );
+    if (response.ok) return await response.json();
+    responded = true;
+    const retryAfterSeconds = Number(response.headers.get("Retry-After"));
+    cooldowns.set(
+      url,
+      Date.now() +
+        (retryAfterSeconds > 0
+          ? retryAfterSeconds * 1000
+          : OVERPASS_COOLDOWN_MS),
+    );
+    throw new Error(`Overpass ${url} responded ${response.status}`);
+  } catch (error) {
+    if (!signal.aborted && !responded) {
+      // network failure, timeout, or a non-JSON (e.g. HTML error page) response
+      cooldowns.set(url, Date.now() + OVERPASS_COOLDOWN_MS);
+    }
+    throw error;
+  }
+};
+
+// the first response from OVERPASS_URLS, asking the next server as soon as one fails, or alongside it once it's taken OVERPASS_HEDGE_MS without answering -- but never more than OVERPASS_MAX_CONCURRENT at once. The options are for tests; the page always uses the defaults.
+export const fetchOverpass = (
   query,
   signal,
   {
     urls = OVERPASS_URLS,
     timeoutMs = OVERPASS_REQUEST_TIMEOUT_MS,
+    hedgeMs = OVERPASS_HEDGE_MS,
     cooldowns = overpassCooldowns,
   } = {},
 ) => {
-  const available = urls.filter(
-    (url) => (cooldowns.get(url) ?? 0) <= Date.now(),
-  );
-  for (const url of available) {
-    try {
-      // GET rather than POST so the service worker can cache it for offline use (see
-      // ../sw.js) -- the Cache API can't store responses to POSTs. Whitespace is collapsed
-      // to keep the URL short.
-      const response = await fetch(
-        `${url}?data=${encodeURIComponent(query.replace(/\s+/g, " "))}`,
-        {
-          signal: AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]),
+  const queue = urls.filter((url) => (cooldowns.get(url) ?? 0) <= Date.now());
+  // aborted once there's an answer, or the caller gives up, to cancel the rest
+  const finished = new AbortController();
+  const finishedSignal = AbortSignal.any([signal, finished.signal]);
+  let pending = 0;
+  let hedgeTimer;
+
+  return new Promise((resolve, reject) => {
+    const finish = (settle, value) => {
+      clearTimeout(hedgeTimer);
+      finished.abort();
+      settle(value);
+    };
+    const askNext = () => {
+      if (finishedSignal.aborted || pending >= OVERPASS_MAX_CONCURRENT) return;
+      if (queue.length === 0) {
+        if (pending === 0) {
+          finish(reject, new Error("No Overpass server available"));
+        }
+        return;
+      }
+      const url = queue.shift();
+      pending++;
+      clearTimeout(hedgeTimer);
+      hedgeTimer = setTimeout(askNext, hedgeMs);
+      fetchFromServer(url, query, finishedSignal, timeoutMs, cooldowns).then(
+        (data) => finish(resolve, data),
+        (error) => {
+          pending--;
+          if (signal.aborted) return finish(reject, error);
+          if (finishedSignal.aborted) return;
+          console.warn(`Overpass ${url} failed:`, error);
+          askNext();
         },
       );
-      if (response.ok) return await response.json();
-      const retryAfterSeconds = Number(response.headers.get("Retry-After"));
-      cooldowns.set(
-        url,
-        Date.now() +
-          (retryAfterSeconds > 0
-            ? retryAfterSeconds * 1000
-            : OVERPASS_COOLDOWN_MS),
-      );
-      console.warn(`Overpass ${url} responded ${response.status}`);
-    } catch (error) {
-      if (signal.aborted) throw error;
-      // network failure, timeout, or a non-JSON (e.g. HTML error page) response
-      cooldowns.set(url, Date.now() + OVERPASS_COOLDOWN_MS);
-      console.warn(`Overpass ${url} failed:`, error);
-    }
-  }
-  throw new Error("No Overpass server available");
+    };
+    askNext();
+  });
 };
 
 // what kind of water source an OSM element is, for the water layers' filters in layers.js.
