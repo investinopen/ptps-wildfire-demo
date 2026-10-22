@@ -12,7 +12,8 @@ on:
       - pyproject.toml
       - uv.lock
       - .github/workflows/build-access-tiles.yml
-  # daily, after Geofabrik's overnight (European time) update of the extract
+  # daily, with room to spare after Geofabrik's update of the extract, which has OSM data up to about 20:20 UTC and is ready around 00:20 UTC
+  # https://www.geofabrik.de/data/download.html
   schedule:
     - cron: "0 9 * * *"
   workflow_dispatch:
