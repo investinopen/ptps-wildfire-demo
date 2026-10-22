@@ -1,4 +1,4 @@
-"""Builds the detailed firefighter map's water and road-access layers (water sources, gates, one-way streets, weight-limited bridges, dead ends) from an OpenStreetMap extract, as GeoJSONSeq files for tippecanoe to turn into PMTiles. Run by .github/workflows/build-access-tiles.yml -- see the README there for how the pieces fit together."""
+"""Builds the detailed firefighter map's water and road-access layers (water sources, gates, one-way streets, weight-limited bridges, dead ends) from an OpenStreetMap extract, as GeoJSONSeq files for tippecanoe to turn into PMTiles. Run by .github/workflows/build-access-tiles.yml -- see site/README.md for how the pieces fit together."""
 
 import itertools
 import json
