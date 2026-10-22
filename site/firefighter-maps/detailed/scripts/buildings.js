@@ -13,6 +13,8 @@ export const RISK_PROPERTY = "0";
 // Bins for that score, each a lower bound (in % annual risk) and color -- zero is its own gray, anything above zero starts at the first bin. A coarser grouping of CarbonPlan's own 10 bins (every boundary here is one of theirs, so a building never lands in a lower bin here than on their map), since crews need to tell low from high at a glance rather than read fine gradations: https://github.com/carbonplan/ocr-web/blob/main/lib/config.ts
 // Colors are picked from ColorBrewer's Reds.
 export const NO_RISK_COLOR = "#d9d9d9";
+// buildings without a score at all (see NO_RISK_DATA_BOUNDS)
+export const NO_RISK_DATA_COLOR = "#ffffff";
 export const RISK_BINS = [
   { min: 0, color: "#fcbba1" },
   { min: 0.1, color: "#fb6a4a" },
@@ -20,3 +22,5 @@ export const RISK_BINS = [
   { min: 1, color: "#67000d" },
 ];
 export const BUILDING_MIN_ZOOM = 14.5;
+// The scores only cover the contiguous US (the tiles' bounds stop there), so Alaska and Hawaii get OpenStreetMap's buildings from the basemap instead, drawn without a score. One box, as [west, south, east, north], from the antimeridian to just east of the Alaska panhandle's tip, which takes in both states and stops well short of Washington. It's the bounds of a source of its own rather than a filter, since MapLibre's "within" doesn't match polygons.
+export const NO_RISK_DATA_BOUNDS = [-180, 18.5, -129, 72];

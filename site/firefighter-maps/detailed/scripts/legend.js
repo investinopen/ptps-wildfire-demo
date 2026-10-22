@@ -1,5 +1,6 @@
 import { FLAME_LENGTH_CLASSES, hatchCss } from "./rasters.js";
 import { iconDataUrl } from "./icons.js";
+import { NO_RISK_DATA_BOUNDS } from "./buildings.js";
 
 // a row of the flame length key below: a pattern cell, a bold name, and a description
 const keyRow = (key, background, name, description) => {
@@ -32,6 +33,22 @@ export const buildLegendKeys = () => {
   }
 };
 
+// Keys the buildings by what's in view: risk colors in the contiguous US, white ones without a score in Alaska and Hawaii (see NO_RISK_DATA_BOUNDS). Swapped in place rather than listed as a second row, which would push a printout onto a second page. The two areas are far enough apart that buildings from both are never in view at once.
+export const bindBuildingsKey = (map) => {
+  const swatch = document.getElementById("buildings-swatch");
+  const name = document.getElementById("buildings-name");
+  const update = () => {
+    const noRiskData = map.getCenter().lng < NO_RISK_DATA_BOUNDS[2];
+    swatch.classList.toggle("buildings", !noRiskData);
+    swatch.classList.toggle("no-risk-data", noRiskData);
+    name.textContent = noRiskData
+      ? "Buildings (no risk data here)"
+      : "Buildings, by wildfire risk";
+  };
+  update();
+  map.on("moveend", update);
+};
+
 // wires each legend checkbox to show/hide its layers
 export const bindLayerToggles = (map) => {
   // wires a checkbox to show/hide one or more layers together
@@ -49,8 +66,12 @@ export const bindLayerToggles = (map) => {
     "buildings-halo",
     "buildings-fill",
     "buildings-outline",
+    "osm-buildings-halo",
+    "osm-buildings-fill",
+    "osm-buildings-outline",
     "housenumbers",
     "building-obstacles",
+    "osm-building-obstacles",
   ]);
   // driveways and paths are listed under roads, without toggles of their own
   bindLayerToggle("roads-toggle", [

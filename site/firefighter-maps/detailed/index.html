@@ -88,8 +88,9 @@
           <div id="flame-length-key" class="layer-key table-key"></div>
           <label>
             <input type="checkbox" id="buildings-toggle" checked />
-            <span class="swatch buildings"></span>
-            Buildings, by wildfire risk
+            <!-- switched to the no-risk-data key in Alaska and Hawaii by legend.js -->
+            <span class="swatch buildings" id="buildings-swatch"></span>
+            <span id="buildings-name">Buildings, by wildfire risk</span>
           </label>
           <label>
             <input type="checkbox" id="roads-toggle" checked />
@@ -152,7 +153,9 @@
           <a href="https://www.openstreetmap.org/" target="_blank"
             >OpenStreetMap</a
           >
-          take up to three days to appear here.
+          take up to three days to appear here. The map covers the 50 states,
+          minus the westernmost Aleutians; there are no building risk scores in
+          Alaska or Hawaii.
         </p>
         <div id="map-attribution"></div>
       </aside>

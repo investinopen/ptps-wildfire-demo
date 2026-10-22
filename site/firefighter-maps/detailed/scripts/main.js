@@ -11,7 +11,11 @@ import {
   SIGN_BOX_OPTIONS,
   iconImageData,
 } from "./icons.js";
-import { buildLegendKeys, bindLayerToggles } from "./legend.js";
+import {
+  buildLegendKeys,
+  bindBuildingsKey,
+  bindLayerToggles,
+} from "./legend.js";
 import { bindSidebarToggle } from "./sidebar.js";
 import { bindPlaceHeading } from "./places.js";
 import { bindOverviewMap } from "./overview.js";
@@ -108,6 +112,7 @@ document
 
 bindPlaceSearch(map);
 bindLayerToggles(map);
+bindBuildingsKey(map);
 
 // resize so the canvas redraws at full page size instead of printing blank/clipped
 window.addEventListener("beforeprint", () => map.resize());

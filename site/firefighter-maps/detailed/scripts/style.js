@@ -1,5 +1,5 @@
 // the map's sources and layers (in draw order) -- kept separate from main.js so it can be loaded, and validated, without a browser
-import { PMTILES_URL } from "./buildings.js";
+import { NO_RISK_DATA_BOUNDS, PMTILES_URL } from "./buildings.js";
 import { FLAME_LENGTH_URL } from "./rasters.js";
 import {
   HILLSHADE_LAYER,
@@ -22,6 +22,10 @@ import {
   BUILDINGS_FILL_LAYER,
   BUILDINGS_HALO_LAYER,
   BUILDINGS_OUTLINE_LAYER,
+  OSM_BUILDINGS_HALO_LAYER,
+  OSM_BUILDINGS_FILL_LAYER,
+  OSM_BUILDINGS_OUTLINE_LAYER,
+  OSM_BUILDING_OBSTACLES_LAYER,
   HOUSENUMBERS_LAYER,
   HYDRANTS_LAYER,
   WATER_SOURCES_LAYER,
@@ -31,6 +35,9 @@ import {
   WEIGHT_LIMITS_LAYER,
   PLACE_LABELS_LAYER,
 } from "./layers.js";
+
+// OpenMapTiles-schema vector tiles, free & keyless: https://openfreemap.org
+const OPENFREEMAP_URL = "https://tiles.openfreemap.org/planet";
 
 // built daily and published next to this page -- see the "osm-access" source below
 export const ACCESS_TILES_URL = new URL(
@@ -59,10 +66,15 @@ export const STYLE = {
       attribution:
         '&copy; <a href="https://mapterhorn.com" target="_blank">Mapterhorn</a>',
     },
-    // OpenMapTiles-schema vector tiles, free & keyless: https://openfreemap.org
     roadsSource: {
       type: "vector",
-      url: "https://tiles.openfreemap.org/planet",
+      url: OPENFREEMAP_URL,
+    },
+    // the same tiles, only fetched where buildings.js has no risk scores
+    osmBuildings: {
+      type: "vector",
+      url: OPENFREEMAP_URL,
+      bounds: NO_RISK_DATA_BOUNDS,
     },
     buildings: {
       type: "vector",
@@ -101,12 +113,15 @@ export const STYLE = {
     STATE_LINES_LAYER,
     BUILDINGS_HALO_LAYER,
     BUILDINGS_FILL_LAYER,
+    OSM_BUILDINGS_HALO_LAYER,
+    OSM_BUILDINGS_FILL_LAYER,
     TRAILS_LAYER,
     DRIVEWAYS_LAYER,
     ROADS_LAYER,
     ONEWAY_ARROWS_LAYER,
     WATER_LABELS_LAYER,
     BUILDINGS_OUTLINE_LAYER,
+    OSM_BUILDINGS_OUTLINE_LAYER,
     TRAIL_LABELS_LAYER,
     POOLS_LAYER,
     WATER_SOURCES_LAYER,
@@ -117,6 +132,7 @@ export const STYLE = {
     ROUTE_SHIELDS_LAYER,
     DRIVEWAY_OBSTACLES_LAYER,
     BUILDING_OBSTACLES_LAYER,
+    OSM_BUILDING_OBSTACLES_LAYER,
     HOUSENUMBERS_LAYER,
     ROAD_LABEL_FALLBACKS_LAYER,
     ROAD_LABELS_LAYER,
