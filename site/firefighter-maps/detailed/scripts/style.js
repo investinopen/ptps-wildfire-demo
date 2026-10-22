@@ -32,6 +32,12 @@ import {
   PLACE_LABELS_LAYER,
 } from "./layers.js";
 
+// built daily and published next to this page -- see the "osm-access" source below
+export const ACCESS_TILES_URL = new URL(
+  "../osm-access.pmtiles",
+  import.meta.url,
+).href;
+
 export const STYLE = {
   version: 8,
   sources: {
@@ -73,8 +79,7 @@ export const STYLE = {
     // alongside this page; the file's attribution says what date its data is from.
     "osm-access": {
       type: "vector",
-      url:
-        "pmtiles://" + new URL("../osm-access.pmtiles", import.meta.url).href,
+      url: "pmtiles://" + ACCESS_TILES_URL,
     },
     // USFS Wildfire Risk to Communities (public domain); exportImage per-tile via
     // the {bbox-epsg-3857} template maplibre substitutes for ArcGIS image services
