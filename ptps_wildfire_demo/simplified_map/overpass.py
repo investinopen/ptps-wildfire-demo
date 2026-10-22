@@ -33,6 +33,8 @@ def raise_if_overloaded(response: requests.Response, *args, **kwargs) -> None:
 
 def from_overpass(fetch: Callable[[], T]) -> T:
     """The result of `fetch` (an OSMnx call that queries Overpass), trying each of OVERPASS_URLS in turn until one responds."""
+    # skips OSMnx's check of each server's /status before querying it, which it follows with a 60-second pause when it can't parse the reply (e.g. a 502 page), or a wait for a busy server's next slot. A server that's at capacity says so with a 429 anyway, which raise_if_overloaded() turns into moving on.
+    ox.settings.overpass_rate_limit = False
     ox.settings.requests_timeout = REQUEST_TIMEOUT
     ox.settings.requests_kwargs = {"hooks": {"response": raise_if_overloaded}}
     for url in OVERPASS_URLS[:-1]:

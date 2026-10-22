@@ -12,7 +12,12 @@ from ptps_wildfire_demo.simplified_map.overpass import (
 
 @pytest.fixture(autouse=True)
 def restore_osmnx_settings(monkeypatch: pytest.MonkeyPatch):
-    for name in ("overpass_url", "requests_timeout", "requests_kwargs"):
+    for name in (
+        "overpass_url",
+        "overpass_rate_limit",
+        "requests_timeout",
+        "requests_kwargs",
+    ):
         monkeypatch.setattr(ox.settings, name, getattr(ox.settings, name))
 
 
@@ -25,6 +30,15 @@ def test_from_overpass_uses_first_server():
 
     assert from_overpass(fetch) == "roads"
     assert tried == OVERPASS_URLS[:1]
+
+
+def test_from_overpass_skips_status_check():
+    """OSMnx otherwise checks each server's /status first, and pauses for 60 seconds when it can't make sense of the reply (e.g. a 502 page), or until a busy server has a free slot."""
+
+    def fetch():
+        return ox.settings.overpass_rate_limit
+
+    assert from_overpass(fetch) is False
 
 
 @pytest.mark.parametrize(
