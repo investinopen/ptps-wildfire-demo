@@ -3,6 +3,8 @@ import osmnx as ox
 from shapely import LineString
 from shapely.ops import linemerge
 
+from ptps_wildfire_demo.simplified_map.overpass import from_overpass
+
 # the same highway types as DRIVABLE_HIGHWAYS in the detailed firefighter map, minus parking lot aisles and drive-throughs
 # https://wiki.openstreetmap.org/wiki/Key:highway
 DRIVABLE_FILTER = (
@@ -24,13 +26,15 @@ def fetch_roads(center: tuple[float, float], radius_meters: float) -> nx.MultiGr
     """The drivable roads within `radius_meters` of `center` (lat, lon), projected to meters, with only intersections, dead ends, gates, and places where a road's name changes as nodes."""
     ox.settings.useful_tags_node = ["highway", "barrier"]
     ox.settings.useful_tags_way = [*EDGE_TAGS, "surface"]
-    raw = ox.graph_from_point(
-        center,
-        dist=radius_meters,
-        custom_filter=DRIVABLE_FILTER,
-        simplify=False,
-        # keeps roads that leave the area running to the next intersection, rather than stopping at the edge
-        truncate_by_edge=True,
+    raw = from_overpass(
+        lambda: ox.graph_from_point(
+            center,
+            dist=radius_meters,
+            custom_filter=DRIVABLE_FILTER,
+            simplify=False,
+            # keeps roads that leave the area running to the next intersection, rather than stopping at the edge
+            truncate_by_edge=True,
+        )
     )
     # only vehicle barriers should survive simplification as nodes of their own
     for _, data in raw.nodes(data=True):

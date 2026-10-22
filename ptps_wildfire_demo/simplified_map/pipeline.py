@@ -19,6 +19,7 @@ from ptps_wildfire_demo.simplified_map.elevation import ElevationModel
 from ptps_wildfire_demo.simplified_map.layout import Layout, layout
 from ptps_wildfire_demo.simplified_map.links import detailed_map_url, openstreetmap_url
 from ptps_wildfire_demo.simplified_map.network import drop_short_driveways, fetch_roads
+from ptps_wildfire_demo.simplified_map.overpass import from_overpass
 from ptps_wildfire_demo.simplified_map.profile import add_profiles
 
 
@@ -122,8 +123,10 @@ class SimplifiedMap:
         )
 
         found = unique_addresses(
-            ox.features_from_point(
-                center, tags={"addr:housenumber": True}, dist=radius_meters
+            from_overpass(
+                lambda: ox.features_from_point(
+                    center, tags={"addr:housenumber": True}, dist=radius_meters
+                )
             ).to_crs(G.graph["crs"])
         )
         # buildings/lots are mapped as areas
