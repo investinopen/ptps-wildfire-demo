@@ -17,10 +17,10 @@ import { HYDRANTS_LAYER, ONEWAY_ARROWS_LAYER } from "./layers.js";
 // https://wiki.openstreetmap.org/wiki/Overpass_API#Public_Overpass_API_instances
 export const OVERPASS_URLS = [
   "https://overpass-api.de/api/interpreter",
-  // VK Maps' public instance, which also allows cross-origin requests
-  "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
   // Private.coffee's public instance -- no rate limits, per the wiki page above
   "https://overpass.private.coffee/api/interpreter",
+  // VK Maps' public instance, which also allows cross-origin requests. Last, since its data can lag behind OSM's.
+  "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
 ];
 // how long to wait on one server before moving on to the next, so one that's hanging (rather than failing outright) doesn't hold up the others. A bit longer than the queries' own [timeout:25].
 const OVERPASS_REQUEST_TIMEOUT_MS = 30 * 1000;
