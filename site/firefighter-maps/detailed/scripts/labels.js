@@ -212,8 +212,11 @@ export const bindLabelBlockers = (map, { sourceId }) => {
       }),
     });
   };
-  map.on("load", update);
-  map.on("moveend", update);
-  // includes the sidebar changing width, e.g. when a legend key shows/hides with its layer
-  map.on("resize", update);
+  // only once loaded, since the source isn't there before then
+  map.on("load", () => {
+    update();
+    map.on("moveend", update);
+    // includes the sidebar changing width, e.g. when a legend key shows/hides with its layer
+    map.on("resize", update);
+  });
 };
