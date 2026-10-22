@@ -146,8 +146,9 @@ body {
   margin: 0;
   /* wraps at the same width as the attribution, rather than widening the sidebar */
   max-width: 240px;
-  font-size: 12px;
-  color: #666666;
+  /* the same as the attribution below it */
+  font-size: 11px;
+  color: #888888;
 }
 #data-delay-note a {
   color: inherit;
