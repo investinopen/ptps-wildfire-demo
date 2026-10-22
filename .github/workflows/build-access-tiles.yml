@@ -33,7 +33,37 @@ env:
   USER_AGENT: ptps-wildfire-demo (https://github.com/investinopen/ptps-wildfire-demo)
 
 jobs:
+  # Whether there's anything new to build. Geofabrik publishes a checksum next to the extract, which changes with each update, so tiles aren't built again from the same extract with the same code -- such as on a day Geofabrik's update runs late. A manual run always builds.
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      key: ${{ steps.key.outputs.key }}
+      built: ${{ steps.built.outputs.cache-hit }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Find the extract's checksum
+        id: key
+        env:
+          CODE_HASH: ${{ hashFiles('ptps_wildfire_demo/access_tiles.py', 'uv.lock', '.github/workflows/build-access-tiles.yml') }}
+        run: |
+          md5=$(curl --fail --silent --show-error --location --user-agent "$USER_AGENT" https://download.geofabrik.de/north-america/us-latest.osm.pbf.md5 | cut -d' ' -f1)
+          echo "key=access-tiles-built-$md5-$CODE_HASH" >> "$GITHUB_OUTPUT"
+
+      # an empty cache entry, saved by the build job, marks that these were built
+      - name: Look for tiles built from it already
+        id: built
+        if: github.event_name != 'workflow_dispatch'
+        uses: actions/cache/restore@v6
+        with:
+          path: built
+          key: ${{ steps.key.outputs.key }}
+          lookup-only: true
+
   build:
+    needs: check
+    if: needs.check.outputs.built != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 180
     steps:
@@ -117,3 +147,13 @@ jobs:
           path: osm-access.pmtiles
           # already compressed
           compression-level: 0
+
+      # see the check job
+      - name: Mark the tiles as built
+        run: echo "$DATA_DATE" > built
+
+      - name: Save the mark
+        uses: actions/cache/save@v6
+        with:
+          path: built
+          key: ${{ needs.check.outputs.key }}
