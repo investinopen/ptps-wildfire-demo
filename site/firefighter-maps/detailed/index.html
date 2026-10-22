@@ -55,9 +55,9 @@
     </div>
     <div id="map-container">
       <!-- the legend, scale, and attribution, beside the map rather than over it -->
-      <aside id="sidebar">
+      <aside id="sidebar" class="sidebar">
         <!-- the town(s) in view, filled in by places.js -->
-        <h1 id="map-places" hidden></h1>
+        <h1 id="map-places" class="map-places" hidden></h1>
         <form id="place-search" autocomplete="off">
           <input
             type="search"
@@ -73,7 +73,7 @@
         </form>
         <!-- see overview.js -->
         <div id="overview-map"></div>
-        <div id="layer-controls">
+        <div id="layer-controls" class="layer-controls">
           <label>
             <input type="checkbox" id="hillshade-toggle" checked />
             <span class="swatch hillshade"></span>
@@ -145,7 +145,7 @@
           </label>
         </div>
         <!-- the scale and attribution are filled in by main.js -->
-        <div id="map-scale"></div>
+        <div id="map-scale" class="map-scale"></div>
         <!-- on screen only -- a printout shows its data's date in the attribution -->
         <p id="data-delay-note">
           Edits to water sources, gates, dead ends, one-way streets, and weight
@@ -157,7 +157,7 @@
           minus the westernmost Aleutians; there are no building risk scores in
           Alaska or Hawaii.
         </p>
-        <div id="map-attribution"></div>
+        <div id="map-attribution" class="map-attribution"></div>
       </aside>
       <div id="map-area">
         <div id="map"></div>
