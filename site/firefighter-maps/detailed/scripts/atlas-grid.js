@@ -65,6 +65,24 @@ const rectTouchesPolygon = ([w, n, e, s], rings) => {
 const pagesAcross = (span, size, step) =>
   Math.max(1, Math.ceil((span - size) / step) + 1);
 
+// The pages (each with a row and col), numbered in the order given, with each one's neighbors' numbers as { north, south, east, west } -- leaving out neighbors that aren't among them, so pages can be dropped (e.g. empty ones) and the rest renumbered.
+export const numberPages = (cells) => {
+  const numbers = new Map(cells.map((c, i) => [`${c.row},${c.col}`, i + 1]));
+  return cells.map((cell, i) => {
+    const at = (dRow, dCol) =>
+      numbers.get(`${cell.row + dRow},${cell.col + dCol}`);
+    const neighbors = Object.fromEntries(
+      Object.entries({
+        north: at(-1, 0),
+        south: at(1, 0),
+        west: at(0, -1),
+        east: at(0, 1),
+      }).filter(([, number]) => number),
+    );
+    return { ...cell, number: i + 1, neighbors };
+  });
+};
+
 // Given an area (a GeoJSON Polygon or MultiPolygon) and the pages' { zoom, width, height } (in CSS pixels) and overlap (a fraction of a page), returns the pages covering it as { cells, rows, cols }, the grid centered on the area. Each cell is { number, row, col, center: [lng, lat], bounds: [[west, south], [east, north]], neighbors: { north, south, east, west } } (page numbers), numbered across then down, leaving out pages that would be entirely outside the area.
 export const atlasGrid = (geometry, { zoom, width, height, overlap }) => {
   const polygons = polygonsOf(geometry).map((rings) =>
@@ -87,17 +105,13 @@ export const atlasGrid = (geometry, { zoom, width, height, overlap }) => {
   const x0 = (minX + maxX) / 2 - (width + (cols - 1) * stepX) / 2;
   const y0 = (minY + maxY) / 2 - (height + (rows - 1) * stepY) / 2;
 
-  const numbers = new Map();
   const cells = [];
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
       const [w, n] = [x0 + col * stepX, y0 + row * stepY];
       const rect = [w, n, w + width, n + height];
       if (!polygons.some((rings) => rectTouchesPolygon(rect, rings))) continue;
-      const number = cells.length + 1;
-      numbers.set(`${row},${col}`, number);
       cells.push({
-        number,
         row,
         col,
         center: fromWorld({ x: w + width / 2, y: n + height / 2 }, zoom),
@@ -108,17 +122,5 @@ export const atlasGrid = (geometry, { zoom, width, height, overlap }) => {
       });
     }
   }
-  for (const cell of cells) {
-    const at = (dRow, dCol) =>
-      numbers.get(`${cell.row + dRow},${cell.col + dCol}`);
-    cell.neighbors = Object.fromEntries(
-      Object.entries({
-        north: at(-1, 0),
-        south: at(1, 0),
-        west: at(0, -1),
-        east: at(0, 1),
-      }).filter(([, number]) => number),
-    );
-  }
-  return { cells, rows, cols };
+  return { cells: numberPages(cells), rows, cols };
 };

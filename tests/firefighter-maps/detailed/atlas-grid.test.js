@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import {
   atlasGrid,
   fromWorld,
+  numberPages,
   scaleDenominator,
   toWorld,
 } from "../../../site/firefighter-maps/detailed/scripts/atlas-grid.js";
@@ -148,6 +149,17 @@ describe("atlasGrid", () => {
     );
     expect(cols).toBe(5);
     expect(cells.map((c) => c.col)).toEqual([0, 4]);
+  });
+});
+
+describe("numberPages", () => {
+  test("renumbers the pages left after dropping some", () => {
+    const { cells } = atlasGrid(square(250), page);
+    // without the middle one
+    const kept = numberPages(cells.filter((c) => c.number !== 5));
+    expect(kept.map((c) => c.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+    expect(kept[1].neighbors).toEqual({ west: 1, east: 3 });
+    expect(kept[3].neighbors).toEqual({ north: 1, south: 6 });
   });
 });
 
