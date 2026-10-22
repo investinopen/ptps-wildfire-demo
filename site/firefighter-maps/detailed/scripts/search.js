@@ -26,6 +26,8 @@ export const bindPlaceSearch = (map) => {
     pending = new AbortController();
     const { lng, lat } = map.getCenter();
     const params = new URLSearchParams({
+      // only places the map can show
+      bbox: map.getMaxBounds().toArray().flat().join(","),
       q: query,
       // extra, to make up for the duplicates dropped below
       limit: MAX_SUGGESTIONS * 2,

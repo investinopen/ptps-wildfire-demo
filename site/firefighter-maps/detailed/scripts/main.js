@@ -24,6 +24,17 @@ bindSidebarToggle();
 
 const CENTER = [-105.375925, 40.052187]; // [lon, lat]
 const ZOOM = 16.03;
+// the contiguous US, with a little margin -- the building risk scores only cover it (see buildings.js), and not zooming out past it keeps the map from asking the tile and image servers for the whole world at once. The overview map in the sidebar shows the wider area.
+const MAX_BOUNDS = [
+  [-125.5, 24], // [west, south]
+  [-66, 50], // [east, north]
+];
+const MIN_ZOOM = 4;
+// MapLibre ignores a #zoom/lat/lng zoomed out past minZoom, opening at CENTER instead, so a link like that is moved in to MIN_ZOOM to still open where it points
+const [hashZoom, ...hashPlace] = location.hash.slice(1).split("/");
+if (hashPlace.length === 2 && Number(hashZoom) < MIN_ZOOM) {
+  history.replaceState(null, "", `#${[MIN_ZOOM, ...hashPlace].join("/")}`);
+}
 
 const protocol = new pmtiles.Protocol();
 maplibregl.addProtocol("pmtiles", protocol.tile);
@@ -40,6 +51,8 @@ const map = new maplibregl.Map({
   style: STYLE,
   center: CENTER,
   zoom: ZOOM,
+  maxBounds: MAX_BOUNDS,
+  minZoom: MIN_ZOOM,
 });
 
 // the symbols drawn in icons.js
