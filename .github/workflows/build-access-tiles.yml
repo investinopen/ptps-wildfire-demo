@@ -1,0 +1,121 @@
+name: Build access tiles
+
+# Builds the detailed firefighter map's water and road-access layers (water sources, gates, one-way streets, weight-limited bridges, dead ends) as PMTiles from Geofabrik's daily OpenStreetMap extract of the US, and passes them to publish-site.yml as an artifact. Kept separate from publishing, since it takes 30+ minutes: a site change publishes right away with the last tiles built, and a failed build just leaves those tiles up.
+
+on:
+  push:
+    branches:
+      - main
+    # anything that changes what the tiles contain
+    paths:
+      - ptps_wildfire_demo/access_tiles.py
+      - pyproject.toml
+      - uv.lock
+      - .github/workflows/build-access-tiles.yml
+  # daily, after Geofabrik's overnight (European time) update of the extract
+  schedule:
+    - cron: "0 9 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# a newer build makes an in-progress one moot
+concurrency:
+  group: build-access-tiles
+  cancel-in-progress: true
+
+env:
+  # the same as the map's MAX_BOUNDS in site/firefighter-maps/detailed/scripts/main.js, as west,south,east,north
+  BBOX: -125.5,24,-66,50
+  # https://operations.osmfoundation.org/policies/ -- identifies who's downloading
+  USER_AGENT: ptps-wildfire-demo (https://github.com/investinopen/ptps-wildfire-demo)
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      # the 12 GB extract plus what's made from it doesn't fit alongside everything preinstalled on the runner -- these are toolchains nothing here uses
+      - name: Free up disk space
+        run: |
+          df -h /
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h /
+
+      - name: Install osmium-tool and tippecanoe
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes osmium-tool tippecanoe
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.0.1
+        with:
+          version: latest
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Download the US extract
+        run: curl --fail --silent --show-error --location --user-agent "$USER_AGENT" --output us.osm.pbf https://download.geofabrik.de/north-america/us-latest.osm.pbf
+
+      # down to just what access_tiles.py reads (with the nodes the roads use), and the area the map shows, which takes it from about 12 GB to about 2.5 GB
+      - name: Filter the extract
+        run: |
+          osmium tags-filter us.osm.pbf \
+            w/highway=motorway,motorway_link,trunk,trunk_link,primary,primary_link,secondary,secondary_link,tertiary,tertiary_link,unclassified,residential,living_street,service,track \
+            n/barrier=gate,lift_gate,swing_gate,chain,bollard \
+            n/highway=turning_circle,turning_loop \
+            nwr/emergency=fire_hydrant,water_tank,suction_point,fire_water_pond \
+            nwr/leisure=swimming_pool \
+            --output filtered.osm.pbf
+          # how current the data is, for the tiles' attribution
+          echo "DATA_DATE=$(osmium fileinfo --get header.option.osmosis_replication_timestamp us.osm.pbf | cut -c1-10)" >> "$GITHUB_ENV"
+          rm us.osm.pbf
+          osmium extract --bbox "$BBOX" filtered.osm.pbf --output clipped.osm.pbf
+          rm filtered.osm.pbf
+          ls -lh clipped.osm.pbf
+
+      - name: Extract the layers
+        run: uv run python -m ptps_wildfire_demo.access_tiles clipped.osm.pbf layers | tee counts.json
+
+      # every feature kept at every zoom (-r1, no feature or tile size limits), so no hydrant goes missing from a crowded tile. Max zoom 14, which MapLibre stretches to draw closer in.
+      - name: Build the tiles
+        run: |
+          tippecanoe --output osm-access.pmtiles --minimum-zoom 13 --maximum-zoom 14 \
+            --drop-rate 1 --no-feature-limit --no-tile-size-limit --read-parallel --quiet \
+            --name "Water sources and road access" \
+            --attribution "Water sources &amp; road access: &copy; <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\">OpenStreetMap</a> contributors, as of $DATA_DATE" \
+            --named-layer water:layers/water.geojsonl \
+            --named-layer gates:layers/gates.geojsonl \
+            --named-layer oneway:layers/oneway.geojsonl \
+            --named-layer weight-limits:layers/weight-limits.geojsonl \
+            --named-layer dead-ends:layers/dead-ends.geojsonl
+          ls -lh osm-access.pmtiles
+
+      - name: Summarize
+        run: |
+          {
+            echo "OpenStreetMap data as of $DATA_DATE: $(du -h osm-access.pmtiles | cut -f1)"
+            echo
+            echo '```json'
+            cat counts.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the tiles
+        uses: actions/upload-artifact@v7
+        with:
+          name: access-tiles
+          path: osm-access.pmtiles
+          # already compressed
+          compression-level: 0
