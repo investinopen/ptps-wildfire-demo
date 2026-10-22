@@ -2,7 +2,9 @@
 // MapLibre only ships as an ES module since v6, and loads its own web worker from the same CDN.
 import * as maplibregl from "https://cdn.jsdelivr.net/npm/maplibre-gl@6/dist/maplibre-gl.mjs";
 import { flameHatchProtocol } from "./rasters.js";
-import { STYLE } from "./style.js";
+import { ACCESS_TILES_URL, STYLE } from "./style.js";
+import { PMTILES_URL } from "./buildings.js";
+import { CachedSource } from "./pmtiles-cache.js";
 import {
   ICONS,
   ICON_PIXEL_RATIO,
@@ -13,7 +15,6 @@ import { buildLegendKeys, bindLayerToggles } from "./legend.js";
 import { bindSidebarToggle } from "./sidebar.js";
 import { bindPlaceHeading } from "./places.js";
 import { bindOverviewMap } from "./overview.js";
-import { bindOverpassData } from "./overpass.js";
 import { bindFallbackRoadLabels, bindLabelBlockers } from "./labels.js";
 import { ROAD_LABELS_LAYER } from "./layers.js";
 import { bindPlaceSearch } from "./search.js";
@@ -36,7 +37,14 @@ if (hashPlace.length === 2 && Number(hashZoom) < MIN_ZOOM) {
   history.replaceState(null, "", `#${[MIN_ZOOM, ...hashPlace].join("/")}`);
 }
 
-const protocol = new pmtiles.Protocol();
+// metadata, so a source without its own attribution (the access tiles) takes the one in its file, with the date its data is from
+const protocol = new pmtiles.Protocol({ metadata: true });
+// read through CachedSource, so areas viewed before still draw offline
+for (const url of [ACCESS_TILES_URL, PMTILES_URL]) {
+  protocol.add(
+    new pmtiles.PMTiles(new CachedSource(new pmtiles.FetchSource(url))),
+  );
+}
 maplibregl.addProtocol("pmtiles", protocol.tile);
 maplibregl.addProtocol("flamehatch", flameHatchProtocol);
 
@@ -64,7 +72,6 @@ map.on("load", () => {
     });
   }
 });
-bindOverpassData(map);
 bindPlaceHeading(map);
 bindOverviewMap(map);
 bindLabelBlockers(map, { sourceId: "label-blockers" });

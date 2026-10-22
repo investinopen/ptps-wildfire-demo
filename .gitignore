@@ -22,6 +22,8 @@ data_cache/
 site/_site/
 # executed notebook results -- made by the "Refresh notebooks" workflow and passed to publishing as an artifact, rather than committed
 site/_freeze/
+# the detailed map's water and road-access tiles -- made by the "Build access tiles" workflow and passed to publishing as an artifact, rather than committed
+site/firefighter-maps/detailed/osm-access.pmtiles
 # intermediate files, moved into _site/ once rendering finishes
 site/site_libs/
 site/*_files/
