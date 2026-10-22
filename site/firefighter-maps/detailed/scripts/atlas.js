@@ -8,6 +8,7 @@ import {
   PAGE_MAP_SIZE,
   indexPage,
   mapPage,
+  sidebarCopy,
 } from "./atlas-pages.js";
 
 // county boundaries come from Nominatim, one request per county picked (which its usage policy allows, unlike search-as-you-type -- see search.js), simplified to about 50 m so the response stays small
@@ -156,7 +157,8 @@ export const bindAtlas = (map) => {
         );
         progress.value = i / cells.length;
         const result = await capturePage(map, { center: cell.center, zoom });
-        if (!result.empty) drawn.push({ ...cell, ...result });
+        if (!result.empty)
+          drawn.push({ ...cell, ...result, sidebar: sidebarCopy() });
       }
     });
     if (thisRun.cancelled) return;

@@ -79,8 +79,8 @@ export const indexPage = ({ title, details, index, pages }) => {
   ]);
 };
 
-// A copy of the sidebar as it is now (so with the current scale, attribution, and which layers are on), minus what's only for the screen, without ids so they stay unique on the page.
-const sidebarCopy = () => {
+// A copy of the sidebar as it is now (so with the current scale, attribution, buildings key, and which layers are on), minus what's only for the screen, without ids so they stay unique on the page. Taken while each page is on screen (see atlas.js), since all of those depend on the view.
+export const sidebarCopy = () => {
   const sidebar = document.getElementById("sidebar");
   const copy = sidebar.cloneNode(true);
   // a copied checkbox gets its default checked state rather than its current one
@@ -113,10 +113,7 @@ const neighborLabels = (neighbors) =>
   );
 
 export const mapPage = ({ title, page, total, index, pages }) => {
-  const sidebar = sidebarCopy();
-  // as they were when the page was drawn, rather than for the view on screen now
-  sidebar.querySelector(".map-scale").innerHTML = page.scale;
-  sidebar.querySelector(".map-attribution").innerHTML = page.attribution;
+  const { sidebar } = page;
   const heading = sidebar.querySelector(".map-places");
   heading.hidden = false;
   heading.textContent = title;

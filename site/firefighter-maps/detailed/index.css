@@ -348,7 +348,7 @@ body {
   border-color: #2b2b2b;
 }
 /* NO_RISK_DATA_COLOR from buildings.js, with the same outline */
-#layer-controls .swatch.no-risk-data {
+.layer-controls .swatch.no-risk-data {
   background: #ffffff;
   border-color: #2b2b2b;
 }

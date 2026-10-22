@@ -9,7 +9,13 @@ const MIN_PIXEL_RATIO = 2;
 const JPEG_QUALITY = 0.88;
 
 // the layers that say there's something on a page worth printing
-const CONTENT_LAYERS = ["roads", "driveways", "trails", "buildings-fill"];
+const CONTENT_LAYERS = [
+  "roads",
+  "driveways",
+  "trails",
+  "buildings-fill",
+  "osm-buildings-fill",
+];
 // left off of the index page's map
 const INDEX_HIDDEN_LAYERS = ["hillshade", "flame-length"];
 
@@ -157,7 +163,7 @@ export const captureIndex = async (map, geometry, cells, { padding }) => {
 const refreshAttribution = (map) =>
   map.fire("sourcedata", { dataType: "source", sourceDataType: "visibility" });
 
-// Draws one page: its image, the town(s) on it (from the sidebar heading -- see places.js), its scale bar and attribution (as HTML, since both depend on the view), and whether there's anything on it worth printing.
+// Draws one page: its image, the town(s) on it (from the sidebar heading -- see places.js), and whether there's anything on it worth printing.
 export const capturePage = async (map, { center, zoom }) => {
   map.jumpTo({ center, zoom, bearing: 0, pitch: 0 });
   await settle(map);
@@ -172,8 +178,6 @@ export const capturePage = async (map, { center, zoom }) => {
   return {
     image: empty ? undefined : await snapshot(map),
     places: heading.hidden ? "" : heading.textContent,
-    scale: document.getElementById("map-scale").innerHTML,
-    attribution: document.getElementById("map-attribution").innerHTML,
     empty,
   };
 };

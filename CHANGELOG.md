@@ -9,7 +9,9 @@ Only includes notable updates.
 
 ## 2026-10-22
 
-- **[Detailed firefighter map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-maps/detailed/):** Cover Alaska and Hawaii, with flame lengths, water sources, and road access. There are no building risk scores there, so buildings are drawn from OpenStreetMap in white.
+- **[Detailed firefighter map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-maps/detailed/):**
+  - Cover Alaska and Hawaii, with flame lengths, water sources, and road access. There are no building risk scores there, so buildings are drawn from OpenStreetMap in white.
+  - Print a whole county: pick a county and a level of detail, and get an index page and one landscape page per piece of a grid over it, each with the legend, a key map, and the numbers of the pages next to it.
 
 ## 2026-09-25
 
