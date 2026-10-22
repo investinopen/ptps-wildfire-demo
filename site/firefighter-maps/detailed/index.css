@@ -17,7 +17,9 @@ body {
   gap: 4px 16px;
   background: #000000;
   padding: 8px 12px;
-  font: 15px/1.4 Inter, sans-serif;
+  font:
+    15px/1.4 Inter,
+    sans-serif;
 }
 #site-nav a {
   color: rgba(255, 255, 255, 0.8);
@@ -270,7 +272,7 @@ body {
   margin: 0;
 }
 /* over the rest of the sidebar, rather than pushing it down */
-#place-search-suggestions {
+.suggestions {
   position: absolute;
   top: 100%;
   left: 0;
@@ -284,15 +286,15 @@ body {
   border-radius: 4px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
-#place-search-suggestions[hidden] {
+.suggestions[hidden] {
   display: none;
 }
-#place-search-suggestions li {
+.suggestions li {
   padding: 5px 10px;
   cursor: pointer;
 }
-#place-search-suggestions li:hover,
-#place-search-suggestions li[aria-selected="true"] {
+.suggestions li:hover,
+.suggestions li[aria-selected="true"] {
   background: #eef3fb;
 }
 #place-search input {
@@ -364,8 +366,7 @@ body {
       rgb(209, 101, 11) 0 1.5px,
       transparent 1.5px 5.66px
     ),
-    linear-gradient(rgba(209, 101, 11, 0.08), rgba(209, 101, 11, 0.08)),
-    #ffffff;
+    linear-gradient(rgba(209, 101, 11, 0.08), rgba(209, 101, 11, 0.08)), #ffffff;
 }
 /* one row per class: its color + what that flame length means for attack */
 /* the flame length key: one row per class, with its pattern, a bold name, and a description */
@@ -465,6 +466,224 @@ body {
     white-space: normal;
   }
   .map-attribution .maplibregl-ctrl-attrib {
+    max-width: none;
+  }
+}
+
+/* the county atlas (see atlas.js) */
+.sidebar-button {
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  background: #f7f7f7;
+  font: 13px sans-serif;
+  cursor: pointer;
+}
+.sidebar-button:hover {
+  background: #eeeeee;
+}
+#atlas-dialog {
+  width: calc(100vw - 32px);
+  max-width: 480px;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  font: 14px/1.4 sans-serif;
+}
+#atlas-dialog h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+#atlas-dialog label {
+  display: block;
+  margin: 12px 0 4px;
+  font-weight: bold;
+}
+#atlas-county-search {
+  position: relative;
+  margin: 0;
+}
+#atlas-dialog input,
+#atlas-dialog select {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  font: inherit;
+}
+#atlas-dialog progress {
+  width: 100%;
+}
+#atlas-status:empty {
+  display: none;
+}
+.atlas-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+.atlas-actions button {
+  min-height: 36px;
+  padding: 6px 14px;
+  font: inherit;
+  cursor: pointer;
+}
+/* while the pages are being drawn, the map is sized to one page's map (see atlas-capture.js), without its controls, so labels don't steer around them */
+#map-container.atlas-capturing #map-area {
+  flex: none;
+}
+#map-container.atlas-capturing .maplibregl-ctrl,
+#map-container.atlas-capturing #sidebar-toggle {
+  display: none;
+}
+@media screen {
+  #atlas {
+    display: none;
+  }
+}
+@media print {
+  .sidebar-button {
+    display: none;
+  }
+  /* with an atlas made, printing prints it rather than the map on screen */
+  #atlas {
+    display: none;
+  }
+  body.atlas-ready > :not(#atlas) {
+    display: none !important;
+  }
+  body.atlas-ready #atlas {
+    display: block;
+  }
+  html:has(body.atlas-ready),
+  body.atlas-ready {
+    height: auto;
+  }
+  /* one sheet each, the size of a US Letter landscape page within the margins (see @page above), a little short so rounding can't spill onto a second sheet */
+  .atlas-page {
+    display: flex;
+    width: 10.2in;
+    height: 7.6in;
+    overflow: hidden;
+    break-after: page;
+  }
+  .atlas-page:last-child {
+    break-after: auto;
+  }
+  /* tighter than the map's own printout, since it has the page number, key map, and disclaimer too */
+  .atlas-page .sidebar {
+    overflow: hidden;
+    gap: 6px;
+  }
+  .atlas-map {
+    position: relative;
+    flex: none;
+  }
+  .atlas-map img {
+    display: block;
+  }
+  /* the pages next to this one, at its edges */
+  .atlas-neighbor {
+    position: absolute;
+    padding: 1px 6px;
+    background: #ffffff;
+    border: 1.5px solid #000000;
+    border-radius: 3px;
+    font: bold 13px sans-serif;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .atlas-neighbor.north {
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .atlas-neighbor.south {
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .atlas-neighbor.west {
+    left: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .atlas-neighbor.east {
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .atlas-page-number {
+    margin: 0;
+    font-weight: bold;
+  }
+  .atlas-disclaimer {
+    margin: 0;
+    font-size: 10px;
+  }
+  .atlas-key-map {
+    flex: none;
+    /* less than the sidebar's width, so the legend, attribution, and disclaimer still fit under it */
+    width: 60%;
+    height: auto;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+  }
+  .atlas-key-map rect,
+  .atlas-index-map rect {
+    fill: none;
+    stroke: rgba(0, 0, 0, 0.35);
+    stroke-width: 1;
+  }
+  /* bolder than on the small key maps, where they'd crowd out the map */
+  .atlas-index-map rect {
+    stroke: #333333;
+    stroke-width: 1.5;
+  }
+  .atlas-key-map rect.current {
+    fill: rgba(214, 40, 40, 0.45);
+    stroke: #d62828;
+    stroke-width: 4;
+  }
+  .atlas-key-map .outline,
+  .atlas-index-map .outline {
+    fill: none;
+    stroke: #000000;
+    stroke-width: 3;
+  }
+  .atlas-index {
+    flex-direction: column;
+    gap: 6px;
+    font: 13px/1.4 sans-serif;
+  }
+  .atlas-index h1 {
+    margin: 0;
+    font-size: 20px;
+  }
+  .atlas-index header p {
+    margin: 0;
+  }
+  .atlas-index-map {
+    flex: none;
+    width: 974px;
+    height: 620px;
+  }
+  .atlas-index-map text {
+    fill: #000000;
+    font-family: sans-serif;
+    font-weight: bold;
+    text-anchor: middle;
+    dominant-baseline: central;
+    paint-order: stroke;
+    stroke: #ffffff;
+    stroke-width: 3px;
+  }
+  .atlas-index .map-attribution .maplibregl-ctrl-attrib {
     max-width: none;
   }
 }

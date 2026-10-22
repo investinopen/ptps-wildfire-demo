@@ -23,6 +23,7 @@ import { bindOverviewMap } from "./overview.js";
 import { bindFallbackRoadLabels, bindLabelBlockers } from "./labels.js";
 import { ROAD_LABELS_LAYER } from "./layers.js";
 import { bindPlaceSearch } from "./search.js";
+import { bindAtlas } from "./atlas.js";
 
 buildLegendKeys();
 // before the map is created, so it starts out at the right width
@@ -71,6 +72,8 @@ const map = new maplibregl.Map({
   zoom: ZOOM,
   maxBounds: MAX_BOUNDS,
   minZoom: MIN_ZOOM,
+  // keeps the last frame drawn, so the county atlas can save it as an image (see atlas-capture.js)
+  canvasContextAttributes: { preserveDrawingBuffer: true },
 });
 
 // the symbols drawn in icons.js
@@ -119,6 +122,7 @@ document
 bindPlaceSearch(map);
 bindLayerToggles(map);
 bindBuildingsKey(map);
+bindAtlas(map);
 
 // resize so the canvas redraws at full page size instead of printing blank/clipped
 window.addEventListener("beforeprint", () => map.resize());
