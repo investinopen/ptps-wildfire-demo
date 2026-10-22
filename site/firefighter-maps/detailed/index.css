@@ -248,29 +248,6 @@ body {
     display: none;
   }
 }
-#live-data-spinner {
-  position: absolute;
-  top: 12px;
-  /* right of the sidebar toggle */
-  left: 48px;
-  z-index: 1;
-  width: 22px;
-  height: 22px;
-  border: 3px solid #ffffff;
-  border-top-color: #e0342a;
-  border-radius: 50%;
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
-  animation: live-data-spin 0.8s linear infinite;
-}
-#live-data-spinner[hidden] {
-  display: none;
-}
-@keyframes live-data-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 /* in the sidebar under the town name(s), rather than floated over the map */
 #place-search {
   position: relative;

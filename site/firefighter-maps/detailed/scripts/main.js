@@ -13,7 +13,6 @@ import { buildLegendKeys, bindLayerToggles } from "./legend.js";
 import { bindSidebarToggle } from "./sidebar.js";
 import { bindPlaceHeading } from "./places.js";
 import { bindOverviewMap } from "./overview.js";
-import { bindOverpassData } from "./overpass.js";
 import { bindFallbackRoadLabels, bindLabelBlockers } from "./labels.js";
 import { ROAD_LABELS_LAYER } from "./layers.js";
 import { bindPlaceSearch } from "./search.js";
@@ -36,7 +35,8 @@ if (hashPlace.length === 2 && Number(hashZoom) < MIN_ZOOM) {
   history.replaceState(null, "", `#${[MIN_ZOOM, ...hashPlace].join("/")}`);
 }
 
-const protocol = new pmtiles.Protocol();
+// metadata, so a source without its own attribution (the access tiles) takes the one in its file, with the date its data is from
+const protocol = new pmtiles.Protocol({ metadata: true });
 maplibregl.addProtocol("pmtiles", protocol.tile);
 maplibregl.addProtocol("flamehatch", flameHatchProtocol);
 
@@ -64,7 +64,6 @@ map.on("load", () => {
     });
   }
 });
-bindOverpassData(map);
 bindPlaceHeading(map);
 bindOverviewMap(map);
 bindLabelBlockers(map, { sourceId: "label-blockers" });

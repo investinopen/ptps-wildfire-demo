@@ -65,31 +65,16 @@ export const STYLE = {
       attribution:
         '<a href="https://carbonplan.org/research/climate-risk" target="_blank">CarbonPlan Open Climate Risk</a> (<a href="https://opendatacommons.org/licenses/odbl/" target="_blank">ODbL</a>), <a href="https://overturemaps.org" target="_blank">Overture Maps</a>',
     },
-    // hydrants and other water sources aren't in OpenFreeMap's POI set -- fetched
-    // live from OSM in overpass.js
-    water: {
-      type: "geojson",
-      data: { type: "FeatureCollection", features: [] },
-    },
-    // OpenFreeMap's own "oneway" field is unreliable (nearly every road reports
-    // oneway:1, real one-way streets are a small minority) -- fetched live from
-    // OSM's real oneway tags in overpass.js instead, same as hydrants
-    oneway: {
-      type: "geojson",
-      data: { type: "FeatureCollection", features: [] },
-    },
-    // access hazards -- also from OSM in overpass.js, along with the oneway streets
-    gates: {
-      type: "geojson",
-      data: { type: "FeatureCollection", features: [] },
-    },
-    "dead-ends": {
-      type: "geojson",
-      data: { type: "FeatureCollection", features: [] },
-    },
-    "weight-limits": {
-      type: "geojson",
-      data: { type: "FeatureCollection", features: [] },
+    // water sources and road access (one-way streets, gates, dead ends, bridge weight
+    // limits) from OSM, as one layer each -- OpenFreeMap's tiles don't include
+    // hydrants/tanks/gates at all, its "oneway" field is unreliable (nearly every road
+    // reports oneway:1), and finding dead ends takes how roads connect, which its tiles
+    // don't keep. Built daily by .github/workflows/build-access-tiles.yml and published
+    // alongside this page; the file's attribution says what date its data is from.
+    "osm-access": {
+      type: "vector",
+      url:
+        "pmtiles://" + new URL("../osm-access.pmtiles", import.meta.url).href,
     },
     // USFS Wildfire Risk to Communities (public domain); exportImage per-tile via
     // the {bbox-epsg-3857} template maplibre substitutes for ArcGIS image services

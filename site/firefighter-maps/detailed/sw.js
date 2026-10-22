@@ -75,10 +75,7 @@ registerRoute(
 );
 
 // place search (Photon) is live data -- always prefer the network, and only fall back
-// to a short-lived cache entry if there's genuinely no connection. Water sources/road
-// access (Overpass) aren't handled here: scripts/overpass.js caches those itself, so it
-// can show a saved response while it waits on a fresh one, and so a cached response
-// can't stand in for a failed server, which would keep it from trying the next one.
+// to a short-lived cache entry if there's genuinely no connection
 registerRoute(
   ({ url }) => url.hostname === "photon.komoot.io",
   new NetworkFirst({

@@ -95,12 +95,13 @@ export const ROADS_LAYER = {
   },
 };
 
-// fed by live Overpass data (see OVERPASS_GROUPS in overpass.js), not roadsSource -- its "oneway"
-// field isn't reliable in this tileset
+// from the OSM access tiles (see style.js), not roadsSource -- its "oneway" field isn't
+// reliable in this tileset
 export const ONEWAY_ARROWS_LAYER = {
   id: "oneway-arrows",
   type: "symbol",
-  source: "oneway",
+  source: "osm-access",
+  "source-layer": "oneway",
   minzoom: 15,
   layout: {
     visibility: "visible",
@@ -433,12 +434,13 @@ export const HOUSENUMBERS_LAYER = {
   },
 };
 
-// the three layers below all draw from the one "water" source (see OVERPASS_GROUPS
-// in overpass.js), split by the "kind" each feature is tagged with
+// the three layers below all draw from the access tiles' one "water" layer (see
+// ptps_wildfire_demo/access_tiles.py), split by the "kind" each feature is tagged with
 export const HYDRANTS_LAYER = {
   id: "hydrants",
   type: "circle",
-  source: "water",
+  source: "osm-access",
+  "source-layer": "water",
   filter: ["==", ["get", "kind"], "hydrant"],
   minzoom: 13,
   layout: { visibility: "visible" },
@@ -455,7 +457,8 @@ export const HYDRANTS_LAYER = {
 export const WATER_SOURCES_LAYER = {
   id: "water-sources",
   type: "circle",
-  source: "water",
+  source: "osm-access",
+  "source-layer": "water",
   filter: ["==", ["get", "kind"], "water_source"],
   minzoom: 13,
   layout: { visibility: "visible" },
@@ -472,7 +475,8 @@ export const WATER_SOURCES_LAYER = {
 export const POOLS_LAYER = {
   id: "pools",
   type: "circle",
-  source: "water",
+  source: "osm-access",
+  "source-layer": "water",
   filter: ["==", ["get", "kind"], "pool"],
   minzoom: 13,
   layout: { visibility: "visible" },
@@ -484,14 +488,15 @@ export const POOLS_LAYER = {
   },
 };
 
-// access hazards for an engine, fed by live Overpass data (see OVERPASS_GROUPS in
-// overpass.js) at the same street-level zoom as the one-way arrows. Symbols are drawn in
+// access hazards for an engine, from the access tiles (see style.js) at the same
+// street-level zoom as the one-way arrows. Symbols are drawn in
 // icons.js, and always shown even when they overlap -- a hidden gate is worse than a
 // crowded map.
 export const DEAD_ENDS_LAYER = {
   id: "dead-ends",
   type: "symbol",
-  source: "dead-ends",
+  source: "osm-access",
+  "source-layer": "dead-ends",
   minzoom: ONEWAY_ARROWS_LAYER.minzoom,
   layout: {
     visibility: "visible",
@@ -503,7 +508,8 @@ export const DEAD_ENDS_LAYER = {
 export const GATES_LAYER = {
   id: "gates",
   type: "symbol",
-  source: "gates",
+  source: "osm-access",
+  "source-layer": "gates",
   minzoom: ONEWAY_ARROWS_LAYER.minzoom,
   layout: {
     visibility: "visible",
@@ -517,7 +523,8 @@ export const GATES_LAYER = {
 export const WEIGHT_LIMITS_LAYER = {
   id: "weight-limits",
   type: "symbol",
-  source: "weight-limits",
+  source: "osm-access",
+  "source-layer": "weight-limits",
   minzoom: ONEWAY_ARROWS_LAYER.minzoom,
   layout: {
     visibility: "visible",
