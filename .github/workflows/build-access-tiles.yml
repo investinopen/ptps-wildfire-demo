@@ -65,8 +65,9 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked
 
+      # wget rather than curl, for progress that reads well in the log: a line per 32 MB, rather than a meter redrawn in place. It also retries and resumes if the connection drops partway.
       - name: Download the US extract
-        run: curl --fail --silent --show-error --location --user-agent "$USER_AGENT" --output us.osm.pbf https://download.geofabrik.de/north-america/us-latest.osm.pbf
+        run: wget --progress=dot:giga --user-agent "$USER_AGENT" --output-document us.osm.pbf https://download.geofabrik.de/north-america/us-latest.osm.pbf
 
       # down to just what access_tiles.py reads (with the nodes the roads use), and the area the map shows, which takes it from about 12 GB to about 2.5 GB
       - name: Filter the extract
