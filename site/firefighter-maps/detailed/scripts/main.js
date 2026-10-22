@@ -25,10 +25,10 @@ bindSidebarToggle();
 
 const CENTER = [-105.375925, 40.052187]; // [lon, lat]
 const ZOOM = 16.03;
-// the contiguous US, with a little margin -- the building risk scores only cover it (see buildings.js), and not zooming out past it keeps the map from asking the tile and image servers for the whole world at once. The overview map in the sidebar shows the wider area.
+// the 50 states, with a little margin, since the flame lengths cover them all -- the building risk scores only cover the contiguous US (see buildings.js), so Alaska and Hawaii have no buildings. Not zooming out past it keeps the map from asking the tile and image servers for the whole world at once. Stops at the antimeridian, which leaves out Alaska's westernmost Aleutians (the Near Islands), since a box can't cross it. The overview map in the sidebar shows the wider area.
 const MAX_BOUNDS = [
-  [-125.5, 24], // [west, south]
-  [-66, 50], // [east, north]
+  [-180, 18.5], // [west, south]
+  [-66, 72], // [east, north]
 ];
 const MIN_ZOOM = 4;
 // MapLibre ignores a #zoom/lat/lng zoomed out past minZoom, opening at CENTER instead, so a link like that is moved in to MIN_ZOOM to still open where it points

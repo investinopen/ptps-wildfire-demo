@@ -28,7 +28,7 @@ concurrency:
 
 env:
   # the same as the map's MAX_BOUNDS in site/firefighter-maps/detailed/scripts/main.js, as west,south,east,north
-  BBOX: -125.5,24,-66,50
+  BBOX: -180,18.5,-66,72
   # https://operations.osmfoundation.org/policies/ -- identifies who's downloading
   USER_AGENT: ptps-wildfire-demo (https://github.com/investinopen/ptps-wildfire-demo)
 
