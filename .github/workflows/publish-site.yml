@@ -1,6 +1,6 @@
 name: Publish Pages site
 
-# Renders the site without executing any code: the pages that run against live data are executed by refresh-notebooks.yml, and their results are pulled in from its latest successful run. So publishing doesn't depend on any outside data source being up.
+# Renders the site without executing any code: the pages that run against live data are executed by refresh-notebooks.yml, and the detailed firefighter map's water and road-access tiles are built by build-access-tiles.yml, with each pulled in from its latest successful run. So publishing doesn't depend on any outside data source being up.
 
 on:
   push:
@@ -10,10 +10,11 @@ on:
       - site/**
       - ptps_wildfire_demo/**
       - .github/workflows/publish-site.yml
-  # picks up freshly executed pages
+  # picks up freshly executed pages and tiles
   workflow_run:
     workflows:
       - Refresh notebooks
+      - Build access tiles
     types:
       - completed
   workflow_dispatch:
@@ -54,6 +55,28 @@ jobs:
           name: executed-pages
           path: site
           run-id: ${{ steps.refresh.outputs.run-id }}
+          github-token: ${{ github.token }}
+
+      # Unlike the pages, the map has no fallback without these, so publishing stops rather than deploying it broken. The artifacts last 90 days, far longer than between daily builds.
+      - name: Find the latest access tiles
+        id: tiles
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run_id=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow build-access-tiles.yml --branch main --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+          if [ -z "$run_id" ]; then
+            echo "::error::No successful run of build-access-tiles.yml to take the detailed map's tiles from"
+            exit 1
+          fi
+          echo "run-id=$run_id" >> "$GITHUB_OUTPUT"
+
+      # published along with the rest of the detailed map's folder (see site/_quarto.yml)
+      - name: Download access tiles
+        uses: actions/download-artifact@v8
+        with:
+          name: access-tiles
+          path: site/firefighter-maps/detailed
+          run-id: ${{ steps.tiles.outputs.run-id }}
           github-token: ${{ github.token }}
 
       # Python is only needed if there's no refreshed copy of a .qmd page (e.g. its artifact expired), in which case the render executes it after all
