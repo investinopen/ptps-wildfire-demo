@@ -2,6 +2,7 @@ import {
   BUILDING_MIN_ZOOM,
   RISK_BINS,
   NO_RISK_COLOR,
+  NO_RISK_DATA_COLOR,
   RISK_PROPERTY,
   SOURCE_LAYER,
 } from "./buildings.js";
@@ -413,6 +414,30 @@ export const BUILDINGS_OUTLINE_LAYER = {
     "line-color": ROAD,
     "line-width": ["interpolate", ["linear"], ["zoom"], 14.5, 1, 18, 2],
   },
+};
+
+// OpenStreetMap's buildings where there are no risk scores (see NO_RISK_DATA_BOUNDS), drawn the same way but white, so they don't read as the scored buildings' zero-risk gray
+const OSM_BUILDINGS = { source: "osmBuildings", "source-layer": "building" };
+export const OSM_BUILDINGS_HALO_LAYER = {
+  ...BUILDINGS_HALO_LAYER,
+  ...OSM_BUILDINGS,
+  id: "osm-buildings-halo",
+};
+export const OSM_BUILDINGS_FILL_LAYER = {
+  ...BUILDINGS_FILL_LAYER,
+  ...OSM_BUILDINGS,
+  id: "osm-buildings-fill",
+  paint: { "fill-color": NO_RISK_DATA_COLOR },
+};
+export const OSM_BUILDINGS_OUTLINE_LAYER = {
+  ...BUILDINGS_OUTLINE_LAYER,
+  ...OSM_BUILDINGS,
+  id: "osm-buildings-outline",
+};
+export const OSM_BUILDING_OBSTACLES_LAYER = {
+  ...BUILDING_OBSTACLES_LAYER,
+  ...OSM_BUILDINGS,
+  id: "osm-building-obstacles",
 };
 
 export const HOUSENUMBERS_LAYER = {
