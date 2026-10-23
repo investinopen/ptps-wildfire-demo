@@ -122,7 +122,8 @@ document
 bindPlaceSearch(map);
 bindLayerToggles(map);
 bindBuildingsKey(map);
-bindAtlas(map);
+// at the zoom the map opens at, which is close enough to show house numbers
+bindAtlas(map, { zoom: ZOOM });
 
 // resize so the canvas redraws at full page size instead of printing blank/clipped
 window.addEventListener("beforeprint", () => map.resize());

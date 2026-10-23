@@ -505,8 +505,7 @@ body {
   position: relative;
   margin: 0;
 }
-#atlas-dialog input,
-#atlas-dialog select {
+#atlas-dialog input {
   width: 100%;
   box-sizing: border-box;
   min-height: 36px;

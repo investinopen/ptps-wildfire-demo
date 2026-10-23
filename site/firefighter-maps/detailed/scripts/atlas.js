@@ -1,4 +1,4 @@
-// Printing a whole county as an atlas: pick a county and a level of detail, and the county is split into a grid of pages (atlas-grid.js), each drawn by the map itself (atlas-capture.js) and laid out for printing (atlas-pages.js) after an index page. Pages with no roads or buildings on them are left out.
+// Printing a whole county as an atlas: pick a county, and it's split into a grid of pages (atlas-grid.js) at the zoom the map opens at, so house numbers show, each drawn by the map itself (atlas-capture.js) and laid out for printing (atlas-pages.js) after an index page. Pages with no roads or buildings on them are left out.
 import { bindCombobox } from "./combobox.js";
 import { fetchPlaces } from "./search.js";
 import { atlasGrid, numberPages, scaleDenominator } from "./atlas-grid.js";
@@ -17,17 +17,10 @@ const NOMINATIM_LOOKUP_URL = "https://nominatim.openstreetmap.org/lookup";
 const SIMPLIFY_DEGREES = 0.0005;
 const LOOKUP_TIMEOUT_MS = 20_000;
 
-// the zooms to choose from, with what shows at each (see BUILDING_MIN_ZOOM in buildings.js and the minzooms in layers.js)
-const DETAIL_LEVELS = [
-  { zoom: 14, shows: "roads only" },
-  { zoom: 14.5, shows: "roads and buildings" },
-  { zoom: 15, shows: "plus one-way arrows" },
-  { zoom: 16, shows: "plus house numbers" },
-];
-// picked by default: the most detailed level with at most this many pages
-const DEFAULT_MAX_PAGES = 150;
-// more than this would take hours to draw, and more memory than a browser has to hold the images
-const MAX_PAGES = 1000;
+// more than this would take over an hour to draw, and more memory than a browser has to hold the images (roughly 0.3-0.5 MB a page)
+const MAX_PAGES = 2000;
+// about how long each page takes to draw, for the estimate before starting
+const SECONDS_PER_PAGE = 2;
 // how much neighboring pages overlap (as a fraction of a page), so nothing falls on a seam
 const OVERLAP = 0.05;
 // around the area on the index page, in CSS pixels
@@ -68,16 +61,16 @@ const middleLatitude = ({ type, coordinates }) => {
 const scaleText = (lat, zoom) =>
   `1:${(Math.round(scaleDenominator(lat, zoom) / 100) * 100).toLocaleString("en-US")}`;
 
-export const bindAtlas = (map) => {
+// `zoom` is the one the pages are drawn at
+export const bindAtlas = (map, { zoom }) => {
   const dialog = document.getElementById("atlas-dialog");
-  const detail = document.getElementById("atlas-detail");
   const status = document.getElementById("atlas-status");
   const progress = document.getElementById("atlas-progress");
   const makeButton = document.getElementById("atlas-make");
   const printButton = document.getElementById("atlas-print");
   const atlas = document.getElementById("atlas");
 
-  // the county picked, as { title, geometry, latitude, grids } (a grid per detail level)
+  // the county picked, as { title, geometry, latitude, cells } (its pages)
   let county;
   // the atlas being made, if any, so it can be stopped
   let run;
@@ -97,28 +90,9 @@ export const bindAtlas = (map) => {
     progress.hidden = true;
   };
 
-  const showDetailLevels = () => {
-    const options = DETAIL_LEVELS.map(({ zoom, shows }, i) => {
-      const pages = county.grids[i].cells.length;
-      const option = document.createElement("option");
-      option.value = i;
-      option.textContent = `${scaleText(county.latitude, zoom)}: ${shows} (up to ${pages} pages)`;
-      option.disabled = pages > MAX_PAGES;
-      return option;
-    });
-    detail.replaceChildren(...options);
-    const fitting = options.filter(
-      (o, i) => county.grids[i].cells.length <= DEFAULT_MAX_PAGES,
-    );
-    detail.value = (fitting.at(-1) ?? options[0]).value;
-    detail.disabled = false;
-    makeButton.disabled = options.every((o) => o.disabled);
-  };
-
   const chooseCounty = async (feature) => {
     discard();
     county = undefined;
-    detail.disabled = true;
     makeButton.disabled = true;
     setStatus("Looking up the county's boundary…");
     try {
@@ -127,12 +101,25 @@ export const bindAtlas = (map) => {
         title,
         geometry,
         latitude: middleLatitude(geometry),
-        grids: DETAIL_LEVELS.map(({ zoom }) =>
-          atlasGrid(geometry, { zoom, ...PAGE_MAP_SIZE, overlap: OVERLAP }),
-        ),
+        cells: atlasGrid(geometry, {
+          zoom,
+          ...PAGE_MAP_SIZE,
+          overlap: OVERLAP,
+        }).cells,
       };
-      showDetailLevels();
-      setStatus(`${title}: pick how detailed the pages should be.`);
+      const pages = county.cells.length.toLocaleString("en-US");
+      const scale = scaleText(county.latitude, zoom);
+      if (county.cells.length > MAX_PAGES) {
+        setStatus(
+          `${title} would take ${pages} pages at ${scale}, more than this can print at once.`,
+        );
+        return;
+      }
+      makeButton.disabled = false;
+      const minutes = Math.ceil((county.cells.length * SECONDS_PER_PAGE) / 60);
+      setStatus(
+        `${title}: up to ${pages} pages at ${scale}, about ${minutes} min to draw.`,
+      );
     } catch (error) {
       console.error("County lookup failed:", error);
       setStatus("Couldn't get that county's boundary. Try again?");
@@ -140,7 +127,7 @@ export const bindAtlas = (map) => {
   };
 
   // draws every page, then the index, returning the pages with something on them, numbered -- or nothing if stopped partway
-  const drawPages = async (cells, zoom, thisRun) => {
+  const drawPages = async (cells, thisRun) => {
     const drawn = [];
     const started = Date.now();
     await withMapSize(map, PAGE_MAP_SIZE, async () => {
@@ -177,16 +164,15 @@ export const bindAtlas = (map) => {
   const make = async () => {
     discard();
     const thisRun = (run = { cancelled: false });
-    const level = DETAIL_LEVELS[detail.value];
-    const { cells } = county.grids[detail.value];
-    makeButton.disabled = detail.disabled = true;
+    const { cells } = county;
+    makeButton.disabled = true;
     progress.hidden = false;
     try {
-      const result = await drawPages(cells, level.zoom, thisRun);
+      const result = await drawPages(cells, thisRun);
       if (!result) return;
       const { pages, index } = result;
       const skipped = cells.length - pages.length;
-      const details = `${pages.length} pages at ${scaleText(county.latitude, level.zoom)}, made ${new Date().toLocaleDateString()}. ${document.getElementById("disclaimer-banner").textContent.replace(/\s+/g, " ").trim()}`;
+      const details = `${pages.length} pages at ${scaleText(county.latitude, zoom)}, made ${new Date().toLocaleDateString()}. ${document.getElementById("disclaimer-banner").textContent.replace(/\s+/g, " ").trim()}`;
       atlas.replaceChildren(
         indexPage({ title: county.title, details, index, pages }),
         ...pages.map((page) =>
@@ -214,7 +200,7 @@ export const bindAtlas = (map) => {
       setStatus("Something went wrong drawing the pages. Try again?");
     } finally {
       if (run === thisRun) run = undefined;
-      makeButton.disabled = detail.disabled = false;
+      makeButton.disabled = false;
       progress.hidden = true;
     }
   };
@@ -241,8 +227,7 @@ export const bindAtlas = (map) => {
   // closing (including with Escape) stops or throws away the atlas, so printing the map afterward prints the map
   dialog.addEventListener("close", () => {
     discard();
-    makeButton.disabled = !county;
-    detail.disabled = !county;
+    makeButton.disabled = !county || county.cells.length > MAX_PAGES;
   });
   document
     .getElementById("atlas-close")
