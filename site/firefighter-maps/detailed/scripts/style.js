@@ -1,9 +1,6 @@
 // the map's sources and layers (in draw order) -- kept separate from main.js so it can be loaded, and validated, without a browser
-import {
-  NO_RISK_DATA_BOUNDS,
-  OVERTURE_BUILDINGS_URL,
-  PMTILES_URL,
-} from "./buildings.js";
+import { NO_RISK_DATA_BOUNDS, PMTILES_URL } from "./buildings.js";
+import { OVERTURE_ADDRESSES_URL, OVERTURE_BUILDINGS_URL } from "./overture.js";
 import { FLAME_LENGTH_URL } from "./rasters.js";
 import {
   HILLSHADE_LAYER,
@@ -31,6 +28,7 @@ import {
   OVERTURE_BUILDINGS_OUTLINE_LAYER,
   OVERTURE_BUILDING_OBSTACLES_LAYER,
   HOUSENUMBERS_LAYER,
+  OVERTURE_HOUSENUMBERS_LAYER,
   HYDRANTS_LAYER,
   WATER_SOURCES_LAYER,
   POOLS_LAYER,
@@ -74,11 +72,15 @@ export const STYLE = {
       type: "vector",
       url: OPENFREEMAP_URL,
     },
-    // only fetched where buildings.js has no risk scores; attributed by the file itself
+    // only fetched where buildings.js has no risk scores
     overtureBuildings: {
       type: "vector",
       url: "pmtiles://" + OVERTURE_BUILDINGS_URL,
       bounds: NO_RISK_DATA_BOUNDS,
+    },
+    overtureAddresses: {
+      type: "vector",
+      url: "pmtiles://" + OVERTURE_ADDRESSES_URL,
     },
     buildings: {
       type: "vector",
@@ -132,12 +134,13 @@ export const STYLE = {
     HYDRANTS_LAYER,
     DEAD_ENDS_LAYER,
     GATES_LAYER,
-    // Road names first, then the fallbacks for roads they couldn't fit on, then house numbers, then the invisible building/driveway obstacles, then route numbers -- so route numbers avoid all of those -- over everything else below (see ROAD_LABELS_LAYER).
+    // Road names first, then the fallbacks for roads they couldn't fit on, then house numbers (Overture's, then OpenStreetMap's for the ones it's missing), then the invisible building/driveway obstacles, then route numbers -- so route numbers avoid all of those -- over everything else below (see ROAD_LABELS_LAYER).
     ROUTE_SHIELDS_LAYER,
     DRIVEWAY_OBSTACLES_LAYER,
     BUILDING_OBSTACLES_LAYER,
     OVERTURE_BUILDING_OBSTACLES_LAYER,
     HOUSENUMBERS_LAYER,
+    OVERTURE_HOUSENUMBERS_LAYER,
     ROAD_LABEL_FALLBACKS_LAYER,
     ROAD_LABELS_LAYER,
     // bridge weight limits over the road names, which steer around them -- a limit an engine exceeds matters more than the road's name

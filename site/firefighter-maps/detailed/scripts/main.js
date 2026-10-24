@@ -3,7 +3,8 @@
 import * as maplibregl from "https://cdn.jsdelivr.net/npm/maplibre-gl@6/dist/maplibre-gl.mjs";
 import { flameHatchProtocol } from "./rasters.js";
 import { ACCESS_TILES_URL, STYLE } from "./style.js";
-import { OVERTURE_BUILDINGS_URL, PMTILES_URL } from "./buildings.js";
+import { PMTILES_URL } from "./buildings.js";
+import { OVERTURE_ADDRESSES_URL, OVERTURE_BUILDINGS_URL } from "./overture.js";
 import { CachedSource } from "./pmtiles-cache.js";
 import {
   ICONS,
@@ -41,10 +42,15 @@ if (hashPlace.length === 2 && Number(hashZoom) < MIN_ZOOM) {
   history.replaceState(null, "", `#${[MIN_ZOOM, ...hashPlace].join("/")}`);
 }
 
-// metadata, so a source without its own attribution takes the one in its file -- the access tiles' with the date its data is from, Overture's buildings' crediting OSM and Overture
+// metadata, so a source without its own attribution takes the one in its file -- the access tiles' with the date its data is from, Overture's crediting OSM and Overture
 const protocol = new pmtiles.Protocol({ metadata: true });
 // read through CachedSource, so areas viewed before still draw offline
-for (const url of [ACCESS_TILES_URL, PMTILES_URL, OVERTURE_BUILDINGS_URL]) {
+for (const url of [
+  ACCESS_TILES_URL,
+  PMTILES_URL,
+  OVERTURE_BUILDINGS_URL,
+  OVERTURE_ADDRESSES_URL,
+]) {
   protocol.add(
     new pmtiles.PMTiles(new CachedSource(new pmtiles.FetchSource(url))),
   );

@@ -28,6 +28,14 @@ test("every layer's source is defined", () => {
   }
 });
 
+// symbols are placed from the end of the list back, so this has OSM's duplicates collide with Overture's rather than the other way around
+test("Overture's house numbers are placed ahead of OpenStreetMap's", () => {
+  const ids = STYLE.layers.map((l) => l.id);
+  expect(ids.indexOf("overture-housenumbers")).toBeGreaterThan(
+    ids.indexOf("housenumbers"),
+  );
+});
+
 test("layer IDs are unique", () => {
   const ids = STYLE.layers.map((l) => l.id);
   expect(new Set(ids).size).toBe(ids.length);

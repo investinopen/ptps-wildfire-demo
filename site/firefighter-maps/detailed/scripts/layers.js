@@ -462,6 +462,15 @@ export const HOUSENUMBERS_LAYER = {
   },
 };
 
+// Overture's house numbers, placed ahead of OpenStreetMap's. Where both have an address they're nearly always at the same spot (95% within 6 m around Gold Hill, CO, where both come from the county), so OSM's copy collides with Overture's and isn't drawn, leaving OSM's only where Overture has no number there.
+export const OVERTURE_HOUSENUMBERS_LAYER = {
+  ...HOUSENUMBERS_LAYER,
+  id: "overture-housenumbers",
+  source: "overtureAddresses",
+  "source-layer": "address",
+  layout: { ...HOUSENUMBERS_LAYER.layout, "text-field": ["get", "number"] },
+};
+
 // the three layers below all draw from the access tiles' one "water" layer (see
 // ptps_wildfire_demo/access_tiles.py), split by the "kind" each feature is tagged with
 export const HYDRANTS_LAYER = {

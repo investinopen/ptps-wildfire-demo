@@ -70,6 +70,7 @@ export const bindLayerToggles = (map) => {
     "overture-buildings-fill",
     "overture-buildings-outline",
     "housenumbers",
+    "overture-housenumbers",
     "building-obstacles",
     "overture-building-obstacles",
   ]);

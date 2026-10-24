@@ -5,6 +5,7 @@ Only includes notable updates.
 ## 2026-10-24
 
 - **[Detailed firefighter map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-maps/detailed/):** Draw Alaska and Hawaii's buildings from Overture Maps rather than OpenStreetMap, which was missing nearly all of them outside of towns.
+- **[Detailed firefighter map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-maps/detailed/):** Add house numbers from Overture Maps, which has far more of them than OpenStreetMap in most rural areas, keeping OpenStreetMap's where Overture has none.
 
 ## 2026-10-22
 
