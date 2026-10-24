@@ -626,10 +626,14 @@ body {
     margin: 0;
     font-size: 10px;
   }
+  /* the same size as the disclaimer, a little smaller than on the map's own printout -- with Overture's addresses and buildings, it runs to six or seven lines */
+  .atlas-page .map-attribution .maplibregl-ctrl-attrib {
+    font-size: 10px;
+  }
   .atlas-key-map {
     flex: none;
     /* less than the sidebar's width, so the legend, attribution, and disclaimer still fit under it */
-    width: 60%;
+    width: 50%;
     height: auto;
     border: 1px solid rgba(0, 0, 0, 0.2);
   }

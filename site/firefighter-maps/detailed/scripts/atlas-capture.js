@@ -14,7 +14,7 @@ const CONTENT_LAYERS = [
   "driveways",
   "trails",
   "buildings-fill",
-  "osm-buildings-fill",
+  "overture-buildings-fill",
 ];
 // left off of the index page's map
 const INDEX_HIDDEN_LAYERS = ["hillshade", "flame-length"];
