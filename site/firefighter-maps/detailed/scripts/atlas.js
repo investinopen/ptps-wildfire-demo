@@ -1,7 +1,8 @@
-// Printing a whole county as an atlas: pick a county, and it's split into a grid of pages (atlas-grid.js) at the zoom the map opens at, so house numbers show, each drawn by the map itself (atlas-capture.js) and laid out for printing (atlas-pages.js) after an index page. Pages with no roads or buildings on them are left out.
+// Printing a whole county as an atlas: pick a county, and it's split into a grid of pages (atlas-grid.js), each drawn by the map itself (atlas-capture.js) and laid out for printing (atlas-pages.js) after an index page. Pages with no roads or buildings on them are left out.
 import { bindCombobox } from "./combobox.js";
 import { fetchPlaces } from "./search.js";
 import { atlasGrid, numberPages, scaleDenominator } from "./atlas-grid.js";
+import { HOUSENUMBERS_LAYER } from "./layers.js";
 import { captureIndex, capturePage, withMapSize } from "./atlas-capture.js";
 import {
   INDEX_MAP_SIZE,
@@ -17,6 +18,8 @@ const NOMINATIM_LOOKUP_URL = "https://nominatim.openstreetmap.org/lookup";
 const SIMPLIFY_DEGREES = 0.0005;
 const LOOKUP_TIMEOUT_MS = 20_000;
 
+// the pages are drawn at the most zoomed-out view that still shows everything -- house numbers come in last, at the same zoom as dead ends, gates, and weight limits (see layers.js) -- so a county takes as few pages as it can
+const ZOOM = HOUSENUMBERS_LAYER.minzoom;
 // more than this would take over an hour to draw, and more memory than a browser has to hold the images (roughly 0.3-0.5 MB a page)
 const MAX_PAGES = 2000;
 // about how long each page takes to draw, for the estimate before starting
@@ -61,8 +64,7 @@ const middleLatitude = ({ type, coordinates }) => {
 const scaleText = (lat, zoom) =>
   `1:${(Math.round(scaleDenominator(lat, zoom) / 100) * 100).toLocaleString("en-US")}`;
 
-// `zoom` is the one the pages are drawn at
-export const bindAtlas = (map, { zoom }) => {
+export const bindAtlas = (map) => {
   const dialog = document.getElementById("atlas-dialog");
   const status = document.getElementById("atlas-status");
   const progress = document.getElementById("atlas-progress");
@@ -102,13 +104,13 @@ export const bindAtlas = (map, { zoom }) => {
         geometry,
         latitude: middleLatitude(geometry),
         cells: atlasGrid(geometry, {
-          zoom,
+          zoom: ZOOM,
           ...PAGE_MAP_SIZE,
           overlap: OVERLAP,
         }).cells,
       };
       const pages = county.cells.length.toLocaleString("en-US");
-      const scale = scaleText(county.latitude, zoom);
+      const scale = scaleText(county.latitude, ZOOM);
       if (county.cells.length > MAX_PAGES) {
         setStatus(
           `${title} would take ${pages} pages at ${scale}, more than this can print at once.`,
@@ -143,7 +145,10 @@ export const bindAtlas = (map, { zoom }) => {
             (left ? ` (about ${left} min left)…` : "…"),
         );
         progress.value = i / cells.length;
-        const result = await capturePage(map, { center: cell.center, zoom });
+        const result = await capturePage(map, {
+          center: cell.center,
+          zoom: ZOOM,
+        });
         if (!result.empty)
           drawn.push({ ...cell, ...result, sidebar: sidebarCopy() });
       }
@@ -172,7 +177,7 @@ export const bindAtlas = (map, { zoom }) => {
       if (!result) return;
       const { pages, index } = result;
       const skipped = cells.length - pages.length;
-      const details = `${pages.length} pages at ${scaleText(county.latitude, zoom)}, made ${new Date().toLocaleDateString()}. ${document.getElementById("disclaimer-banner").textContent.replace(/\s+/g, " ").trim()}`;
+      const details = `${pages.length} pages at ${scaleText(county.latitude, ZOOM)}, made ${new Date().toLocaleDateString()}. ${document.getElementById("disclaimer-banner").textContent.replace(/\s+/g, " ").trim()}`;
       atlas.replaceChildren(
         indexPage({ title: county.title, details, index, pages }),
         ...pages.map((page) =>
