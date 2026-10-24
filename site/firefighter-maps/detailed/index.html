@@ -78,7 +78,7 @@
         </form>
         <!-- see atlas.js -->
         <button type="button" id="atlas-open" class="sidebar-button" disabled>
-          Print a whole county…
+          Print an area…
         </button>
         <!-- see overview.js -->
         <div id="overview-map"></div>
@@ -177,41 +177,35 @@
           aria-controls="sidebar"
           aria-expanded="true"
         ></button>
+        <!-- shown while the area to print is being drawn -- see atlas.js -->
+        <div id="atlas-draw-banner" role="status" hidden>
+          <span>Drag a rectangle over the area to print.</span>
+          <button type="button" id="atlas-use-view">
+            Use what's on screen
+          </button>
+          <button type="button" id="atlas-draw-cancel">Cancel</button>
+        </div>
       </div>
     </div>
     <!-- see atlas.js -->
     <dialog id="atlas-dialog" aria-labelledby="atlas-title">
-      <h2 id="atlas-title">Print a whole county</h2>
+      <h2 id="atlas-title">Print an area</h2>
       <p>
-        Splits a county into pages of this map, one per landscape sheet, with an
-        index page first. Each page is drawn with the layers that are on now.
-        Keep this tab in front while the pages are drawn, since browsers pause
-        drawing in background tabs. It picks up where it left off when you come
-        back.
+        Splits the area into pages of this map, one per landscape sheet, as
+        outlined on the map, with an index page first. Each page is drawn with
+        the layers that are on now. Keep this tab in front while the pages are
+        drawn, since browsers pause drawing in background tabs. It picks up
+        where it left off when you come back.
       </p>
-      <form id="atlas-county-search" autocomplete="off">
-        <label for="atlas-county-input">County</label>
-        <input
-          type="search"
-          id="atlas-county-input"
-          placeholder="Search for a county…"
-          role="combobox"
-          aria-autocomplete="list"
-          aria-controls="atlas-county-suggestions"
-          aria-expanded="false"
-        />
-        <ul
-          id="atlas-county-suggestions"
-          class="suggestions"
-          role="listbox"
-          hidden
-        ></ul>
-      </form>
+      <label for="atlas-scale">Scale</label>
+      <!-- filled in by atlas.js once an area is drawn, leaving out scales too zoomed out for house numbers at its latitude -->
+      <select id="atlas-scale"></select>
       <p id="atlas-status" role="status"></p>
       <progress id="atlas-progress" hidden></progress>
       <div class="atlas-actions">
         <button type="button" id="atlas-make" disabled>Make pages</button>
         <button type="button" id="atlas-print" hidden>Print…</button>
+        <button type="button" id="atlas-redraw">Draw again</button>
         <button type="button" id="atlas-close">Close</button>
       </div>
     </dialog>

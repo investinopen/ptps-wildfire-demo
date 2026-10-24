@@ -42,7 +42,8 @@ const keyMap = ({ image, outline, rects }, pages, { numbered, current }) => {
       {
         x: x + w / 2,
         y: y + h / 2,
-        "font-size": Math.min(w, h) * 0.4,
+        // capped, so a few big pages on the index don't get numbers that cover the map
+        "font-size": Math.min(w * 0.4, h * 0.4, 32),
       },
       [String(number)],
     );
@@ -116,11 +117,11 @@ export const mapPage = ({ title, page, total, index, pages }) => {
   const { sidebar } = page;
   const heading = sidebar.querySelector(".map-places");
   heading.hidden = false;
-  heading.textContent = title;
+  // the town(s) on this page, or the whole area's if it has none of its own
+  heading.textContent = page.places || title;
   heading.after(
     element("p", { class: "atlas-page-number" }, [
       `Page ${page.number} of ${total}`,
-      ...(page.places ? [element("br"), page.places] : []),
     ]),
     keyMap(index, pages, { numbered: false, current: page.number }),
   );

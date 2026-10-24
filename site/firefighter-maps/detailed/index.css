@@ -501,11 +501,15 @@ body {
   margin: 12px 0 4px;
   font-weight: bold;
 }
-#atlas-county-search {
-  position: relative;
-  margin: 0;
+/* at the bottom of the screen, so the area and its pages outlined on the map can be seen above it (see atlas.js) */
+#atlas-dialog {
+  margin-bottom: 16px;
 }
-#atlas-dialog input {
+/* light, so the area and its pages outlined on the map show through */
+#atlas-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.15);
+}
+#atlas-dialog select {
   width: 100%;
   box-sizing: border-box;
   min-height: 36px;
@@ -541,13 +545,47 @@ body {
 #map-container.atlas-capturing #sidebar-toggle {
   display: none;
 }
+/* while the area to print is being drawn (see atlas-draw.js) */
+#map-container.atlas-drawing .maplibregl-canvas-container {
+  cursor: crosshair;
+}
+/* over the top of the map, between the sidebar toggle and the zoom buttons */
+#atlas-draw-banner {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 10px;
+  width: max-content;
+  max-width: calc(100% - 100px);
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  font: 14px/1.4 sans-serif;
+}
+#atlas-draw-banner[hidden] {
+  display: none;
+}
+#atlas-draw-banner button {
+  min-height: 32px;
+  padding: 4px 10px;
+  font: inherit;
+  cursor: pointer;
+}
 @media screen {
   #atlas {
     display: none;
   }
 }
 @media print {
-  .sidebar-button {
+  .sidebar-button,
+  #atlas-draw-banner {
     display: none;
   }
   /* with an atlas made, printing prints it rather than the map on screen */
