@@ -10,7 +10,7 @@ const PLACE_CLASSES = ["city", "town", "village", "hamlet"];
 const MAX_PLACES = 3;
 
 // whether [lng, lat] is inside a polygon, given as rings of [lng, lat] -- by counting how many ring edges a ray from the point crosses, so holes (odd crossings of an inner ring) work too
-const inPolygon = ([x, y], rings) => {
+export const inPolygon = ([x, y], rings) => {
   let inside = false;
   for (const ring of rings) {
     for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
