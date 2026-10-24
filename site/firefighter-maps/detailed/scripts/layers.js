@@ -364,6 +364,72 @@ export const WATER_LABELS_LAYER = {
   },
 };
 
+// Named peaks with their elevation, so crews can find terrain they're told about over the radio. Italic, the usual convention for natural features, so they aren't mistaken for road names. Hidden zoomed out, where they'd crowd out the town names.
+export const PEAK_LABELS_LAYER = {
+  id: "peak-labels",
+  type: "symbol",
+  source: "roadsSource",
+  "source-layer": "mountain_peak",
+  minzoom: 11,
+  filter: [
+    "all",
+    ["in", ["get", "class"], ["literal", ["peak", "volcano"]]],
+    ["has", "name"],
+  ],
+  layout: {
+    // see icons.js
+    "icon-image": "peak",
+    "text-field": [
+      "case",
+      ["has", "ele_ft"],
+      [
+        "format",
+        ["get", "name"],
+        {},
+        "\n",
+        {},
+        [
+          "concat",
+          ["number-format", ["get", "ele_ft"], { locale: "en-US" }],
+          " ft",
+        ],
+        { "font-scale": 0.85 },
+      ],
+      ["get", "name"],
+    ],
+    "text-font": ["Noto Sans Bold Italic"],
+    "text-size": 12,
+    "text-anchor": "top",
+    "text-offset": [0, 0.4],
+  },
+  paint: {
+    "text-color": "#000000",
+    "text-halo-color": "#ffffff",
+    "text-halo-width": 1.5,
+  },
+};
+
+// named ridges, along the ridge line -- styled like PEAK_LABELS_LAYER
+export const RIDGE_LABELS_LAYER = {
+  id: "ridge-labels",
+  type: "symbol",
+  source: "roadsSource",
+  "source-layer": "mountain_peak",
+  minzoom: PEAK_LABELS_LAYER.minzoom,
+  filter: [
+    "all",
+    ["in", ["get", "class"], ["literal", ["ridge", "arete"]]],
+    ["has", "name"],
+  ],
+  layout: {
+    "text-field": ["get", "name"],
+    "text-font": PEAK_LABELS_LAYER.layout["text-font"],
+    "text-size": 12,
+    "symbol-placement": "line",
+  },
+  paint: PEAK_LABELS_LAYER.paint,
+};
+
 // a white ring around each building, cutting it out of the flame length hatch and hillshade behind it. Drawn under the fill, so the fill covers the inner half of the line and only the outer half shows.
 export const BUILDINGS_HALO_LAYER = {
   id: "buildings-halo",

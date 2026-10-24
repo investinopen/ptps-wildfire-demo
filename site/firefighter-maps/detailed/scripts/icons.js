@@ -57,6 +57,17 @@ const drawDeadEnd = (ctx, size) => {
   ctx.fillRect(size * 0.45, size * 0.3, size * 0.1, size * 0.38);
 };
 
+// a mountain peak: a small black triangle, the usual map symbol
+const drawPeak = (ctx, size) => {
+  ctx.fillStyle = "#000000";
+  ctx.beginPath();
+  ctx.moveTo(size / 2, size / 8);
+  ctx.lineTo(size - size / 10, size - size / 8);
+  ctx.lineTo(size / 10, size - size / 8);
+  ctx.closePath();
+  ctx.fill();
+};
+
 // a box with a border, stretched to fit a label (a weight limit or route number) like a road sign -- see SIGN_BOX_OPTIONS
 // A corner radius (in CSS pixels) has to stay within the unstretched edges -- see boxInset.
 const drawBox =
@@ -76,6 +87,7 @@ export const ICONS = {
   "oneway-arrow": { draw: drawArrow, size: 14 },
   gate: { draw: drawGate, size: 14 },
   "dead-end": { draw: drawDeadEnd, size: 16 },
+  peak: { draw: drawPeak, size: 10 },
   // stretchable ones get SIGN_BOX_OPTIONS when registered (see main.js)
   "sign-box": {
     draw: drawBox("#ffffff", "#000000"),
