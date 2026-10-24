@@ -4,6 +4,7 @@ import {
   fromWorld,
   numberPages,
   scaleDenominator,
+  zoomForScale,
   toWorld,
 } from "../../../site/firefighter-maps/detailed/scripts/atlas-grid.js";
 
@@ -167,5 +168,15 @@ describe("scaleDenominator", () => {
   // MapLibre's tiles are 512 pixels, so its zooms are one off from the 256 pixel ones of OSM's scale tables
   test("is about 1:6,900 at zoom 15 in Colorado", () => {
     expect(scaleDenominator(40, 15)).toBeCloseTo(6_900, -2);
+  });
+});
+
+describe("zoomForScale", () => {
+  test("undoes scaleDenominator", () => {
+    expect(zoomForScale(40, scaleDenominator(40, 15.7))).toBeCloseTo(15.7, 9);
+  });
+
+  test("zooms in further north for the same scale, where Web Mercator stretches the map", () => {
+    expect(zoomForScale(61, 4_000)).toBeLessThan(zoomForScale(40, 4_000));
   });
 });
