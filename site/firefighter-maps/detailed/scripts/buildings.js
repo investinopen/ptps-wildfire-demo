@@ -22,5 +22,10 @@ export const RISK_BINS = [
   { min: 1, color: "#67000d" },
 ];
 export const BUILDING_MIN_ZOOM = 14.5;
-// The scores only cover the contiguous US (the tiles' bounds stop there), so Alaska and Hawaii get OpenStreetMap's buildings from the basemap instead, drawn without a score. One box, as [west, south, east, north], from the antimeridian to just east of the Alaska panhandle's tip, which takes in both states and stops well short of Washington. It's the bounds of a source of its own rather than a filter, since MapLibre's "within" doesn't match polygons.
+// The scores only cover the contiguous US (the tiles' bounds stop there), so Alaska and Hawaii get Overture's buildings instead (OVERTURE_BUILDINGS_URL), drawn without a score. One box, as [west, south, east, north], from the antimeridian to just east of the Alaska panhandle's tip, which takes in both states and stops well short of Washington. It's the bounds of a source of its own rather than a filter, since MapLibre's "within" doesn't match polygons.
 export const NO_RISK_DATA_BOUNDS = [-180, 18.5, -129, 72];
+
+// Overture's own vector tiles of its buildings, the same footprints CarbonPlan's are built from -- OpenStreetMap's alone have almost none in rural Alaska and Hawaii (1 in the z14 tile around Hawaiian Paradise Park, to Overture's 1,169), since Overture adds Microsoft's and Google's machine-learned ones. Only read within NO_RISK_DATA_BOUNDS. ODbL: https://docs.overturemaps.org/attribution/
+// Each release's tiles are only kept for about two months (https://stac.overturemaps.org/catalog.json lists the ones still up), so publish-site.yml replaces this with the latest release each time it publishes.
+export const OVERTURE_RELEASE = "2026-10-21.0";
+export const OVERTURE_BUILDINGS_URL = `https://tiles.overturemaps.org/${OVERTURE_RELEASE}/buildings.pmtiles`;

@@ -79,6 +79,16 @@ jobs:
           run-id: ${{ steps.tiles.outputs.run-id }}
           github-token: ${{ github.token }}
 
+      # Overture only keeps each release's tiles for about two months, so the detailed map's Alaska and Hawaii buildings are pointed at the latest one (see OVERTURE_RELEASE in buildings.js). If Overture's catalog is down, the release already in the file is kept.
+      - name: Use the latest Overture release
+        run: |
+          if release=$(curl -fsS --max-time 30 https://stac.overturemaps.org/catalog.json | jq -er .latest); then
+            sed -i "s|^export const OVERTURE_RELEASE = .*|export const OVERTURE_RELEASE = \"$release\";|" site/firefighter-maps/detailed/scripts/buildings.js
+            grep -F "OVERTURE_RELEASE = \"$release\"" site/firefighter-maps/detailed/scripts/buildings.js
+          else
+            echo "::warning::Couldn't get the latest Overture release, so the detailed map keeps the one in buildings.js"
+          fi
+
       # Python is only needed if there's no refreshed copy of a .qmd page (e.g. its artifact expired), in which case the render executes it after all
       - name: Install uv
         uses: astral-sh/setup-uv@v10.0.1

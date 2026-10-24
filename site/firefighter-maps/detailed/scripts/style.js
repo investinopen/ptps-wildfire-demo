@@ -1,5 +1,9 @@
 // the map's sources and layers (in draw order) -- kept separate from main.js so it can be loaded, and validated, without a browser
-import { NO_RISK_DATA_BOUNDS, PMTILES_URL } from "./buildings.js";
+import {
+  NO_RISK_DATA_BOUNDS,
+  OVERTURE_BUILDINGS_URL,
+  PMTILES_URL,
+} from "./buildings.js";
 import { FLAME_LENGTH_URL } from "./rasters.js";
 import {
   HILLSHADE_LAYER,
@@ -22,10 +26,10 @@ import {
   BUILDINGS_FILL_LAYER,
   BUILDINGS_HALO_LAYER,
   BUILDINGS_OUTLINE_LAYER,
-  OSM_BUILDINGS_HALO_LAYER,
-  OSM_BUILDINGS_FILL_LAYER,
-  OSM_BUILDINGS_OUTLINE_LAYER,
-  OSM_BUILDING_OBSTACLES_LAYER,
+  OVERTURE_BUILDINGS_HALO_LAYER,
+  OVERTURE_BUILDINGS_FILL_LAYER,
+  OVERTURE_BUILDINGS_OUTLINE_LAYER,
+  OVERTURE_BUILDING_OBSTACLES_LAYER,
   HOUSENUMBERS_LAYER,
   HYDRANTS_LAYER,
   WATER_SOURCES_LAYER,
@@ -70,10 +74,10 @@ export const STYLE = {
       type: "vector",
       url: OPENFREEMAP_URL,
     },
-    // the same tiles, only fetched where buildings.js has no risk scores
-    osmBuildings: {
+    // only fetched where buildings.js has no risk scores; attributed by the file itself
+    overtureBuildings: {
       type: "vector",
-      url: OPENFREEMAP_URL,
+      url: "pmtiles://" + OVERTURE_BUILDINGS_URL,
       bounds: NO_RISK_DATA_BOUNDS,
     },
     buildings: {
@@ -113,15 +117,15 @@ export const STYLE = {
     STATE_LINES_LAYER,
     BUILDINGS_HALO_LAYER,
     BUILDINGS_FILL_LAYER,
-    OSM_BUILDINGS_HALO_LAYER,
-    OSM_BUILDINGS_FILL_LAYER,
+    OVERTURE_BUILDINGS_HALO_LAYER,
+    OVERTURE_BUILDINGS_FILL_LAYER,
     TRAILS_LAYER,
     DRIVEWAYS_LAYER,
     ROADS_LAYER,
     ONEWAY_ARROWS_LAYER,
     WATER_LABELS_LAYER,
     BUILDINGS_OUTLINE_LAYER,
-    OSM_BUILDINGS_OUTLINE_LAYER,
+    OVERTURE_BUILDINGS_OUTLINE_LAYER,
     TRAIL_LABELS_LAYER,
     POOLS_LAYER,
     WATER_SOURCES_LAYER,
@@ -132,7 +136,7 @@ export const STYLE = {
     ROUTE_SHIELDS_LAYER,
     DRIVEWAY_OBSTACLES_LAYER,
     BUILDING_OBSTACLES_LAYER,
-    OSM_BUILDING_OBSTACLES_LAYER,
+    OVERTURE_BUILDING_OBSTACLES_LAYER,
     HOUSENUMBERS_LAYER,
     ROAD_LABEL_FALLBACKS_LAYER,
     ROAD_LABELS_LAYER,

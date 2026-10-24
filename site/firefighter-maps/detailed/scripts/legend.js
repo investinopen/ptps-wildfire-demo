@@ -66,12 +66,12 @@ export const bindLayerToggles = (map) => {
     "buildings-halo",
     "buildings-fill",
     "buildings-outline",
-    "osm-buildings-halo",
-    "osm-buildings-fill",
-    "osm-buildings-outline",
+    "overture-buildings-halo",
+    "overture-buildings-fill",
+    "overture-buildings-outline",
     "housenumbers",
     "building-obstacles",
-    "osm-building-obstacles",
+    "overture-building-obstacles",
   ]);
   // driveways and paths are listed under roads, without toggles of their own
   bindLayerToggle("roads-toggle", [

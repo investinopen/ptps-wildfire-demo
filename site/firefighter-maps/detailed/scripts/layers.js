@@ -416,28 +416,31 @@ export const BUILDINGS_OUTLINE_LAYER = {
   },
 };
 
-// OpenStreetMap's buildings where there are no risk scores (see NO_RISK_DATA_BOUNDS), drawn the same way but white, so they don't read as the scored buildings' zero-risk gray
-const OSM_BUILDINGS = { source: "osmBuildings", "source-layer": "building" };
-export const OSM_BUILDINGS_HALO_LAYER = {
-  ...BUILDINGS_HALO_LAYER,
-  ...OSM_BUILDINGS,
-  id: "osm-buildings-halo",
+// Overture's buildings where there are no risk scores (see NO_RISK_DATA_BOUNDS), drawn the same way but white, so they don't read as the scored buildings' zero-risk gray
+const OVERTURE_BUILDINGS = {
+  source: "overtureBuildings",
+  "source-layer": "building",
 };
-export const OSM_BUILDINGS_FILL_LAYER = {
+export const OVERTURE_BUILDINGS_HALO_LAYER = {
+  ...BUILDINGS_HALO_LAYER,
+  ...OVERTURE_BUILDINGS,
+  id: "overture-buildings-halo",
+};
+export const OVERTURE_BUILDINGS_FILL_LAYER = {
   ...BUILDINGS_FILL_LAYER,
-  ...OSM_BUILDINGS,
-  id: "osm-buildings-fill",
+  ...OVERTURE_BUILDINGS,
+  id: "overture-buildings-fill",
   paint: { "fill-color": NO_RISK_DATA_COLOR },
 };
-export const OSM_BUILDINGS_OUTLINE_LAYER = {
+export const OVERTURE_BUILDINGS_OUTLINE_LAYER = {
   ...BUILDINGS_OUTLINE_LAYER,
-  ...OSM_BUILDINGS,
-  id: "osm-buildings-outline",
+  ...OVERTURE_BUILDINGS,
+  id: "overture-buildings-outline",
 };
-export const OSM_BUILDING_OBSTACLES_LAYER = {
+export const OVERTURE_BUILDING_OBSTACLES_LAYER = {
   ...BUILDING_OBSTACLES_LAYER,
-  ...OSM_BUILDINGS,
-  id: "osm-building-obstacles",
+  ...OVERTURE_BUILDINGS,
+  id: "overture-building-obstacles",
 };
 
 export const HOUSENUMBERS_LAYER = {
