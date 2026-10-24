@@ -12,7 +12,7 @@ Only includes notable updates.
 - **[Detailed firefighter map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-maps/detailed/):**
   - Cover Alaska and Hawaii, with flame lengths, water sources, and road access. There are no building risk scores there, so buildings are drawn from OpenStreetMap in white.
   - Show house numbers from one zoom level further out, along with dead ends and gates.
-  - Print a whole county: pick a county, and get an index page and one landscape page per piece of a grid over it, at the most zoomed-out view that still shows house numbers, dead ends, and gates, each with the legend, a key map, and the numbers of the pages next to it.
+  - Print an area: draw a rectangle on the map and pick a scale (1:4,000 to start), and get an index page and one landscape page per piece of a grid over it, each with the legend, a key map, and the numbers of the pages next to it.
 
 ## 2026-09-25
 

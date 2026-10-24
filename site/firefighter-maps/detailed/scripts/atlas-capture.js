@@ -99,7 +99,7 @@ export const withMapSize = async (map, { width, height }, draw) => {
   }
 };
 
-// Draws the whole area to fit, for the index page: its image, and where the area's outline and each page fall on it, in its CSS pixels.
+// Draws the whole area to fit, for the index page: its image, the town(s) in it (from the sidebar heading -- see places.js), and where the area's outline and each page fall on it, in its CSS pixels.
 export const captureIndex = async (map, geometry, cells, { padding }) => {
   const rings =
     geometry.type === "Polygon"
@@ -114,7 +114,7 @@ export const captureIndex = async (map, geometry, cells, { padding }) => {
     ],
     { padding, duration: 0, bearing: 0, pitch: 0 },
   );
-  // zoomed out to a whole county, the shading and flame length hatching cover everything, so the page numbers and towns are hard to read
+  // zoomed out to a whole area, the shading and flame length hatching cover everything, so the page numbers and towns are hard to read
   const visibility = INDEX_HIDDEN_LAYERS.map((id) =>
     map.getLayoutProperty(id, "visibility"),
   );
@@ -123,10 +123,13 @@ export const captureIndex = async (map, geometry, cells, { padding }) => {
   );
   let image;
   let attribution;
+  let places;
   try {
     await settle(map);
     refreshAttribution(map);
     attribution = document.getElementById("map-attribution").innerHTML;
+    const heading = document.getElementById("map-places");
+    places = heading.hidden ? "" : heading.textContent;
     image = await snapshot(map);
   } finally {
     INDEX_HIDDEN_LAYERS.forEach((id, i) =>
@@ -156,7 +159,7 @@ export const captureIndex = async (map, geometry, cells, { padding }) => {
       ];
     }),
   );
-  return { image, attribution, outline, rects };
+  return { image, attribution, places, outline, rects };
 };
 
 // MapLibre's attribution only lists sources that have drawn something, and only rechecks on a few events -- so a source that loaded after the last one stays left off. This is one of those events (a source shown/hidden), so the attribution copied onto each page is complete.

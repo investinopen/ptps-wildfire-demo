@@ -5,13 +5,13 @@ const PHOTON_URL = "https://photon.komoot.io/api/";
 const MAX_SUGGESTIONS = 6;
 
 // "Gold Hill, Boulder, Colorado" -- the place's own name, then where it is, skipping repeats (e.g. a city named after its county)
-export const placeLabel = ({ name, street, city, county, state }) => {
+const placeLabel = ({ name, street, city, county, state }) => {
   const parts = [name || street, city, county, state].filter(Boolean);
   return parts.filter((part, i) => parts.indexOf(part) === i).join(", ");
 };
 
-// Photon's matches for the query (with any extra `params`, like a `layer` to limit it to), biased toward what's on screen so nearby places come first
-export const fetchPlaces = async (map, query, signal, params = {}) => {
+// Photon's matches for the query, biased toward what's on screen so nearby places come first
+const fetchPlaces = async (map, query, signal) => {
   const { lng, lat } = map.getCenter();
   const search = new URLSearchParams({
     // only places the map can show
@@ -22,7 +22,6 @@ export const fetchPlaces = async (map, query, signal, params = {}) => {
     lat: lat.toFixed(4),
     lon: lng.toFixed(4),
     lang: "en",
-    ...params,
   });
   const response = await fetch(`${PHOTON_URL}?${search}`, { signal });
   const { features } = await response.json();
