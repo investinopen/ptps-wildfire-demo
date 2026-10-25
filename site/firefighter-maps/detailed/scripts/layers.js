@@ -432,6 +432,28 @@ export const RIDGE_LABELS_LAYER = {
   paint: PEAK_LABELS_LAYER.paint,
 };
 
+// creek, gulch, and ditch names along the line -- in rural areas, places are often given by drainage ("up Fourmile Creek"). Italic like the other natural features (see PEAK_LABELS_LAYER), and spaced out so a long creek isn't labeled over and over.
+export const WATERWAY_LABELS_LAYER = {
+  id: "waterway-labels",
+  type: "symbol",
+  source: "roadsSource",
+  "source-layer": "waterway",
+  minzoom: 12,
+  filter: ["has", "name"],
+  layout: {
+    "text-field": ["get", "name"],
+    "text-font": ["Noto Sans Bold Italic"],
+    "text-size": 11,
+    "symbol-placement": "line",
+    "symbol-spacing": 400,
+  },
+  paint: {
+    "text-color": "#000000",
+    "text-halo-color": "#ffffff",
+    "text-halo-width": 1.5,
+  },
+};
+
 // a white ring around each building, cutting it out of the flame length hatch and hillshade behind it. Drawn under the fill, so the fill covers the inner half of the line and only the outer half shows.
 export const BUILDINGS_HALO_LAYER = {
   id: "buildings-halo",
