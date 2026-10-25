@@ -364,7 +364,7 @@ export const WATER_LABELS_LAYER = {
   },
 };
 
-// Named peaks with their elevation, so crews can find terrain they're told about over the radio. Italic, the usual convention for natural features, so they aren't mistaken for road names. Hidden zoomed out, where they'd crowd out the town names.
+// Named peaks and passes with their elevation, so crews can find terrain they're told about over the radio. Italic, the usual convention for natural features, so they aren't mistaken for road names. Hidden zoomed out, where they'd crowd out the town names.
 export const PEAK_LABELS_LAYER = {
   id: "peak-labels",
   type: "symbol",
@@ -373,12 +373,12 @@ export const PEAK_LABELS_LAYER = {
   minzoom: 11,
   filter: [
     "all",
-    ["in", ["get", "class"], ["literal", ["peak", "volcano"]]],
+    ["in", ["get", "class"], ["literal", ["peak", "volcano", "saddle"]]],
     ["has", "name"],
   ],
   layout: {
     // see icons.js
-    "icon-image": "peak",
+    "icon-image": ["match", ["get", "class"], "saddle", "saddle", "peak"],
     "text-field": [
       "case",
       ["has", "ele_ft"],
@@ -399,8 +399,10 @@ export const PEAK_LABELS_LAYER = {
     ],
     "text-font": ["Noto Sans Bold Italic"],
     "text-size": 12,
-    "text-anchor": "top",
-    "text-offset": [0, 0.4],
+    // Passes are often right on a road, among the driveway/building obstacles (see DRIVEWAY_OBSTACLES_LAYER), so the small symbol is always drawn and the name moves to whichever side has room.
+    "icon-allow-overlap": true,
+    "text-variable-anchor": ["top", "bottom", "right", "left"],
+    "text-radial-offset": 0.6,
   },
   paint: {
     "text-color": "#000000",

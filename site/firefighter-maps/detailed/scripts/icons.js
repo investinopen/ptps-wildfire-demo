@@ -68,6 +68,24 @@ const drawPeak = (ctx, size) => {
   ctx.fill();
 };
 
+// a mountain pass: two arcs bowing toward each other, ")(", the USGS topo symbol
+const drawSaddle = (ctx, size) => {
+  ctx.strokeStyle = "#000000";
+  ctx.lineWidth = size / 6;
+  ctx.lineCap = "round";
+  for (const side of [-1, 1]) {
+    ctx.beginPath();
+    ctx.moveTo(size / 2 + (side * size) / 3, size / 8);
+    ctx.quadraticCurveTo(
+      size / 2 + (side * size) / 12,
+      size / 2,
+      size / 2 + (side * size) / 3,
+      size - size / 8,
+    );
+    ctx.stroke();
+  }
+};
+
 // a box with a border, stretched to fit a label (a weight limit or route number) like a road sign -- see SIGN_BOX_OPTIONS
 // A corner radius (in CSS pixels) has to stay within the unstretched edges -- see boxInset.
 const drawBox =
@@ -88,6 +106,7 @@ export const ICONS = {
   gate: { draw: drawGate, size: 14 },
   "dead-end": { draw: drawDeadEnd, size: 16 },
   peak: { draw: drawPeak, size: 10 },
+  saddle: { draw: drawSaddle, size: 10 },
   // stretchable ones get SIGN_BOX_OPTIONS when registered (see main.js)
   "sign-box": {
     draw: drawBox("#ffffff", "#000000"),
