@@ -674,6 +674,28 @@ export const WEIGHT_LIMITS_LAYER = {
   },
 };
 
+// Villages and hamlets -- rural reference points (old mining camps, crossroads, subdivisions) that PLACE_LABELS_LAYER leaves out. Unlike town names, they stay up zoomed in, since they're often the only name for an area. Spaced-out capitals, so they don't read as a road or a natural feature.
+export const SMALL_PLACE_LABELS_LAYER = {
+  id: "small-place-labels",
+  type: "symbol",
+  source: "roadsSource",
+  "source-layer": "place",
+  minzoom: 10,
+  filter: ["in", ["get", "class"], ["literal", ["village", "hamlet"]]],
+  layout: {
+    "text-field": ["get", "name"],
+    "text-font": ["Noto Sans Bold"],
+    "text-size": ["match", ["get", "class"], "village", 13, 11],
+    "text-transform": "uppercase",
+    "text-letter-spacing": 0.1,
+  },
+  paint: {
+    "text-color": "#000000",
+    "text-halo-color": "#ffffff",
+    "text-halo-width": 1.5,
+  },
+};
+
 // fades out around where buildings/hydrants start showing (zoom 13), so the
 // two label sets hand off rather than fight for space
 export const PLACE_LABELS_LAYER = {
