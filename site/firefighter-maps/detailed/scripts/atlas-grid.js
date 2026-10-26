@@ -29,6 +29,13 @@ export const scaleDenominator = (lat, zoom) =>
   (TILE_SIZE * 2 ** zoom) /
   METERS_PER_CSS_PIXEL;
 
+// the zoom that prints at 1:`denominator` at the latitude -- the inverse of scaleDenominator
+export const zoomForScale = (lat, denominator) =>
+  Math.log2(
+    (EARTH_CIRCUMFERENCE * Math.cos((lat * Math.PI) / 180)) /
+      (TILE_SIZE * METERS_PER_CSS_PIXEL * denominator),
+  );
+
 // a GeoJSON Polygon/MultiPolygon as a list of polygons, each a list of rings
 const polygonsOf = ({ type, coordinates }) =>
   type === "Polygon" ? [coordinates] : coordinates;

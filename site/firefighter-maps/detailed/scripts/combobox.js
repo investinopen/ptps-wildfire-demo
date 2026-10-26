@@ -1,8 +1,8 @@
-// A search box with suggestions as you type (an ARIA combobox) -- used for the place search (search.js) and for picking a county to print (atlas.js).
+// A search box with suggestions as you type (an ARIA combobox) -- used for the place search (search.js).
 // wait for a pause in typing, so there's one request per word rather than per keystroke
 const DEBOUNCE_MS = 250;
 
-// Wires up a form's input and suggestion list. `search(query, signal)` resolves to the suggestions, `label(suggestion)` is the text shown for one, and `onChoose(suggestion)` is called with the one picked -- with the mouse, the keyboard, or Enter for the best match. `onNoMatch()`, if given, is called when Enter finds nothing.
+// Wires up a form's input and suggestion list. `search(query, signal)` resolves to the suggestions, `label(suggestion)` is the text shown for one, and `onChoose(suggestion)` is called with the one picked -- with the mouse, the keyboard, or Enter for the best match.
 export const bindCombobox = ({
   form,
   input,
@@ -10,7 +10,6 @@ export const bindCombobox = ({
   search,
   label,
   onChoose,
-  onNoMatch = () => {},
 }) => {
   let suggestions = [];
   let active = -1;
@@ -121,11 +120,7 @@ export const bindCombobox = ({
     close();
     try {
       const [best] = await fetchSuggestions(query);
-      if (best) {
-        onChoose(best);
-      } else {
-        onNoMatch();
-      }
+      if (best) onChoose(best);
     } catch (error) {
       logError(error);
     }
