@@ -51,27 +51,20 @@ const settle = (map) =>
     start();
   });
 
-// the map's canvas as an image, as an object URL -- needs the map created with preserveDrawingBuffer (see main.js), so the canvas still has its last frame in it. On white, since the style has no background of its own, and a JPEG would turn the transparent parts black.
-const snapshot = (map) => {
-  const canvas = map.getCanvas();
-  const flat = document.createElement("canvas");
-  flat.width = canvas.width;
-  flat.height = canvas.height;
-  const context = flat.getContext("2d");
-  context.fillStyle = "#ffffff";
-  context.fillRect(0, 0, flat.width, flat.height);
-  context.drawImage(canvas, 0, 0);
-  return new Promise((resolve, reject) =>
-    flat.toBlob(
-      (blob) =>
-        blob
-          ? resolve(URL.createObjectURL(blob))
-          : reject(new Error("couldn't save the map as an image")),
-      "image/jpeg",
-      JPEG_QUALITY,
-    ),
+// the map's canvas as an image, as an object URL -- needs the map created with preserveDrawingBuffer (see main.js), so the canvas still has its last frame in it. The style's white background layer (see layers.js) keeps the JPEG's gaps from coming out black.
+const snapshot = (map) =>
+  new Promise((resolve, reject) =>
+    map
+      .getCanvas()
+      .toBlob(
+        (blob) =>
+          blob
+            ? resolve(URL.createObjectURL(blob))
+            : reject(new Error("couldn't save the map as an image")),
+        "image/jpeg",
+        JPEG_QUALITY,
+      ),
   );
-};
 
 // Runs `draw` with the map resized to { width, height } CSS pixels and its controls hidden (so labels don't avoid them -- see labels.js), then puts the map back how it was.
 export const withMapSize = async (map, { width, height }, draw) => {
@@ -99,21 +92,16 @@ export const withMapSize = async (map, { width, height }, draw) => {
   }
 };
 
-// Draws the whole area to fit, for the index page: its image, the town(s) in it (from the sidebar heading -- see places.js), and where the area's outline and each page fall on it, in its CSS pixels.
-export const captureIndex = async (map, geometry, cells, { padding }) => {
-  const rings =
-    geometry.type === "Polygon"
-      ? geometry.coordinates
-      : geometry.coordinates.flat();
-  const lngs = rings.flat().map(([lng]) => lng);
-  const lats = rings.flat().map(([, lat]) => lat);
-  map.fitBounds(
-    [
-      [Math.min(...lngs), Math.min(...lats)],
-      [Math.max(...lngs), Math.max(...lats)],
-    ],
-    { padding, duration: 0, bearing: 0, pitch: 0 },
-  );
+// where [[west, south], [east, north]] falls on the map, as a { x, y, width, height } rect in its CSS pixels
+const projectBounds = (map, [sw, ne]) => {
+  const a = map.project(sw);
+  const b = map.project(ne);
+  return { x: a.x, y: b.y, width: b.x - a.x, height: a.y - b.y };
+};
+
+// Draws the whole area (given as [[west, south], [east, north]]) to fit, for the index page: its image, the town(s) in it (from the sidebar heading -- see places.js), and where the area and each page fall on it, as rects in its CSS pixels.
+export const captureIndex = async (map, bounds, cells, { padding }) => {
+  map.fitBounds(bounds, { padding, duration: 0, bearing: 0, pitch: 0 });
   // zoomed out to a whole area, the shading and flame length hatching cover everything, so the page numbers and towns are hard to read
   const visibility = INDEX_HIDDEN_LAYERS.map((id) =>
     map.getLayoutProperty(id, "visibility"),
@@ -136,30 +124,19 @@ export const captureIndex = async (map, geometry, cells, { padding }) => {
       map.setLayoutProperty(id, "visibility", visibility[i] ?? "visible"),
     );
   }
-  const outline = rings
-    .map(
-      (ring) =>
-        "M" +
-        ring
-          .map((c) => {
-            const { x, y } = map.project(c);
-            return `${x.toFixed(1)},${y.toFixed(1)}`;
-          })
-          .join("L") +
-        "Z",
-    )
-    .join("");
   const rects = new Map(
-    cells.map(({ row, col, bounds: [sw, ne] }) => {
-      const a = map.project(sw);
-      const b = map.project(ne);
-      return [
-        `${row},${col}`,
-        { x: a.x, y: b.y, width: b.x - a.x, height: a.y - b.y },
-      ];
-    }),
+    cells.map((cell) => [
+      `${cell.row},${cell.col}`,
+      projectBounds(map, cell.bounds),
+    ]),
   );
-  return { image, attribution, places, outline, rects };
+  return {
+    image,
+    attribution,
+    places,
+    outline: projectBounds(map, bounds),
+    rects,
+  };
 };
 
 // MapLibre's attribution only lists sources that have drawn something, and only rechecks on a few events -- so a source that loaded after the last one stays left off. This is one of those events (a source shown/hidden), so the attribution copied onto each page is complete.

@@ -10,6 +10,13 @@ import { ROAD, STATE_LINE } from "./colors.js";
 
 // one const per layer -- keeping these standalone makes the draw order (the `layers`
 // array in main.js) easy to see and rearrange without hunting through each definition
+// white under everything, like the page around the map -- so the map's canvas is opaque, and an atlas page saved from it as a JPEG (see atlas-capture.js) doesn't turn its gaps black
+export const BACKGROUND_LAYER = {
+  id: "background",
+  type: "background",
+  paint: { "background-color": "#ffffff" },
+};
+
 export const HILLSHADE_LAYER = {
   id: "hillshade",
   type: "hillshade",
@@ -538,7 +545,7 @@ export const HOUSENUMBERS_LAYER = {
   type: "symbol",
   source: "roadsSource",
   "source-layer": "housenumber",
-  // from the same zoom as the access hazards below, rather than one closer in, so a printed county atlas (see atlas.js) can be drawn at it with addresses on it -- in rural areas they're spread out enough to stay readable
+  // from the same zoom as the access hazards below, rather than one closer in, so printed atlas pages (see atlas.js) can be drawn at it with addresses on it -- in rural areas they're spread out enough to stay readable
   minzoom: ONEWAY_ARROWS_LAYER.minzoom,
   layout: {
     visibility: "visible",

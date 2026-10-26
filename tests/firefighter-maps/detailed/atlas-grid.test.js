@@ -8,25 +8,15 @@ import {
   toWorld,
 } from "../../../site/firefighter-maps/detailed/scripts/atlas-grid.js";
 
-// a square of the given size (in world pixels at ZOOM) centered on the origin of the map
+// the bounds of a square of the given size (in world pixels at ZOOM) centered on the origin of the map, as [[west, south], [east, north]]
 const ZOOM = 10;
-const square = (size, { x = 0, y = 0 } = {}) => {
+const square = (size) => {
   const center = toWorld([0, 0], ZOOM);
-  const corner = (dx, dy) =>
-    fromWorld({ x: center.x + x + dx, y: center.y + y + dy }, ZOOM);
   const h = size / 2;
-  return {
-    type: "Polygon",
-    coordinates: [
-      [
-        corner(-h, -h),
-        corner(h, -h),
-        corner(h, h),
-        corner(-h, h),
-        corner(-h, -h),
-      ],
-    ],
-  };
+  return [
+    fromWorld({ x: center.x - h, y: center.y + h }, ZOOM),
+    fromWorld({ x: center.x + h, y: center.y - h }, ZOOM),
+  ];
 };
 const page = { zoom: ZOOM, width: 100, height: 100, overlap: 0 };
 
@@ -85,71 +75,13 @@ describe("atlasGrid", () => {
     expect(cells[0].neighbors).toEqual({ south: 4, east: 2 });
   });
 
-  test("skips pages that would be outside the area", () => {
-    // an L: the top row and left column of a 3x3 grid
-    const center = toWorld([0, 0], ZOOM);
-    const at = (x, y) => fromWorld({ x: center.x + x, y: center.y + y }, ZOOM);
-    const l = {
-      type: "Polygon",
-      coordinates: [
-        [
-          at(-145, -145),
-          at(145, -145),
-          at(145, -60),
-          at(-60, -60),
-          at(-60, 145),
-          at(-145, 145),
-          at(-145, -145),
-        ],
-      ],
-    };
-    const { cells } = atlasGrid(l, page);
-    expect(cells.map((c) => [c.row, c.col])).toEqual([
-      [0, 0],
-      [0, 1],
-      [0, 2],
-      [1, 0],
-      [2, 0],
-    ]);
-    // numbered without gaps, and without neighbors that were skipped
-    expect(cells.map((c) => c.number)).toEqual([1, 2, 3, 4, 5]);
-    expect(cells[3].neighbors).toEqual({ north: 1, south: 5 });
-  });
-
-  test("keeps a page that only an edge of the area crosses", () => {
-    // a thin diagonal sliver through the middle page's corner, with no vertex or page corner inside the other
-    const center = toWorld([0, 0], ZOOM);
-    const at = (x, y) => fromWorld({ x: center.x + x, y: center.y + y }, ZOOM);
-    const sliver = {
-      type: "Polygon",
-      coordinates: [
-        [
-          at(-150, 40),
-          at(40, -150),
-          at(40.5, -150),
-          at(-150, 40.5),
-          at(-150, 40),
-        ],
-      ],
-    };
-    const { cells } = atlasGrid(sliver, page);
-    // only the sliver's edges cross the top left page; the bottom right one misses it
-    expect(cells.map((c) => [c.row, c.col])).toEqual([
-      [0, 0],
-      [0, 1],
-      [1, 0],
-    ]);
-  });
-
-  test("covers each part of a multipolygon", () => {
-    const a = square(50, { x: -200 }).coordinates;
-    const b = square(50, { x: 200 }).coordinates;
-    const { cells, cols } = atlasGrid(
-      { type: "MultiPolygon", coordinates: [a, b] },
-      page,
-    );
-    expect(cols).toBe(5);
-    expect(cells.map((c) => c.col)).toEqual([0, 4]);
+  test("gives each page its bounds, lined up with its neighbors'", () => {
+    const { cells } = atlasGrid(square(195), page);
+    const [[, south], [east]] = cells[0].bounds;
+    const [[west], [, north]] = cells[3].bounds;
+    // the top left page's east edge is the bottom right's west, and its south the other's north
+    expect(east).toBeCloseTo(west, 9);
+    expect(south).toBeCloseTo(north, 9);
   });
 });
 

@@ -1,5 +1,4 @@
 // The grid of pages an atlas (see atlas.js) splits an area into: equal-sized pages at one zoom, laid out in Web Mercator like the map itself, so every page prints at the same scale and lines up with its neighbors. Kept apart from atlas.js so it can be tested without a browser.
-import { inPolygon } from "./places.js";
 
 // MapLibre's world is 512 pixels across at zoom 0
 const TILE_SIZE = 512;
@@ -36,38 +35,6 @@ export const zoomForScale = (lat, denominator) =>
       (TILE_SIZE * METERS_PER_CSS_PIXEL * denominator),
   );
 
-// a GeoJSON Polygon/MultiPolygon as a list of polygons, each a list of rings
-const polygonsOf = ({ type, coordinates }) =>
-  type === "Polygon" ? [coordinates] : coordinates;
-
-const segmentsCross = ([a, b], [c, d]) => {
-  const side = (p, q, r) =>
-    Math.sign((q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0]));
-  return side(a, b, c) * side(a, b, d) < 0 && side(c, d, a) * side(c, d, b) < 0;
-};
-
-// whether a rect (as [west, north, east, south]) and a polygon (rings of [x, y]) overlap at all: a vertex of one inside the other, or their edges crossing
-const rectTouchesPolygon = ([w, n, e, s], rings) => {
-  const corners = [
-    [w, n],
-    [e, n],
-    [e, s],
-    [w, s],
-  ];
-  const vertexInside = rings.some((ring) =>
-    ring.some(([x, y]) => x >= w && x <= e && y >= n && y <= s),
-  );
-  if (vertexInside || corners.some((c) => inPolygon(c, rings))) return true;
-  const rectEdges = corners.map((c, i) => [c, corners[(i + 1) % 4]]);
-  return rings.some((ring) =>
-    ring
-      .slice(1)
-      .some((p, i) =>
-        rectEdges.some((edge) => segmentsCross(edge, [ring[i], p])),
-      ),
-  );
-};
-
 // how many pages of `size` pixels, overlapping by `step`, cover `span` pixels
 const pagesAcross = (span, size, step) =>
   Math.max(1, Math.ceil((span - size) / step) + 1);
@@ -90,20 +57,11 @@ export const numberPages = (cells) => {
   });
 };
 
-// Given an area (a GeoJSON Polygon or MultiPolygon) and the pages' { zoom, width, height } (in CSS pixels) and overlap (a fraction of a page), returns the pages covering it as { cells, rows, cols }, the grid centered on the area. Each cell is { number, row, col, center: [lng, lat], bounds: [[west, south], [east, north]], neighbors: { north, south, east, west } } (page numbers), numbered across then down, leaving out pages that would be entirely outside the area.
-export const atlasGrid = (geometry, { zoom, width, height, overlap }) => {
-  const polygons = polygonsOf(geometry).map((rings) =>
-    rings.map((ring) => ring.map((c) => Object.values(toWorld(c, zoom)))),
-  );
-  const points = polygons.flat(2);
-  const xs = points.map(([x]) => x);
-  const ys = points.map(([, y]) => y);
-  const [minX, maxX, minY, maxY] = [
-    Math.min(...xs),
-    Math.max(...xs),
-    Math.min(...ys),
-    Math.max(...ys),
-  ];
+// Given an area's bounds ([[west, south], [east, north]]) and the pages' { zoom, width, height } (in CSS pixels) and overlap (a fraction of a page), returns the pages covering it as { cells, rows, cols }, the grid centered on the area. Each cell is { number, row, col, center: [lng, lat], bounds: [[west, south], [east, north]], neighbors: { north, south, east, west } } (page numbers), numbered across then down.
+export const atlasGrid = ([sw, ne], { zoom, width, height, overlap }) => {
+  // y grows southward in Web Mercator's world pixels
+  const { x: minX, y: maxY } = toWorld(sw, zoom);
+  const { x: maxX, y: minY } = toWorld(ne, zoom);
   const stepX = width * (1 - overlap);
   const stepY = height * (1 - overlap);
   const cols = pagesAcross(maxX - minX, width, stepX);
@@ -116,8 +74,6 @@ export const atlasGrid = (geometry, { zoom, width, height, overlap }) => {
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
       const [w, n] = [x0 + col * stepX, y0 + row * stepY];
-      const rect = [w, n, w + width, n + height];
-      if (!polygons.some((rings) => rectTouchesPolygon(rect, rings))) continue;
       cells.push({
         row,
         col,

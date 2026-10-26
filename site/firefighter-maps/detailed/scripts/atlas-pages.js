@@ -61,7 +61,7 @@ const keyMap = ({ image, outline, rects }, pages, { numbered, current }) => {
     },
     [
       svgElement("image", { href: image, width, height }),
-      svgElement("path", { d: outline, class: "outline" }),
+      svgElement("rect", { ...outline, class: "outline" }),
       ...boxes,
     ],
   );

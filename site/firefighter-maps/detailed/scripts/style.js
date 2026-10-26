@@ -3,6 +3,7 @@ import { NO_RISK_DATA_BOUNDS, PMTILES_URL } from "./buildings.js";
 import { OVERTURE_ADDRESSES_URL, OVERTURE_BUILDINGS_URL } from "./overture.js";
 import { FLAME_LENGTH_URL } from "./rasters.js";
 import {
+  BACKGROUND_LAYER,
   HILLSHADE_LAYER,
   FLAME_LENGTH_LAYER,
   WATER_LAYER,
@@ -116,6 +117,7 @@ export const STYLE = {
   glyphs: "https://fonts.undpgeohub.org/fonts/{fontstack}/{range}.pbf",
   // draw order, bottom to top -- reorder these to change what draws over what. Labels/symbols are also placed in reverse of this order, so the ones nearer the end win when they'd collide.
   layers: [
+    BACKGROUND_LAYER,
     HILLSHADE_LAYER,
     FLAME_LENGTH_LAYER,
     WATER_LAYER,

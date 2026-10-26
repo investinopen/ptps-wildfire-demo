@@ -470,7 +470,7 @@ body {
   }
 }
 
-/* the county atlas (see atlas.js) */
+/* printing an area as an atlas (see atlas.js) */
 .sidebar-button {
   min-height: 32px;
   padding: 6px 10px;
