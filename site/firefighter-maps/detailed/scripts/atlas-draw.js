@@ -32,7 +32,7 @@ const LAYERS = [
 const MIN_DRAG_PX = 10;
 
 // [[west, south], [east, north]] as a GeoJSON polygon
-export const boundsPolygon = ([[w, s], [e, n]]) => ({
+const boundsPolygon = ([[w, s], [e, n]]) => ({
   type: "Polygon",
   coordinates: [
     [

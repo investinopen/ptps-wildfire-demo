@@ -1,6 +1,6 @@
 // Printing an area as an atlas: draw a rectangle on the map (atlas-draw.js) and pick a scale, and the area is split into a grid of pages (atlas-grid.js), each drawn by the map itself (atlas-capture.js) and laid out for printing (atlas-pages.js), after an index page if there's more than one. Pages with no roads or buildings on them are left out.
 import { atlasGrid, numberPages, zoomForScale } from "./atlas-grid.js";
-import { bindAreaDrawing, boundsPolygon } from "./atlas-draw.js";
+import { bindAreaDrawing } from "./atlas-draw.js";
 import { HOUSENUMBERS_LAYER } from "./layers.js";
 import { captureIndex, capturePage, withMapSize } from "./atlas-capture.js";
 import {
@@ -42,7 +42,7 @@ export const bindAtlas = (map) => {
   const printButton = document.getElementById("atlas-print");
   const atlas = document.getElementById("atlas");
 
-  // the area drawn, as { bounds, geometry, latitude }
+  // the area drawn, as { bounds, latitude }
   let area;
   // its pages at the scale picked, as { zoom, scale, cells }
   let layout;
@@ -69,7 +69,7 @@ export const bindAtlas = (map) => {
     discard();
     const scale = Number(scaleSelect.value);
     const zoom = zoomForScale(area.latitude, scale);
-    const { cells } = atlasGrid(area.geometry, {
+    const { cells } = atlasGrid(area.bounds, {
       zoom,
       ...PAGE_MAP_SIZE,
       overlap: OVERLAP,
@@ -110,11 +110,7 @@ export const bindAtlas = (map) => {
 
   const drawn = (bounds) => {
     banner.hidden = true;
-    area = {
-      bounds,
-      geometry: boundsPolygon(bounds),
-      latitude: (bounds[0][1] + bounds[1][1]) / 2,
-    };
+    area = { bounds, latitude: (bounds[0][1] + bounds[1][1]) / 2 };
     showScales();
     showLayout();
     dialog.showModal();
@@ -169,7 +165,7 @@ export const bindAtlas = (map) => {
     const pages = numberPages(drawnPages);
     setStatus("Drawing the index page…");
     const index = await withMapSize(map, INDEX_MAP_SIZE, () =>
-      captureIndex(map, area.geometry, pages, { padding: INDEX_PADDING }),
+      captureIndex(map, area.bounds, pages, { padding: INDEX_PADDING }),
     );
     if (thisRun.cancelled) {
       URL.revokeObjectURL(index.image);

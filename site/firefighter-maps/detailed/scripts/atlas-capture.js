@@ -99,21 +99,16 @@ export const withMapSize = async (map, { width, height }, draw) => {
   }
 };
 
-// Draws the whole area to fit, for the index page: its image, the town(s) in it (from the sidebar heading -- see places.js), and where the area's outline and each page fall on it, in its CSS pixels.
-export const captureIndex = async (map, geometry, cells, { padding }) => {
-  const rings =
-    geometry.type === "Polygon"
-      ? geometry.coordinates
-      : geometry.coordinates.flat();
-  const lngs = rings.flat().map(([lng]) => lng);
-  const lats = rings.flat().map(([, lat]) => lat);
-  map.fitBounds(
-    [
-      [Math.min(...lngs), Math.min(...lats)],
-      [Math.max(...lngs), Math.max(...lats)],
-    ],
-    { padding, duration: 0, bearing: 0, pitch: 0 },
-  );
+// where [[west, south], [east, north]] falls on the map, as a { x, y, width, height } rect in its CSS pixels
+const projectBounds = (map, [sw, ne]) => {
+  const a = map.project(sw);
+  const b = map.project(ne);
+  return { x: a.x, y: b.y, width: b.x - a.x, height: a.y - b.y };
+};
+
+// Draws the whole area (given as [[west, south], [east, north]]) to fit, for the index page: its image, the town(s) in it (from the sidebar heading -- see places.js), and where the area and each page fall on it, as rects in its CSS pixels.
+export const captureIndex = async (map, bounds, cells, { padding }) => {
+  map.fitBounds(bounds, { padding, duration: 0, bearing: 0, pitch: 0 });
   // zoomed out to a whole area, the shading and flame length hatching cover everything, so the page numbers and towns are hard to read
   const visibility = INDEX_HIDDEN_LAYERS.map((id) =>
     map.getLayoutProperty(id, "visibility"),
@@ -136,30 +131,19 @@ export const captureIndex = async (map, geometry, cells, { padding }) => {
       map.setLayoutProperty(id, "visibility", visibility[i] ?? "visible"),
     );
   }
-  const outline = rings
-    .map(
-      (ring) =>
-        "M" +
-        ring
-          .map((c) => {
-            const { x, y } = map.project(c);
-            return `${x.toFixed(1)},${y.toFixed(1)}`;
-          })
-          .join("L") +
-        "Z",
-    )
-    .join("");
   const rects = new Map(
-    cells.map(({ row, col, bounds: [sw, ne] }) => {
-      const a = map.project(sw);
-      const b = map.project(ne);
-      return [
-        `${row},${col}`,
-        { x: a.x, y: b.y, width: b.x - a.x, height: a.y - b.y },
-      ];
-    }),
+    cells.map((cell) => [
+      `${cell.row},${cell.col}`,
+      projectBounds(map, cell.bounds),
+    ]),
   );
-  return { image, attribution, places, outline, rects };
+  return {
+    image,
+    attribution,
+    places,
+    outline: projectBounds(map, bounds),
+    rects,
+  };
 };
 
 // MapLibre's attribution only lists sources that have drawn something, and only rechecks on a few events -- so a source that loaded after the last one stays left off. This is one of those events (a source shown/hidden), so the attribution copied onto each page is complete.
