@@ -545,7 +545,7 @@ export const HOUSENUMBERS_LAYER = {
   type: "symbol",
   source: "roadsSource",
   "source-layer": "housenumber",
-  // from the same zoom as the access hazards below, rather than one closer in, so a printed county atlas (see atlas.js) can be drawn at it with addresses on it -- in rural areas they're spread out enough to stay readable
+  // from the same zoom as the access hazards below, rather than one closer in, so printed atlas pages (see atlas.js) can be drawn at it with addresses on it -- in rural areas they're spread out enough to stay readable
   minzoom: ONEWAY_ARROWS_LAYER.minzoom,
   layout: {
     visibility: "visible",

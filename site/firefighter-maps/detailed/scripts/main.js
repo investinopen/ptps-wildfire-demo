@@ -72,7 +72,7 @@ const map = new maplibregl.Map({
   zoom: ZOOM,
   maxBounds: MAX_BOUNDS,
   minZoom: MIN_ZOOM,
-  // keeps the last frame drawn, so the county atlas can save it as an image (see atlas-capture.js)
+  // keeps the last frame drawn, so atlas pages can be saved from it as images (see atlas-capture.js)
   canvasContextAttributes: { preserveDrawingBuffer: true },
 });
 
