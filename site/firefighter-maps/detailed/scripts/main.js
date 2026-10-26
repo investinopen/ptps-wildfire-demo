@@ -76,14 +76,13 @@ const map = new maplibregl.Map({
   canvasContextAttributes: { preserveDrawingBuffer: true },
 });
 
-// the symbols drawn in icons.js
-map.on("load", () => {
-  for (const name of Object.keys(ICONS)) {
-    map.addImage(name, iconImageData(name), {
-      pixelRatio: ICON_PIXEL_RATIO,
-      ...(ICONS[name].stretchable ? SIGN_BOX_OPTIONS : {}),
-    });
-  }
+// the symbols drawn in icons.js, added as layers ask for them -- adding them all on "load" was too late for the first tiles, which logged them as missing
+map.setMissingStyleImageResolver((name) => {
+  if (!ICONS[name]) return;
+  map.addImage(name, iconImageData(name), {
+    pixelRatio: ICON_PIXEL_RATIO,
+    ...(ICONS[name].stretchable ? SIGN_BOX_OPTIONS : {}),
+  });
 });
 bindPlaceHeading(map);
 bindOverviewMap(map);
