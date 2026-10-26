@@ -2,6 +2,10 @@
 
 Only includes notable updates.
 
+## 2026-10-25
+
+- **[Detailed firefighter map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-maps/detailed/):** Show county lines.
+
 ## 2026-10-24
 
 - **[Detailed firefighter map](https://investinopen.github.io/ptps-wildfire-demo/firefighter-maps/detailed/):** Draw Alaska and Hawaii's buildings from Overture Maps rather than OpenStreetMap, which was missing nearly all of them outside of towns.

@@ -87,6 +87,7 @@ export const bindLayerToggles = (map) => {
     "trail-labels",
   ]);
   bindLayerToggle("state-lines-toggle", ["state-lines"]);
+  bindLayerToggle("county-lines-toggle", ["county-lines"]);
   bindLayerToggle("hydrants-toggle", ["hydrants"]);
   bindLayerToggle("water-sources-toggle", ["water-sources"]);
   bindLayerToggle("pools-toggle", ["pools"]);

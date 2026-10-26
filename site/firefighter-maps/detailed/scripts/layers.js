@@ -77,6 +77,22 @@ export const STATE_LINES_LAYER = {
   },
 };
 
+// county lines, from the same tiles as the state lines (which have them from zoom 9), thinner and in a dash-dot-dot so they read as the lesser boundary. The tiles keep one line per stretch of boundary, at its highest level, so where a county line is also a state line only the state line is drawn.
+export const COUNTY_LINES_LAYER = {
+  ...STATE_LINES_LAYER,
+  id: "county-lines",
+  filter: [
+    "all",
+    ["==", ["get", "admin_level"], 6],
+    ["!=", ["get", "maritime"], 1],
+  ],
+  paint: {
+    ...STATE_LINES_LAYER.paint,
+    "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.75, 18, 2],
+    "line-dasharray": [6, 2, 1, 2, 1, 2],
+  },
+};
+
 // actual drivable road classes -- excluding this way (an allowlist) rather than just
 // excluding driveways/tracks/paths means rail/transit/tram/ferry/aerialway lines,
 // which the previous exclusion-only filter let through, don't render as "roads" too
