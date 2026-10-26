@@ -33,7 +33,7 @@ registerRoute(
     plugins: [
       cacheableResponse,
       // room for the page plus each of its script and data files
-      new ExpirationPlugin({ maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 }),
+      new ExpirationPlugin({ maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 }),
     ],
   }),
 );
