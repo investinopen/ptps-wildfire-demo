@@ -2,13 +2,21 @@
 import * as maplibregl from "https://cdn.jsdelivr.net/npm/maplibre-gl@6/dist/maplibre-gl.mjs";
 
 const STYLE_URL = "https://tiles.openfreemap.org/styles/positron";
+// Positron's route shield layers compare each road's ref_length to a number, but roads without a ref have none, which logs a warning and fails the filter. Defaulting it to a length too long for a shield fails the filter the same way, quietly.
+const REF_LENGTH = '["get","ref_length"]';
+const withRefLengthDefault = (_, style) =>
+  JSON.parse(
+    JSON.stringify(style).replaceAll(
+      REF_LENGTH,
+      `["coalesce",${REF_LENGTH},99]`,
+    ),
+  );
 // how much further out the overview is than the main map
 const ZOOM_OUT = 4;
 
 export const bindOverviewMap = (map) => {
   const overview = new maplibregl.Map({
     container: "overview-map",
-    style: STYLE_URL,
     // panning only; zooming stays with the main map, which the overview follows
     scrollZoom: false,
     boxZoom: false,
@@ -21,6 +29,7 @@ export const bindOverviewMap = (map) => {
     center: map.getCenter(),
     zoom: Math.max(0, map.getZoom() - ZOOM_OUT),
   });
+  overview.setStyle(STYLE_URL, { transformStyle: withRefLengthDefault });
 
   const viewBox = () => {
     const bounds = map.getBounds();
