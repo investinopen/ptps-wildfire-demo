@@ -51,27 +51,20 @@ const settle = (map) =>
     start();
   });
 
-// the map's canvas as an image, as an object URL -- needs the map created with preserveDrawingBuffer (see main.js), so the canvas still has its last frame in it. On white, since the style has no background of its own, and a JPEG would turn the transparent parts black.
-const snapshot = (map) => {
-  const canvas = map.getCanvas();
-  const flat = document.createElement("canvas");
-  flat.width = canvas.width;
-  flat.height = canvas.height;
-  const context = flat.getContext("2d");
-  context.fillStyle = "#ffffff";
-  context.fillRect(0, 0, flat.width, flat.height);
-  context.drawImage(canvas, 0, 0);
-  return new Promise((resolve, reject) =>
-    flat.toBlob(
-      (blob) =>
-        blob
-          ? resolve(URL.createObjectURL(blob))
-          : reject(new Error("couldn't save the map as an image")),
-      "image/jpeg",
-      JPEG_QUALITY,
-    ),
+// the map's canvas as an image, as an object URL -- needs the map created with preserveDrawingBuffer (see main.js), so the canvas still has its last frame in it. The style's white background layer (see layers.js) keeps the JPEG's gaps from coming out black.
+const snapshot = (map) =>
+  new Promise((resolve, reject) =>
+    map
+      .getCanvas()
+      .toBlob(
+        (blob) =>
+          blob
+            ? resolve(URL.createObjectURL(blob))
+            : reject(new Error("couldn't save the map as an image")),
+        "image/jpeg",
+        JPEG_QUALITY,
+      ),
   );
-};
 
 // Runs `draw` with the map resized to { width, height } CSS pixels and its controls hidden (so labels don't avoid them -- see labels.js), then puts the map back how it was.
 export const withMapSize = async (map, { width, height }, draw) => {

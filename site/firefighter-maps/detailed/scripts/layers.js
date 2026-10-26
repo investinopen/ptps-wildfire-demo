@@ -10,6 +10,13 @@ import { ROAD, STATE_LINE } from "./colors.js";
 
 // one const per layer -- keeping these standalone makes the draw order (the `layers`
 // array in main.js) easy to see and rearrange without hunting through each definition
+// white under everything, like the page around the map -- so the map's canvas is opaque, and an atlas page saved from it as a JPEG (see atlas-capture.js) doesn't turn its gaps black
+export const BACKGROUND_LAYER = {
+  id: "background",
+  type: "background",
+  paint: { "background-color": "#ffffff" },
+};
+
 export const HILLSHADE_LAYER = {
   id: "hillshade",
   type: "hillshade",
